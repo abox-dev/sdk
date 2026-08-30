@@ -27,6 +27,4 @@ export default defineConfig({
       (f) => !excludedPackages.includes(f)
     ),
   },
-  // Copy template files to dist/templates
-  copy: [{ from: 'src/templates', to: 'dist' }],
 })
