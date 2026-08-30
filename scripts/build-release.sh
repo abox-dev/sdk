@@ -29,7 +29,10 @@ uv build --project "$root_dir/packages/code-interpreter-python" \
 
 (
   cd "$release_dir"
-  find npm pypi pypi-code-interpreter -type f -print0 \
-    | sort -z \
-    | xargs -0 shasum -a 256 > SHA256SUMS
+  while IFS= read -r -d '' artifact; do
+    digest=$(shasum -a 256 "$artifact" | cut -d ' ' -f 1)
+    printf '%s  %s\n' "$digest" "${artifact##*/}"
+  done < <(
+    find npm pypi pypi-code-interpreter -type f -print0 | sort -z
+  ) > SHA256SUMS
 )

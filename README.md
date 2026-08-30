@@ -6,13 +6,13 @@
 
 Official JavaScript, Python, and CLI clients for running isolated AgentBox sandboxes and code interpreters.
 
-| Package | Install | Import |
-|---|---|---|
-| JavaScript SDK | `npm install @abox-dev/sdk` | `@abox-dev/sdk` |
-| Python SDK | `pip install abox-sdk` | `agentbox` |
+| Package                     | Install                                  | Import                       |
+| --------------------------- | ---------------------------------------- | ---------------------------- |
+| JavaScript SDK              | `npm install @abox-dev/sdk`              | `@abox-dev/sdk`              |
+| Python SDK                  | `pip install abox-sdk`                   | `agentbox`                   |
 | JavaScript Code Interpreter | `npm install @abox-dev/code-interpreter` | `@abox-dev/code-interpreter` |
-| Python Code Interpreter | `pip install abox-code-interpreter` | `agentbox_code_interpreter` |
-| CLI | `npm install --global @abox-dev/cli` | `agentbox` |
+| Python Code Interpreter     | `pip install abox-code-interpreter`      | `agentbox_code_interpreter`  |
+| CLI                         | `npm install --global @abox-dev/cli`     | `agentbox`                   |
 
 ## Quick start
 
@@ -91,5 +91,9 @@ AGENTBOX_SANDBOX_URL=http://localhost:3002 \
 ```
 
 The runtime smoke covers the JavaScript and Python sync/async SDKs, both Code Interpreter packages, the CLI lifecycle, private traffic routing, and a real temporary template build. It removes the test sandboxes and template when it finishes.
+
+After publishing, run the same checks from clean npm and PyPI installs with
+`./scripts/test-published-runtime.sh`. It defaults to version `0.1.0` and does
+not use workspace links or local package artifacts.
 
 AgentBox SDK is derived from upstream work described in [UPSTREAM.md](UPSTREAM.md). Licensing notices are in [LICENSE](LICENSE) and [NOTICE](NOTICE).

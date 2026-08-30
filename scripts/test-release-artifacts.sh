@@ -6,6 +6,17 @@ release_dir=${1:-"$root_dir/release"}
 test_dir=$(mktemp -d)
 trap 'rm -rf "$test_dir"' EXIT
 
+mkdir -p "$test_dir/checksums"
+find "$release_dir"/npm \
+  "$release_dir"/pypi \
+  "$release_dir"/pypi-code-interpreter \
+  -type f -exec cp {} "$test_dir/checksums" \;
+cp "$release_dir/SHA256SUMS" "$test_dir/checksums/SHA256SUMS"
+(
+  cd "$test_dir/checksums"
+  shasum -a 256 -c SHA256SUMS
+)
+
 mkdir -p "$test_dir/npm"
 cd "$test_dir/npm"
 npm init --yes >/dev/null
