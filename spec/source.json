@@ -1,0 +1,10 @@
+{
+  "source": "agentbox/mono",
+  "revision": "559cf23aa80d22eeb1bd2769d4ab6646b8e40fcb",
+  "files": {
+    "spec/openapi.yml": "9e4e6cbbb135d9319da25fcfe82ed90081f146630bed5e543d016d6d5dcf4ba8",
+    "spec/envd/envd.yaml": "dab04a541720b813e837eb803074a8ae7e5611411b79a619bddf676e7e5fb324",
+    "spec/envd/filesystem/filesystem.proto": "1d862617d00478673b68953ee9849e9a500b3307796d76e3f0567c95da69f77b",
+    "spec/envd/process/process.proto": "8edd9358c7dbfcad96796b3f0ed8d14c262b8b14d6bc7d5e84d468941511b8e0"
+  }
+}

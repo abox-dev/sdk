@@ -1,0 +1,4 @@
+packages/python-sdk/agentbox/api/client/** linguist-generated=true
+packages/python-sdk/agentbox/envd/filesystem/** linguist-generated=true
+packages/python-sdk/agentbox/envd/process/** linguist-generated=true
+**/*.gen.ts linguist-generated=true

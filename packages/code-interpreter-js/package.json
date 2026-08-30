@@ -1,0 +1,78 @@
+{
+  "name": "@abox-dev/code-interpreter",
+  "version": "0.1.0",
+  "packageManager": "pnpm@10.34.5",
+  "description": "AgentBox Code Interpreter - Stateful code execution",
+  "homepage": "https://docs.agentbox.ru/en/sdk/code-interpreter/",
+  "license": "MIT",
+  "author": {
+    "name": "RetailDriver LLC",
+    "url": "https://agentbox.ru"
+  },
+  "bugs": "https://github.com/abox-dev/sdk/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abox-dev/sdk",
+    "directory": "packages/code-interpreter-js"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "prepublishOnly": "pnpm build",
+    "build": "tsc --noEmit && tsdown",
+    "dev": "tsdown --watch",
+    "test": "vitest run tests/sandboxUrl.test.ts",
+    "test:integration": "vitest run --exclude tests/sandboxUrl.test.ts",
+    "test:coverage": "vitest run --coverage",
+    "test:bun": "bunx --bun vitest run",
+    "test:deno": "deno run -A ./node_modules/vitest/vitest.mjs run",
+    "test:cf": "vitest run --config tests/runtimes/cloudflare/vitest.config.mts",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint --config ../../.oxlintrc.json src tests",
+    "format": "prettier --write src/ tests/",
+    "format:check": "prettier --check src/ tests/"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.18.7",
+    "@types/node": "catalog:",
+    "@typescript/native": "catalog:",
+    "dotenv": "^16.4.5",
+    "tsdown": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "package.json",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "keywords": [
+    "agentbox",
+    "ai-agents",
+    "agents",
+    "ai",
+    "code-interpreter",
+    "stateful-sandbox",
+    "stateful-serverless",
+    "sandbox",
+    "code",
+    "runtime",
+    "vm"
+  ],
+  "engines": {
+    "node": ">=20.18.1 <21 || >=22"
+  },
+  "browserslist": [
+    "defaults"
+  ],
+  "dependencies": {
+    "@abox-dev/sdk": "workspace:^"
+  }
+}

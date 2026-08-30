@@ -1,0 +1,120 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: 0.10.12
+          enable-cache: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pnpm install --frozen-lockfile
+      - run: uv sync --project packages/python-sdk --frozen
+      - run: uv sync --project packages/code-interpreter-python --frozen
+      - run: node scripts/check-release-versions.mjs "${GITHUB_REF_NAME}"
+      - run: ./scripts/build-release.sh
+      - run: node scripts/check-public-artifacts.mjs release
+      - run: ./scripts/test-release-artifacts.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ github.ref_name }}
+          path: release
+          if-no-files-found: error
+
+  npm:
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-${{ github.ref_name }}
+          path: release
+      - run: node scripts/publish-npm.mjs release/npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  pypi-core:
+    needs: build
+    runs-on: ubuntu-24.04
+    environment: pypi
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-${{ github.ref_name }}
+          path: release
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/check-pypi-digests.py release/pypi abox-sdk "${GITHUB_REF_NAME#v}"
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: release/pypi
+          skip-existing: true
+
+  pypi-code-interpreter:
+    needs: build
+    runs-on: ubuntu-24.04
+    environment: pypi-code-interpreter
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-${{ github.ref_name }}
+          path: release
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/check-pypi-digests.py release/pypi-code-interpreter abox-code-interpreter "${GITHUB_REF_NAME#v}"
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: release/pypi-code-interpreter
+          skip-existing: true
+
+  github-release:
+    needs: [npm, pypi-core, pypi-code-interpreter]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-${{ github.ref_name }}
+          path: release
+      - uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            release/SHA256SUMS
+            release/npm/*.tgz
+            release/pypi/*
+            release/pypi-code-interpreter/*

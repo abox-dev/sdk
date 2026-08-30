@@ -1,0 +1,12 @@
+AgentBox SDK
+Copyright 2026 RetailDriver LLC
+
+This product includes software developed by FOUNDRYLABS, INC. and published
+as the E2B SDK. The source used to create this derivative work was commit
+5a56c87e9db0e221b138662805af7743e75f1082 from:
+
+    https://github.com/e2b-dev/E2B
+
+The repository root is distributed under the Apache License 2.0. Individual
+packages retain their upstream MIT license and copyright notice. See LICENSE,
+the package LICENSE files, and UPSTREAM.md.

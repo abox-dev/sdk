@@ -1,0 +1,14 @@
+{
+  "name": "@abox-dev/code-interpreter-python",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "test": "uv run pytest -n 2 --verbose -x tests/test_sandbox_url.py",
+    "test:integration": "uv run pytest -n 2 --verbose -x",
+    "postVersion": "uv version $(pnpm pkg get version --workspaces=false | tr -d \\\")",
+    "typecheck": "uv run make typecheck",
+    "lint": "uv run make lint",
+    "format": "uv run make format",
+    "format:check": "uv run make lint"
+  }
+}
