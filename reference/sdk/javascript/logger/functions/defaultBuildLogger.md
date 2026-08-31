@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / defaultBuildLogger
+[agentbox-sdk-monorepo](../README.md) / defaultBuildLogger
 
 # Function: defaultBuildLogger()
 

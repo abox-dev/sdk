@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / FilesystemReadOpts
+[agentbox-sdk-monorepo](../README.md) / FilesystemReadOpts
 
 # Interface: FilesystemReadOpts
 
@@ -6,7 +6,7 @@ Options for reading files from the sandbox filesystem.
 
 ## Extends
 
-- [`FilesystemRequestOpts`](FilesystemRequestOpts.md)
+- `FilesystemRequestOpts`
 
 ## Properties
 
@@ -32,7 +32,7 @@ Timeout for requests to the API in **milliseconds**.
 
 #### Inherited from
 
-[`FilesystemRequestOpts`](FilesystemRequestOpts.md).[`requestTimeoutMs`](FilesystemRequestOpts.md#requesttimeoutms)
+`FilesystemRequestOpts.requestTimeoutMs`
 
 ***
 
@@ -46,7 +46,7 @@ returned promise rejects with an `AbortError`.
 
 #### Inherited from
 
-[`FilesystemRequestOpts`](FilesystemRequestOpts.md).[`signal`](FilesystemRequestOpts.md#signal)
+`FilesystemRequestOpts.signal`
 
 ***
 
@@ -71,4 +71,4 @@ This affects the resolution of relative paths and ownership of the created files
 
 #### Inherited from
 
-[`FilesystemRequestOpts`](FilesystemRequestOpts.md).[`user`](FilesystemRequestOpts.md#user)
+`FilesystemRequestOpts.user`

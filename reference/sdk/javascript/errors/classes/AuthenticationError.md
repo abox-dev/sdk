@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / AuthenticationError
+[agentbox-sdk-monorepo](../README.md) / AuthenticationError
 
 # Class: AuthenticationError
 

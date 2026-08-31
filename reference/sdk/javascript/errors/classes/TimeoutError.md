@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / TimeoutError
+[agentbox-sdk-monorepo](../README.md) / TimeoutError
 
 # Class: TimeoutError
 

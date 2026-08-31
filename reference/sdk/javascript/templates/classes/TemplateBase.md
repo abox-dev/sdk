@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / TemplateBase
+[agentbox-sdk-monorepo](../README.md) / TemplateBase
 
 # Class: TemplateBase
 

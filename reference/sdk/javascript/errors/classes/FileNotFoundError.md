@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / FileNotFoundError
+[agentbox-sdk-monorepo](../README.md) / FileNotFoundError
 
 # Class: FileNotFoundError
 

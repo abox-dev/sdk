@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / TemplateBuilder
+[agentbox-sdk-monorepo](../README.md) / TemplateBuilder
 
 # Interface: TemplateBuilder
 

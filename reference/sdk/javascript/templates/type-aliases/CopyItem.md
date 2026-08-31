@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / CopyItem
+[agentbox-sdk-monorepo](../README.md) / CopyItem
 
 # Type Alias: CopyItem
 

@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / TemplateClass
+[agentbox-sdk-monorepo](../README.md) / TemplateClass
 
 # Type Alias: TemplateClass
 

@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / LogEntryStart
+[agentbox-sdk-monorepo](../README.md) / LogEntryStart
 
 # Class: LogEntryStart
 

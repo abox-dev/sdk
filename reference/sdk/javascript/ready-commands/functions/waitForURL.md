@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / waitForURL
+[agentbox-sdk-monorepo](../README.md) / waitForURL
 
 # Function: waitForURL()
 

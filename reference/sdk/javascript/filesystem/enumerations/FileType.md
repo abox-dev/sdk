@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / FileType
+[agentbox-sdk-monorepo](../README.md) / FileType
 
 # Enumeration: FileType
 

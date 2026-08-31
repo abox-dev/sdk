@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / SandboxError
+[agentbox-sdk-monorepo](../README.md) / SandboxError
 
 # Class: SandboxError
 
@@ -12,13 +12,13 @@ Thrown when general sandbox errors occur.
 
 ## Extended by
 
-- [`TimeoutError`](TimeoutError.md)
+- [`FileNotFoundError`](FileNotFoundError.md)
 - [`InvalidArgumentError`](InvalidArgumentError.md)
 - [`NotEnoughSpaceError`](NotEnoughSpaceError.md)
-- [`FileNotFoundError`](FileNotFoundError.md)
+- [`RateLimitError`](RateLimitError.md)
 - [`SandboxNotFoundError`](SandboxNotFoundError.md)
 - [`TemplateError`](TemplateError.md)
-- [`RateLimitError`](RateLimitError.md)
+- [`TimeoutError`](TimeoutError.md)
 
 ## Constructors
 

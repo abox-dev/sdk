@@ -1,20 +1,37 @@
 {
   "javascript": {
-    "errors": ["packages/js-sdk/src/errors.ts"],
-    "sandbox": [
-      "packages/js-sdk/src/sandbox/index.ts",
-      "packages/js-sdk/src/sandbox/sandboxApi.ts"
-    ],
-    "commands": ["packages/js-sdk/src/sandbox/commands/index.ts"],
-    "filesystem": ["packages/js-sdk/src/sandbox/filesystem/index.ts"],
-    "templates": ["packages/js-sdk/src/template/index.ts"],
-    "logger": ["packages/js-sdk/src/template/logger.ts"],
-    "ready-commands": ["packages/js-sdk/src/template/readycmd.ts"],
-    "code-interpreter": [
-      "packages/code-interpreter-js/src/sandbox.ts",
-      "packages/code-interpreter-js/src/messaging.ts",
-      "packages/code-interpreter-js/src/charts.ts"
-    ]
+    "errors": {
+      "entryPoint": "reference-config/javascript/errors.ts",
+      "tsconfig": "reference-config/typedoc.js-sdk.json"
+    },
+    "sandbox": {
+      "entryPoint": "reference-config/javascript/sandbox.ts",
+      "tsconfig": "reference-config/typedoc.js-sdk.json"
+    },
+    "commands": {
+      "entryPoint": "reference-config/javascript/commands.ts",
+      "tsconfig": "reference-config/typedoc.js-sdk.json"
+    },
+    "filesystem": {
+      "entryPoint": "reference-config/javascript/filesystem.ts",
+      "tsconfig": "reference-config/typedoc.js-sdk.json"
+    },
+    "templates": {
+      "entryPoint": "reference-config/javascript/templates.ts",
+      "tsconfig": "reference-config/typedoc.js-sdk.json"
+    },
+    "logger": {
+      "entryPoint": "reference-config/javascript/logger.ts",
+      "tsconfig": "reference-config/typedoc.js-sdk.json"
+    },
+    "ready-commands": {
+      "entryPoint": "reference-config/javascript/ready-commands.ts",
+      "tsconfig": "reference-config/typedoc.js-sdk.json"
+    },
+    "code-interpreter": {
+      "entryPoint": "reference-config/javascript/code-interpreter.ts",
+      "tsconfig": "reference-config/typedoc.code-interpreter.json"
+    }
   },
   "python": {
     "exceptions": ["agentbox.exceptions"],

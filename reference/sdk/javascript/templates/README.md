@@ -1,4 +1,4 @@
-# @abox-dev/sdk
+# agentbox-sdk-monorepo
 
 ## Classes
 

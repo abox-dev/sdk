@@ -1,4 +1,4 @@
-# @abox-dev/sdk
+# agentbox-sdk-monorepo
 
 ## Classes
 
@@ -13,7 +13,3 @@
 - [SandboxNotFoundError](classes/SandboxNotFoundError.md)
 - [TemplateError](classes/TemplateError.md)
 - [TimeoutError](classes/TimeoutError.md)
-
-## Functions
-
-- [formatSandboxTimeoutError](functions/formatSandboxTimeoutError.md)

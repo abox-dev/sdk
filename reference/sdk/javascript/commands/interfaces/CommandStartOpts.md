@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / CommandStartOpts
+[agentbox-sdk-monorepo](../README.md) / CommandStartOpts
 
 # Interface: CommandStartOpts
 
@@ -15,7 +15,7 @@ Options for starting a new command.
 > `optional` **background?**: `boolean`
 
 If true, starts command in the background and the method returns immediately.
-You can use CommandHandle.wait to wait for the command to finish.
+You can use [CommandHandle.wait](CommandHandle.md#wait) to wait for the command to finish.
 
 ***
 
@@ -119,7 +119,7 @@ returned promise rejects with an `AbortError`.
 
 > `optional` **stdin?**: `boolean`
 
-If true, command stdin is kept open and you can send data to it using [Commands.sendStdin](../classes/Commands.md#sendstdin) or CommandHandle.sendStdin.
+If true, command stdin is kept open and you can send data to it using [Commands.sendStdin](Commands.md#sendstdin) or [CommandHandle.sendStdin](CommandHandle.md#sendstdin).
 
 #### Default
 

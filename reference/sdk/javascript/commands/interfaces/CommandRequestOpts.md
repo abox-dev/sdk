@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / CommandRequestOpts
+[agentbox-sdk-monorepo](../README.md) / CommandRequestOpts
 
 # Interface: CommandRequestOpts
 

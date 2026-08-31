@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / TemplateBuildStatus
+[agentbox-sdk-monorepo](../README.md) / TemplateBuildStatus
 
 # Type Alias: TemplateBuildStatus
 

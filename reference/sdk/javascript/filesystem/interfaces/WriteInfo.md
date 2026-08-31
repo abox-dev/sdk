@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / WriteInfo
+[agentbox-sdk-monorepo](../README.md) / WriteInfo
 
 # Interface: WriteInfo
 

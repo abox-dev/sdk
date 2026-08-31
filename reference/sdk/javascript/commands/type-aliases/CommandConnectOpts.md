@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / CommandConnectOpts
+[agentbox-sdk-monorepo](../README.md) / CommandConnectOpts
 
 # Type Alias: CommandConnectOpts
 

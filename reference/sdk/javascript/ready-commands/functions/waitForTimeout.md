@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / waitForTimeout
+[agentbox-sdk-monorepo](../README.md) / waitForTimeout
 
 # Function: waitForTimeout()
 

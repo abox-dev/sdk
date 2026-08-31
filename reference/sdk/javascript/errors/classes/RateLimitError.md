@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / RateLimitError
+[agentbox-sdk-monorepo](../README.md) / RateLimitError
 
 # Class: RateLimitError
 

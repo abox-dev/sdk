@@ -34,6 +34,11 @@ def main() -> None:
         for operation in operations
     }
     assert len(ids) == len(set(ids)), "operationId values must be unique"
+    for operation in operations:
+        markdown = REFERENCE / operation["markdown"]
+        assert markdown.is_file(), operation["operationId"]
+        rendered = markdown.read_text()
+        assert "## Responses" in rendered, operation["operationId"]
     assert not any(
         part in operation["path"]
         for operation in operations
@@ -67,6 +72,26 @@ def main() -> None:
     )
     assert "x-not-implemented" not in rendered_specs
     assert "SandboxEgressProxyConfig" not in rendered_specs
+
+    javascript_files = {
+        str(path.relative_to(REFERENCE))
+        for path in (REFERENCE / "sdk/javascript").rglob("*.md")
+    }
+    assert not any("mapEntryInfo" in path for path in javascript_files)
+    assert not any("formatSandboxTimeoutError" in path for path in javascript_files)
+    assert not any("deserializeChart" in path for path in javascript_files)
+    assert not any("parseOutput" in path for path in javascript_files)
+    assert not any("extractError" in path for path in javascript_files)
+
+    list_sandboxes = (
+        REFERENCE / "openapi/markdown/listSandboxes.md"
+    ).read_text()
+    assert "Metadata query used to filter the sandboxes" in list_sandboxes
+    assert "### 200" in list_sandboxes
+    create_sandbox = (
+        REFERENCE / "openapi/markdown/createSandbox.md"
+    ).read_text()
+    assert "Schema: `NewSandbox`" in create_sandbox
 
 
 if __name__ == "__main__":
