@@ -377,31 +377,6 @@ components:
         disk_total:
           type: integer
           description: Total disk space in bytes
-    CollapseResult:
-      type: object
-      description: Per-call statistics from a heap collapse
-      properties:
-        regions:
-          type: integer
-          description: Anonymous read-write regions scanned
-        chunks:
-          type: integer
-          description: 2 MiB chunks attempted
-        collapsed:
-          type: integer
-          description: Chunks whose base pages were actually migrated into a new hugepage
-            (real work)
-        alreadyHuge:
-          type: integer
-          description: Chunks MADV_COLLAPSE accepted but were already hugepages (no
-            work)
-        skipped:
-          type: integer
-          description: Chunks that could not be collapsed (empty or ineligible)
-        elapsedMs:
-          type: integer
-          format: int64
-          description: Wall-clock time spent collapsing, in milliseconds
     ComposeRequest:
       type: object
       required:
@@ -419,20 +394,6 @@ components:
         username:
           type: string
           description: User for setting ownership and resolving relative paths
-    VolumeMount:
-      type: object
-      description: Volume mount configuration
-      additionalProperties: false
-      properties:
-        nfs_target:
-          type: string
-          description: Server target address
-        path:
-          type: string
-          description: Mount path inside the sandbox
-      required:
-      - nfs_target
-      - path
   securitySchemes:
     AccessTokenAuth:
       type: apiKey

@@ -30,6 +30,18 @@ FORBIDDEN_SECURITY_SCHEMES = {
     "AuthProviderBearerAuth",
     "AuthProviderTeamAuth",
 }
+FORBIDDEN_COMPONENTS = {
+    "AdminSandboxKillResult",
+    "AdminBuildCancelResult",
+    "TeamAPIKey",
+    "CreatedTeamAPIKey",
+    "NewTeamAPIKey",
+    "UpdateTeamAPIKey",
+    "apiKeyID",
+    "accessTokenID",
+    "volumeID",
+    "VolumeMount",
+}
 
 
 def resolve_local_ref(document: dict, value: dict) -> dict:
@@ -95,6 +107,42 @@ def assert_public_schema(value) -> None:
     elif isinstance(value, list):
         for child in value:
             assert_public_schema(child)
+
+
+def component_references(value) -> set[tuple[str, str]]:
+    references = set()
+    if isinstance(value, dict):
+        reference = value.get("$ref")
+        if isinstance(reference, str) and reference.startswith("#/components/"):
+            section, name, *_ = reference.removeprefix("#/components/").split("/")
+            references.add((section, name))
+        for child in value.values():
+            references.update(component_references(child))
+    elif isinstance(value, list):
+        for child in value:
+            references.update(component_references(child))
+    return references
+
+
+def assert_only_reachable_components(document: dict) -> None:
+    components = document.get("components", {})
+    roots = {key: value for key, value in document.items() if key != "components"}
+    pending = list(component_references(roots))
+    reachable = set()
+    while pending:
+        component = pending.pop()
+        if component in reachable:
+            continue
+        reachable.add(component)
+        section, name = component
+        pending.extend(component_references(components[section][name]) - reachable)
+    published = {
+        (section, name)
+        for section, definitions in components.items()
+        if section != "securitySchemes"
+        for name in definitions
+    }
+    assert published == reachable
 
 
 def main() -> None:
@@ -192,6 +240,12 @@ def main() -> None:
         }
         assert_public_schema(document)
         assert_local_refs_resolve(document)
+        assert_only_reachable_components(document)
+        assert not any(
+            name in FORBIDDEN_COMPONENTS
+            for definitions in document.get("components", {}).values()
+            for name in definitions
+        )
 
     for operation in operations:
         document = public_documents[operation["spec"]]
@@ -246,6 +300,12 @@ def main() -> None:
     assert not any("deserializeChart" in path for path in javascript_files)
     assert not any("parseOutput" in path for path in javascript_files)
     assert not any("extractError" in path for path in javascript_files)
+    javascript_markdown = "\n".join(
+        path.read_text() for path in (REFERENCE / "sdk/javascript").rglob("*.md")
+    )
+    assert "**`Internal`**" not in javascript_markdown
+    assert "envdAccessToken" not in javascript_markdown
+    assert "protected static createSandbox" not in javascript_markdown
 
     list_sandboxes = (REFERENCE / "openapi/markdown/listSandboxes.md").read_text()
     assert "Metadata query used to filter the sandboxes" in list_sandboxes

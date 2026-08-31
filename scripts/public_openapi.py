@@ -91,6 +91,71 @@ def assert_no_removed_refs(value: Any) -> None:
             assert_no_removed_refs(child)
 
 
+def component_reference(reference: str) -> tuple[str, str] | None:
+    prefix = "#/components/"
+    if not reference.startswith(prefix):
+        return None
+    parts = reference[len(prefix) :].split("/")
+    if len(parts) < 2:
+        return None
+
+    def decode(value: str) -> str:
+        return value.replace("~1", "/").replace("~0", "~")
+
+    return decode(parts[0]), decode(parts[1])
+
+
+def collect_component_references(value: Any) -> set[tuple[str, str]]:
+    references = set()
+    if isinstance(value, dict):
+        reference = value.get("$ref")
+        if isinstance(reference, str):
+            component = component_reference(reference)
+            if component is not None:
+                references.add(component)
+        for child in value.values():
+            references.update(collect_component_references(child))
+    elif isinstance(value, list):
+        for child in value:
+            references.update(collect_component_references(child))
+    return references
+
+
+def prune_unreferenced_components(document: dict) -> None:
+    """Keep only components reachable from the published OpenAPI surface."""
+    components = document.get("components")
+    if not isinstance(components, dict):
+        return
+
+    roots = {key: value for key, value in document.items() if key != "components"}
+    pending = list(collect_component_references(roots))
+    reachable = set()
+    while pending:
+        component = pending.pop()
+        if component in reachable:
+            continue
+        section, name = component
+        definition = components.get(section, {}).get(name)
+        if definition is None:
+            raise RuntimeError(
+                f"public OpenAPI references missing component: {section}/{name}"
+            )
+        reachable.add(component)
+        pending.extend(collect_component_references(definition) - reachable)
+
+    for section in list(components):
+        definitions = components[section]
+        if not isinstance(definitions, dict):
+            continue
+        components[section] = {
+            name: definition
+            for name, definition in definitions.items()
+            if (section, name) in reachable
+        }
+        if not components[section]:
+            del components[section]
+
+
 def filter_public_openapi(document: dict, *, for_reference: bool = False) -> dict:
     """Mutate and return a client-safe or stricter documentation-safe contract."""
     remove_properties(
@@ -106,4 +171,6 @@ def filter_public_openapi(document: dict, *, for_reference: bool = False) -> dic
         schemas.pop(name, None)
 
     assert_no_removed_refs(document)
+    if for_reference:
+        prune_unreferenced_components(document)
     return document

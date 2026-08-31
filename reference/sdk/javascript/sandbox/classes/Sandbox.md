@@ -37,35 +37,11 @@ Module for running commands in the sandbox
 
 ***
 
-### connectionConfig
-
-> `protected` `readonly` **connectionConfig**: `ConnectionConfig`
-
-***
-
-### envdAccessToken?
-
-> `protected` `readonly` `optional` **envdAccessToken?**: `string`
-
-***
-
-### envdPort
-
-> `protected` `readonly` **envdPort**: `49983` = `49983`
-
-***
-
 ### files
 
 > `readonly` **files**: `Filesystem`
 
 Module for interacting with the sandbox filesystem
-
-***
-
-### mcpPort
-
-> `protected` `readonly` **mcpPort**: `50005` = `50005`
 
 ***
 
@@ -98,24 +74,6 @@ Unique identifier of the sandbox.
 > `readonly` `optional` **trafficAccessToken?**: `string`
 
 Traffic access token for accessing sandbox services with restricted public traffic.
-
-***
-
-### defaultMcpTemplate
-
-> `protected` `readonly` `static` **defaultMcpTemplate**: `string` = `'mcp-gateway'`
-
-***
-
-### defaultSandboxTimeoutMs
-
-> `protected` `readonly` `static` **defaultSandboxTimeoutMs**: `300000` = `DEFAULT_SANDBOX_TIMEOUT_MS`
-
-***
-
-### defaultTemplate
-
-> `protected` `readonly` `static` **defaultTemplate**: `string` = `'base'`
 
 ## Methods
 
@@ -621,30 +579,6 @@ const sameSandbox = await Sandbox.connect(sandboxId)
 
 ***
 
-### connectSandbox()
-
-> `protected` `static` **connectSandbox**(`sandboxId`, `opts?`): `Promise`\<\{ `envdAccessToken`: `string` \| `undefined`; `envdVersion`: `string`; `sandboxDomain`: `string` \| `undefined`; `sandboxId`: `string`; `trafficAccessToken`: `string` \| `undefined`; \}\>
-
-#### Parameters
-
-##### sandboxId
-
-`string`
-
-##### opts?
-
-[`SandboxConnectOpts`](../type-aliases/SandboxConnectOpts.md)
-
-#### Returns
-
-`Promise`\<\{ `envdAccessToken`: `string` \| `undefined`; `envdVersion`: `string`; `sandboxDomain`: `string` \| `undefined`; `sandboxId`: `string`; `trafficAccessToken`: `string` \| `undefined`; \}\>
-
-#### Inherited from
-
-`SandboxApi.connectSandbox`
-
-***
-
 ### create()
 
 #### Call Signature
@@ -732,34 +666,6 @@ const sandbox = await Sandbox.create('<template-name-or-id>')
 ##### Constructs
 
 Sandbox
-
-***
-
-### createSandbox()
-
-> `protected` `static` **createSandbox**(`template`, `timeoutMs`, `opts?`): `Promise`\<\{ `envdAccessToken`: `string` \| `undefined`; `envdVersion`: `string`; `sandboxDomain`: `string` \| `undefined`; `sandboxId`: `string`; `trafficAccessToken`: `string` \| `undefined`; \}\>
-
-#### Parameters
-
-##### template
-
-`string`
-
-##### timeoutMs
-
-`number`
-
-##### opts?
-
-[`SandboxOpts`](../interfaces/SandboxOpts.md)
-
-#### Returns
-
-`Promise`\<\{ `envdAccessToken`: `string` \| `undefined`; `envdVersion`: `string`; `sandboxDomain`: `string` \| `undefined`; `sandboxId`: `string`; `trafficAccessToken`: `string` \| `undefined`; \}\>
-
-#### Inherited from
-
-`SandboxApi.createSandbox`
 
 ***
 
@@ -888,38 +794,6 @@ if (fork1 instanceof Sandbox) {
   await fork1.commands.run('echo "hello from fork"')
 }
 ```
-
-***
-
-### forkSandbox()
-
-> `protected` `static` **forkSandbox**(`sandboxId`, `timeoutMs`, `count`, `opts?`): `Promise`\<`SandboxForkResponse`[]\>
-
-#### Parameters
-
-##### sandboxId
-
-`string`
-
-##### timeoutMs
-
-`number`
-
-##### count
-
-`number`
-
-##### opts?
-
-[`SandboxApiOpts`](../interfaces/SandboxApiOpts.md)
-
-#### Returns
-
-`Promise`\<`SandboxForkResponse`[]\>
-
-#### Inherited from
-
-`SandboxApi.forkSandbox`
 
 ***
 

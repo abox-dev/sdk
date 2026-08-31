@@ -38,24 +38,6 @@ AGENTBOX_API_KEY // environment variable
 
 ***
 
-### debug?
-
-> `optional` **debug?**: `boolean`
-
-**`Internal`**
-
-If true the SDK starts in the debug mode and connects to the local envd API server.
-
-#### Default
-
-AGENTBOX_DEBUG // environment variable or `false`
-
-#### Inherited from
-
-[`SandboxForkOpts`](SandboxForkOpts.md).[`debug`](SandboxForkOpts.md#debug)
-
-***
-
 ### domain?
 
 > `optional` **domain?**: `string`
