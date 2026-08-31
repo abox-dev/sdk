@@ -16,6 +16,7 @@ paths:
       operationId: getEnvironmentHealth
       tags:
       - environment
+      security: []
   /metrics:
     get:
       summary: Service stats
@@ -29,6 +30,9 @@ paths:
       operationId: getEnvironmentMetrics
       tags:
       - environment
+      security:
+      - {}
+      - AccessTokenAuth: []
   /envs:
     get:
       summary: Environment variables
@@ -42,6 +46,9 @@ paths:
       operationId: getEnvironmentVariables
       tags:
       - environment
+      security:
+      - {}
+      - AccessTokenAuth: []
   /files:
     get:
       summary: Download a file
@@ -66,6 +73,9 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
       operationId: downloadFile
+      security:
+      - {}
+      - AccessTokenAuth: []
     post:
       summary: Upload a file and ensure the parent directories exist. If the file
         exists, it will be overwritten.
@@ -130,6 +140,9 @@ paths:
         '507':
           $ref: '#/components/responses/NotEnoughDiskSpace'
       operationId: uploadFile
+      security:
+      - {}
+      - AccessTokenAuth: []
   /files/compose:
     post:
       summary: Compose multiple files into a single file using zero-copy concatenation.
@@ -160,6 +173,9 @@ paths:
         '507':
           $ref: '#/components/responses/NotEnoughDiskSpace'
       operationId: composeFiles
+      security:
+      - {}
+      - AccessTokenAuth: []
 components:
   parameters:
     FilePath:
@@ -417,3 +433,8 @@ components:
       required:
       - nfs_target
       - path
+  securitySchemes:
+    AccessTokenAuth:
+      type: apiKey
+      in: header
+      name: X-Access-Token

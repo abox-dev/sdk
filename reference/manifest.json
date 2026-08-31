@@ -2,8 +2,8 @@
   "files": {
     "connect/filesystem.md": "1cc1e81386810d3c5c999458e02340e3becb3da8138d943558584094750e5aae",
     "connect/process.md": "037574455e9e8c5159c391d8c007e7272560f62c4e5ee681f8aec29f9cd24539",
-    "openapi/control-plane.yml": "95df3951c30223827e4933f1dab8c6e2c75a2a8d81269646f807427d11078548",
-    "openapi/envd.yml": "30a0fba3b410c77db6b50b674f0ef9d110bf626ca2558820b5a6a05e4640cf19",
+    "openapi/control-plane.yml": "f3009ea28f824b61092142caf527a062f59c791bc760a7810a4fb9dec8226a29",
+    "openapi/envd.yml": "83bc85bf7b4084105ac9ffeec708d04d0e14ab275026d616c30de31caea62589",
     "openapi/markdown/assignTemplateTags.md": "3ec3dc705cbda5780d0a9e78234c7777f014784b2ec193821b6f5bb2ea26ec57",
     "openapi/markdown/composeFiles.md": "3e5c37b40268689b6e5287a906c75b80f71fefafe94205c6327c976ca0594d5c",
     "openapi/markdown/connectSandbox.md": "9106d09a6f525aa0bcbd1eed06de62a4d015d1f6fa63496ccb6aebbebb3ad332",
