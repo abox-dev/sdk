@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / SandboxNotFoundError
+[agentbox-sdk-monorepo](../README.md) / SandboxNotFoundError
 
 # Class: SandboxNotFoundError
 

@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / BuildOptions
+[agentbox-sdk-monorepo](../README.md) / BuildOptions
 
 # Type Alias: BuildOptions
 

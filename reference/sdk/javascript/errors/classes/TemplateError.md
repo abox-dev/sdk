@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / TemplateError
+[agentbox-sdk-monorepo](../README.md) / TemplateError
 
 # Class: TemplateError
 

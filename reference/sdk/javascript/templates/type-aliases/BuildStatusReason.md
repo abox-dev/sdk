@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / BuildStatusReason
+[agentbox-sdk-monorepo](../README.md) / BuildStatusReason
 
 # Type Alias: BuildStatusReason
 

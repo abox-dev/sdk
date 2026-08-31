@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / McpServerName
+[agentbox-sdk-monorepo](../README.md) / McpServerName
 
 # Type Alias: McpServerName
 

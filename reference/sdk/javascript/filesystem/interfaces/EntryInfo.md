@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / EntryInfo
+[agentbox-sdk-monorepo](../README.md) / EntryInfo
 
 # Interface: EntryInfo
 

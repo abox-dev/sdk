@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / TemplateTagInfo
+[agentbox-sdk-monorepo](../README.md) / TemplateTagInfo
 
 # Type Alias: TemplateTagInfo
 

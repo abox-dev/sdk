@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / LogEntry
+[agentbox-sdk-monorepo](../README.md) / LogEntry
 
 # Class: LogEntry
 
@@ -6,8 +6,8 @@ Represents a single log entry from the template build process.
 
 ## Extended by
 
-- [`LogEntryStart`](LogEntryStart.md)
 - [`LogEntryEnd`](LogEntryEnd.md)
+- [`LogEntryStart`](LogEntryStart.md)
 
 ## Constructors
 

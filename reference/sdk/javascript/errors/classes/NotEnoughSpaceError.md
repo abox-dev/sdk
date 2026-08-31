@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / NotEnoughSpaceError
+[agentbox-sdk-monorepo](../README.md) / NotEnoughSpaceError
 
 # Class: NotEnoughSpaceError
 

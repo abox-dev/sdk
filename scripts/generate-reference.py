@@ -40,6 +40,126 @@ def strip_extension(value):
     return value
 
 
+def resolve_ref(document: dict, value: dict) -> tuple[dict, str | None]:
+    current = value
+    reference_name = None
+    visited = set()
+    while isinstance(current, dict) and "$ref" in current:
+        reference = current["$ref"]
+        if not reference.startswith("#/") or reference in visited:
+            break
+        visited.add(reference)
+        reference_name = reference.rsplit("/", 1)[-1]
+        resolved = document
+        for part in reference[2:].split("/"):
+            resolved = resolved[part.replace("~1", "/").replace("~0", "~")]
+        current = resolved
+    return current, reference_name
+
+
+def markdown_cell(value: object) -> str:
+    return str(value or "").replace("\n", " ").replace("|", "\\|").strip()
+
+
+def schema_type(document: dict, schema: dict) -> str:
+    resolved, reference_name = resolve_ref(document, schema)
+    if reference_name:
+        return reference_name
+    if "oneOf" in resolved:
+        return " | ".join(schema_type(document, item) for item in resolved["oneOf"])
+    if "anyOf" in resolved:
+        return " | ".join(schema_type(document, item) for item in resolved["anyOf"])
+    if resolved.get("type") == "array":
+        return f"array<{schema_type(document, resolved.get('items', {}))}>"
+    if resolved.get("enum"):
+        return " | ".join(str(item) for item in resolved["enum"])
+    return resolved.get("type", "object")
+
+
+def render_schema(document: dict, schema: dict) -> list[str]:
+    resolved, reference_name = resolve_ref(document, schema)
+    lines = [f"Schema: `{reference_name or schema_type(document, resolved)}`", ""]
+    properties = resolved.get("properties", {})
+    if not properties:
+        return lines
+    required = set(resolved.get("required", []))
+    lines.extend(
+        [
+            "| Field | Type | Required | Description |",
+            "| --- | --- | --- | --- |",
+        ]
+    )
+    for name, property_schema in properties.items():
+        property_value, _ = resolve_ref(document, property_schema)
+        lines.append(
+            f"| `{name}` | `{markdown_cell(schema_type(document, property_schema))}` "
+            f"| {'yes' if name in required else 'no'} "
+            f"| {markdown_cell(property_value.get('description', ''))} |"
+        )
+    lines.append("")
+    return lines
+
+
+def render_operation_markdown(document: dict, record: dict) -> str:
+    operation = document["paths"][record["path"]][record["method"].lower()]
+    lines = [f"# {record['method']} {record['path']}", ""]
+    if operation.get("summary"):
+        lines.extend([operation["summary"].strip(), ""])
+    if operation.get("description"):
+        lines.extend([operation["description"].strip(), ""])
+
+    parameters = []
+    for parameter in operation.get("parameters", []):
+        resolved, _ = resolve_ref(document, parameter)
+        parameters.append(resolved)
+    if parameters:
+        lines.extend(
+            [
+                "## Parameters",
+                "",
+                "| Name | In | Required | Type | Description |",
+                "| --- | --- | --- | --- | --- |",
+            ]
+        )
+        for parameter in parameters:
+            lines.append(
+                f"| `{parameter.get('name', '')}` | {parameter.get('in', '')} "
+                f"| {'yes' if parameter.get('required') else 'no'} "
+                f"| `{markdown_cell(schema_type(document, parameter.get('schema', {})))}` "
+                f"| {markdown_cell(parameter.get('description', ''))} |"
+            )
+        lines.append("")
+
+    if operation.get("requestBody"):
+        request_body, _ = resolve_ref(document, operation["requestBody"])
+        lines.extend(
+            [
+                "## Request body",
+                "",
+                f"Required: {'yes' if request_body.get('required') else 'no'}",
+                "",
+            ]
+        )
+        if request_body.get("description"):
+            lines.extend([request_body["description"].strip(), ""])
+        for content_type, media in request_body.get("content", {}).items():
+            lines.extend([f"### {content_type}", ""])
+            if media.get("schema"):
+                lines.extend(render_schema(document, media["schema"]))
+
+    lines.extend(["## Responses", ""])
+    for status, response in operation.get("responses", {}).items():
+        resolved, _ = resolve_ref(document, response)
+        lines.extend([f"### {status}", ""])
+        if resolved.get("description"):
+            lines.extend([resolved["description"].strip(), ""])
+        for content_type, media in resolved.get("content", {}).items():
+            lines.extend([f"Content-Type: `{content_type}`", ""])
+            if media.get("schema"):
+                lines.extend(render_schema(document, media["schema"]))
+    return "\n".join(lines).rstrip() + "\n"
+
+
 def build_openapi(name: str, config: dict) -> list[dict]:
     source = ROOT / config["source"]
     document = yaml.safe_load(source.read_text())
@@ -99,6 +219,7 @@ def build_openapi(name: str, config: dict) -> list[dict]:
                     "group": metadata["group"],
                     "slug": metadata["slug"],
                     "spec": "control-plane" if name == "controlPlane" else "envd",
+                    "markdown": f"openapi/markdown/{metadata['id']}.md",
                 }
             )
 
@@ -135,6 +256,10 @@ def build_openapi(name: str, config: dict) -> list[dict]:
     )
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text(yaml.safe_dump(public, sort_keys=False, allow_unicode=True))
+    for record in records:
+        markdown = OUT / record["markdown"]
+        markdown.parent.mkdir(parents=True, exist_ok=True)
+        markdown.write_text(render_operation_markdown(public, record))
     return sorted(records, key=lambda item: (item["group"], item["slug"]))
 
 
@@ -201,13 +326,16 @@ def proto_reference(source: Path, destination: Path, title: str) -> None:
 
 def run_sdk_generators() -> None:
     groups = json.loads((ROOT / "reference-config/sdk-groups.json").read_text())
-    for name, entries in groups["javascript"].items():
+    for name, settings in groups["javascript"].items():
+        if set(settings) != {"entryPoint", "tsconfig"}:
+            raise SystemExit(
+                f"JavaScript group {name} must define entryPoint and tsconfig"
+            )
+        entry_point = ROOT / settings["entryPoint"]
+        tsconfig = ROOT / settings["tsconfig"]
+        if not entry_point.is_file() or not tsconfig.is_file():
+            raise SystemExit(f"JavaScript group {name} has an invalid configuration")
         destination = OUT / "sdk/javascript" / name
-        tsconfig = (
-            "reference-config/typedoc.code-interpreter.json"
-            if entries[0].startswith("packages/code-interpreter-js/")
-            else "packages/js-sdk/tsconfig.json"
-        )
         command = [
             "pnpm",
             "exec",
@@ -217,14 +345,14 @@ def run_sdk_generators() -> None:
             "--entryPointStrategy",
             "resolve",
             "--tsconfig",
-            tsconfig,
+            str(tsconfig),
             "--readme",
             "none",
             "--disableSources",
             "--hidePageHeader",
             "--out",
             str(destination),
-            *entries,
+            str(entry_point),
         ]
         subprocess.run(command, cwd=ROOT, check=True)
 

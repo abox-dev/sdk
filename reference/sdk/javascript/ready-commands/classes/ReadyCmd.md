@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / ReadyCmd
+[agentbox-sdk-monorepo](../README.md) / ReadyCmd
 
 # Class: ReadyCmd
 

@@ -1,27 +1,16 @@
-# @abox-dev/sdk
+# agentbox-sdk-monorepo
 
 ## Enumerations
 
+- [FilesystemEventType](enumerations/FilesystemEventType.md)
 - [FileType](enumerations/FileType.md)
-
-## Classes
-
-- [Filesystem](classes/Filesystem.md)
 
 ## Interfaces
 
 - [EntryInfo](interfaces/EntryInfo.md)
-- [FilesystemListOpts](interfaces/FilesystemListOpts.md)
+- [Filesystem](interfaces/Filesystem.md)
+- [FilesystemEvent](interfaces/FilesystemEvent.md)
 - [FilesystemReadOpts](interfaces/FilesystemReadOpts.md)
-- [FilesystemRequestOpts](interfaces/FilesystemRequestOpts.md)
 - [FilesystemWriteOpts](interfaces/FilesystemWriteOpts.md)
-- [WatchOpts](interfaces/WatchOpts.md)
+- [WatchHandle](interfaces/WatchHandle.md)
 - [WriteInfo](interfaces/WriteInfo.md)
-
-## Type Aliases
-
-- [WriteEntry](type-aliases/WriteEntry.md)
-
-## Functions
-
-- [mapEntryInfo](functions/mapEntryInfo.md)

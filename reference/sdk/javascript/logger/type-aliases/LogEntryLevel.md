@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / LogEntryLevel
+[agentbox-sdk-monorepo](../README.md) / LogEntryLevel
 
 # Type Alias: LogEntryLevel
 

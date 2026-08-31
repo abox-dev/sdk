@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / GetBuildStatusOptions
+[agentbox-sdk-monorepo](../README.md) / GetBuildStatusOptions
 
 # Type Alias: GetBuildStatusOptions
 

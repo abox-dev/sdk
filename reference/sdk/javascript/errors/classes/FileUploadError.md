@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / FileUploadError
+[agentbox-sdk-monorepo](../README.md) / FileUploadError
 
 # Class: FileUploadError
 

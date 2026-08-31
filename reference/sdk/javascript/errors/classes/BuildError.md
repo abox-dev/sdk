@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / BuildError
+[agentbox-sdk-monorepo](../README.md) / BuildError
 
 # Class: BuildError
 

@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / InvalidArgumentError
+[agentbox-sdk-monorepo](../README.md) / InvalidArgumentError
 
 # Class: InvalidArgumentError
 

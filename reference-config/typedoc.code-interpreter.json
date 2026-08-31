@@ -7,5 +7,9 @@
     "paths": {
       "@abox-dev/sdk": ["packages/js-sdk/src/index.ts"]
     }
-  }
+  },
+  "include": [
+    "../packages/code-interpreter-js/src/**/*.ts",
+    "javascript/code-interpreter.ts"
+  ]
 }

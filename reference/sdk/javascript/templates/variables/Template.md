@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / Template
+[agentbox-sdk-monorepo](../README.md) / Template
 
 # Variable: Template
 

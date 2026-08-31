@@ -1,4 +1,4 @@
-[@abox-dev/sdk](../README.md) / ProcessInfo
+[agentbox-sdk-monorepo](../README.md) / ProcessInfo
 
 # Interface: ProcessInfo
 
