@@ -27,4 +27,4 @@ client = AgentBox(api_key="ab_...")
 sandbox = await client.AsyncSandbox.create()
 ```
 
-Documentation: [core SDK](https://docs.agentbox.ru/en/sdk/), [sandboxes](https://docs.agentbox.ru/en/sdk/sandboxes/), [commands](https://docs.agentbox.ru/en/sdk/commands/), [files](https://docs.agentbox.ru/en/sdk/files/), [templates](https://docs.agentbox.ru/en/sdk/templates/), and [API reference](https://docs.agentbox.ru/en/sdk/api-reference/python/).
+Documentation: [core SDK](https://docs.agentbox.ru/en/sdk/), [sandboxes](https://docs.agentbox.ru/en/sdk/sandboxes/), [commands](https://docs.agentbox.ru/en/sdk/commands/), [files](https://docs.agentbox.ru/en/sdk/files/), [templates](https://docs.agentbox.ru/en/sdk/templates/), and [API reference](https://docs.agentbox.ru/en/sdk-reference/python/).

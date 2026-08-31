@@ -22,4 +22,4 @@ try {
 }
 ```
 
-See the [Code Interpreter guide](https://docs.agentbox.ru/en/sdk/code-interpreter/) and [API reference](https://docs.agentbox.ru/en/sdk/api-reference/javascript/code-interpreter/).
+See the [Code Interpreter guide](https://docs.agentbox.ru/en/sdk/code-interpreter/) and [API reference](https://docs.agentbox.ru/en/sdk-reference/javascript/code-interpreter/).

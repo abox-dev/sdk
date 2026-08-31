@@ -26,7 +26,7 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://docs.agentbox.ru/en/sdk/"
-Documentation = "https://docs.agentbox.ru/en/sdk/api-reference/python/"
+Documentation = "https://docs.agentbox.ru/en/sdk-reference/python/"
 Repository = "https://github.com/abox-dev/sdk/tree/main/packages/python-sdk"
 "Bug Tracker" = "https://github.com/abox-dev/sdk/issues"
 

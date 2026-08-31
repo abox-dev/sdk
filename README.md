@@ -63,7 +63,7 @@ The CLI stores local configuration in `~/.agentbox/config.json`; environment var
 - [Templates and builds](https://docs.agentbox.ru/en/sdk/templates/)
 - [Code Interpreter](https://docs.agentbox.ru/en/sdk/code-interpreter/)
 - [CLI](https://docs.agentbox.ru/en/cli/)
-- [API reference](https://docs.agentbox.ru/en/sdk/api-reference/)
+- [API reference](https://docs.agentbox.ru/en/api-reference/)
 - [Examples](https://docs.agentbox.ru/en/examples/)
 
 ## Development

@@ -45,16 +45,15 @@
     "test": "vitest run",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
+    "reference": "tsx src/reference.ts",
     "check-deps": "knip"
   },
   "devDependencies": {
     "@types/inquirer": "^9.0.10",
-    "@types/json2md": "^1.5.4",
     "@types/node": "catalog:",
     "@types/statuses": "^2.0.6",
     "@typescript/native": "catalog:",
     "@vitest/coverage-v8": "catalog:",
-    "json2md": "^2.0.3",
     "knip": "^5.43.6",
     "tsdown": "catalog:",
     "typescript": "catalog:",
@@ -71,12 +70,12 @@
     "agentbox": "dist/index.js"
   },
   "dependencies": {
+    "@abox-dev/sdk": "workspace:^",
     "@inquirer/prompts": "^7.9.0",
     "boxen": "^7.1.1",
     "chalk": "^5.3.0",
     "cli-highlight": "^2.1.11",
     "commander": "^11.1.0",
-    "@abox-dev/sdk": "workspace:^",
     "inquirer": "^12.10.0",
     "simple-update-notifier": "^2.0.0",
     "simple-wcswidth": "^1.1.2",
