@@ -1,4 +1,5 @@
 Use pnpm for JavaScript packages and uv for Python packages.
+Use English exclusively in source code, comments, documentation, commit messages, and GitHub pull request titles and descriptions.
 Keep the JavaScript and Python SDKs, including sync and async Python APIs, behaviorally aligned.
 Run format checks, lint, type checks, unit tests, deterministic generation, builds, and package-install checks before committing.
 The API and envd snapshots under spec/ are generated from mono/infra. Do not edit them manually. Update them with `make sync-specs MONO_DIR=/path/to/mono`, then run `make generate`.

@@ -162,10 +162,61 @@ def render_operation_markdown(document: dict, record: dict) -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
+def normalize_operation_auth(
+    document: dict, operation: dict, public_scheme_names: set[str]
+) -> dict | None:
+    """Return one documentation-safe auth mechanism for an operation."""
+    security = operation.get("security", document.get("security"))
+    if not security:
+        return None
+    if not isinstance(security, list) or not all(
+        isinstance(requirement, dict) for requirement in security
+    ):
+        raise SystemExit("Operation security must be an OpenAPI security array")
+
+    anonymous_allowed = any(not requirement for requirement in security)
+    public_requirements = [
+        requirement
+        for requirement in security
+        if requirement and set(requirement).issubset(public_scheme_names)
+    ]
+    public_schemes = {
+        name for requirement in public_requirements for name in requirement
+    }
+    if not public_schemes:
+        if anonymous_allowed:
+            return None
+        raise SystemExit(
+            "Authenticated public operation has no allowed public auth scheme"
+        )
+    if len(public_schemes) != 1 or any(
+        len(requirement) != 1 for requirement in public_requirements
+    ):
+        raise SystemExit(
+            "Public reference supports exactly one normalized auth mechanism"
+        )
+
+    scheme_name = next(iter(public_schemes))
+    scheme = document.get("components", {}).get("securitySchemes", {}).get(scheme_name)
+    if not isinstance(scheme, dict):
+        raise SystemExit(f"Public auth scheme is missing: {scheme_name}")
+    if scheme.get("type") != "apiKey" or scheme.get("in") != "header":
+        raise SystemExit(f"Public auth scheme {scheme_name} must be an apiKey header")
+    header = scheme.get("name")
+    if not isinstance(header, str) or not header:
+        raise SystemExit(f"Public auth scheme {scheme_name} has no header name")
+    return {
+        "type": "apiKey",
+        "header": header,
+        "required": not anonymous_allowed,
+    }
+
+
 def build_openapi(name: str, config: dict) -> list[dict]:
     source = ROOT / config["source"]
     document = yaml.safe_load(source.read_text())
     assigned = config["operations"]
+    public_auth_schemes = set(config.get("publicAuthSchemes", []))
     seen = set()
     output_paths = {}
 
@@ -222,6 +273,9 @@ def build_openapi(name: str, config: dict) -> list[dict]:
                     "slug": metadata["slug"],
                     "spec": "control-plane" if name == "controlPlane" else "envd",
                     "markdown": f"openapi/markdown/{metadata['id']}.md",
+                    "auth": normalize_operation_auth(
+                        document, operation, public_auth_schemes
+                    ),
                 }
             )
 

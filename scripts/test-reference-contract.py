@@ -81,6 +81,22 @@ def main() -> None:
     }
     assert len(ids) == len(set(ids)), "operationId values must be unique"
     for operation in operations:
+        assert "auth" in operation, operation["operationId"]
+        auth = operation["auth"]
+        if operation["spec"] == "control-plane":
+            assert auth == {
+                "type": "apiKey",
+                "header": "X-API-Key",
+                "required": True,
+            }, operation["operationId"]
+        elif operation["path"] == "/health":
+            assert auth is None, operation["operationId"]
+        else:
+            assert auth == {
+                "type": "apiKey",
+                "header": "X-Access-Token",
+                "required": False,
+            }, operation["operationId"]
         markdown = REFERENCE / operation["markdown"]
         assert markdown.is_file(), operation["operationId"]
         rendered = markdown.read_text()
