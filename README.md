@@ -66,39 +66,7 @@ The CLI stores local configuration in `~/.agentbox/config.json`; environment var
 
 ## Development
 
-Install JavaScript dependencies with `pnpm install --frozen-lockfile` and Python dependencies with `uv sync --frozen` in each Python package. `make generate` regenerates clients only from the checked-in snapshots under `spec/`; maintainers update them with `make sync-specs MONO_DIR=/path/to/mono`.
-
-The complete maintainer workflow for synchronized package versions, artifact
-verification, KVM checks, tagging, Trusted Publishing, and post-release checks
-is documented in [RELEASING.md](RELEASING.md).
-
-Run the complete local verification before publishing:
-
-```bash
-pnpm format:check
-pnpm lint
-pnpm typecheck
-pnpm test
-make generate
-./scripts/build-release.sh
-node scripts/check-public-artifacts.mjs release
-./scripts/test-release-artifacts.sh
-```
-
-With the AgentBox KVM development contour running, test those exact release artifacts with:
-
-```bash
-AGENTBOX_API_KEY=ab_... \
-AGENTBOX_API_URL=http://localhost:3000 \
-AGENTBOX_SANDBOX_URL=http://localhost:3002 \
-./scripts/test-release-runtime.sh
-```
-
-The runtime smoke covers the JavaScript and Python sync/async SDKs, both Code Interpreter packages, the CLI lifecycle, private traffic routing, and a real temporary template build. It removes the test sandboxes and template when it finishes.
-
-After publishing, run the same checks from clean npm and PyPI installs with
-`./scripts/test-published-runtime.sh X.Y.Z`. With no argument it reads the
-current version from the core SDK manifest. It does not use workspace links or
-local package artifacts.
+Contributor setup, spec synchronization, verification, KVM testing, versioning,
+and publication are documented in [RELEASING.md](RELEASING.md).
 
 AgentBox SDK is derived from upstream work described in [UPSTREAM.md](UPSTREAM.md). Licensing notices are in [LICENSE](LICENSE) and [NOTICE](NOTICE).
