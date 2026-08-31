@@ -26,7 +26,6 @@ Schema: `TemplateWithBuilds`
 | --- | --- | --- | --- |
 | `templateID` | `string` | yes | Identifier of the template |
 | `public` | `boolean` | yes | Whether the template is public or only accessible by the team |
-| `aliases` | `array<string>` | yes | Aliases of the template |
 | `names` | `array<string>` | yes | Names of the template (namespace/alias format when namespaced) |
 | `createdAt` | `string` | yes | Time when the template was created |
 | `updatedAt` | `string` | yes | Time when the template was last updated |

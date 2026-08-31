@@ -25,7 +25,6 @@ Schema: `MaxTeamMetric`
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| `timestamp` | `string` | yes | Timestamp of the metric entry |
 | `timestampUnix` | `integer` | yes | Timestamp of the metric entry in Unix time (seconds since epoch) |
 | `value` | `number` | yes | The maximum value of the requested metric in the given interval |
 

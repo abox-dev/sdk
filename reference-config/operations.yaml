@@ -2,6 +2,8 @@ schemaVersion: 1
 
 controlPlane:
   source: spec/openapi.yml
+  publicAuthSchemes:
+    - ApiKeyAuth
   publicTags:
     - sandboxes
     - snapshots
@@ -41,6 +43,8 @@ controlPlane:
 
 envd:
   source: spec/envd/envd.yaml
+  publicAuthSchemes:
+    - AccessTokenAuth
   operations:
     GET /health: { id: getEnvironmentHealth, group: environment, slug: health }
     GET /metrics: { id: getEnvironmentMetrics, group: environment, slug: metrics }

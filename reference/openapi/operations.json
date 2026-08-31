@@ -6,7 +6,12 @@
     "group": "sandboxes",
     "slug": "connect",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/connectSandbox.md"
+    "markdown": "openapi/markdown/connectSandbox.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "createSandbox",
@@ -15,7 +20,12 @@
     "group": "sandboxes",
     "slug": "create",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/createSandbox.md"
+    "markdown": "openapi/markdown/createSandbox.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "forkSandbox",
@@ -24,7 +34,12 @@
     "group": "sandboxes",
     "slug": "fork",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/forkSandbox.md"
+    "markdown": "openapi/markdown/forkSandbox.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "getSandbox",
@@ -33,7 +48,12 @@
     "group": "sandboxes",
     "slug": "get",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/getSandbox.md"
+    "markdown": "openapi/markdown/getSandbox.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "killSandbox",
@@ -42,7 +62,12 @@
     "group": "sandboxes",
     "slug": "kill",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/killSandbox.md"
+    "markdown": "openapi/markdown/killSandbox.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "listSandboxes",
@@ -51,7 +76,12 @@
     "group": "sandboxes",
     "slug": "list",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/listSandboxes.md"
+    "markdown": "openapi/markdown/listSandboxes.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "listSandboxMetrics",
@@ -60,7 +90,12 @@
     "group": "sandboxes",
     "slug": "list-metrics",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/listSandboxMetrics.md"
+    "markdown": "openapi/markdown/listSandboxMetrics.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "getSandboxLogs",
@@ -69,7 +104,12 @@
     "group": "sandboxes",
     "slug": "logs",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/getSandboxLogs.md"
+    "markdown": "openapi/markdown/getSandboxLogs.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "getSandboxMetrics",
@@ -78,7 +118,12 @@
     "group": "sandboxes",
     "slug": "metrics",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/getSandboxMetrics.md"
+    "markdown": "openapi/markdown/getSandboxMetrics.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "updateSandboxNetwork",
@@ -87,7 +132,12 @@
     "group": "sandboxes",
     "slug": "network",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/updateSandboxNetwork.md"
+    "markdown": "openapi/markdown/updateSandboxNetwork.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "pauseSandbox",
@@ -96,7 +146,12 @@
     "group": "sandboxes",
     "slug": "pause",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/pauseSandbox.md"
+    "markdown": "openapi/markdown/pauseSandbox.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "refreshSandbox",
@@ -105,7 +160,12 @@
     "group": "sandboxes",
     "slug": "refresh",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/refreshSandbox.md"
+    "markdown": "openapi/markdown/refreshSandbox.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "setSandboxTimeout",
@@ -114,7 +174,12 @@
     "group": "sandboxes",
     "slug": "timeout",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/setSandboxTimeout.md"
+    "markdown": "openapi/markdown/setSandboxTimeout.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "createSnapshot",
@@ -123,7 +188,12 @@
     "group": "snapshots",
     "slug": "create",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/createSnapshot.md"
+    "markdown": "openapi/markdown/createSnapshot.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "listSnapshots",
@@ -132,7 +202,12 @@
     "group": "snapshots",
     "slug": "list",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/listSnapshots.md"
+    "markdown": "openapi/markdown/listSnapshots.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "assignTemplateTags",
@@ -141,7 +216,12 @@
     "group": "tags",
     "slug": "assign",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/assignTemplateTags.md"
+    "markdown": "openapi/markdown/assignTemplateTags.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "deleteTemplateTags",
@@ -150,7 +230,12 @@
     "group": "tags",
     "slug": "delete",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/deleteTemplateTags.md"
+    "markdown": "openapi/markdown/deleteTemplateTags.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "listTemplateTags",
@@ -159,7 +244,12 @@
     "group": "tags",
     "slug": "list",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/listTemplateTags.md"
+    "markdown": "openapi/markdown/listTemplateTags.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "getTeamMetrics",
@@ -168,7 +258,12 @@
     "group": "team-metrics",
     "slug": "team-metrics",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/getTeamMetrics.md"
+    "markdown": "openapi/markdown/getTeamMetrics.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "getTeamMetricsMax",
@@ -177,7 +272,12 @@
     "group": "team-metrics",
     "slug": "team-metrics-max",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/getTeamMetricsMax.md"
+    "markdown": "openapi/markdown/getTeamMetricsMax.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "getTemplateByAlias",
@@ -186,7 +286,12 @@
     "group": "templates",
     "slug": "alias",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/getTemplateByAlias.md"
+    "markdown": "openapi/markdown/getTemplateByAlias.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "getTemplateBuildLogs",
@@ -195,7 +300,12 @@
     "group": "templates",
     "slug": "build-logs",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/getTemplateBuildLogs.md"
+    "markdown": "openapi/markdown/getTemplateBuildLogs.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "getTemplateBuildStatus",
@@ -204,7 +314,12 @@
     "group": "templates",
     "slug": "build-status",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/getTemplateBuildStatus.md"
+    "markdown": "openapi/markdown/getTemplateBuildStatus.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "createTemplate",
@@ -213,7 +328,12 @@
     "group": "templates",
     "slug": "create",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/createTemplate.md"
+    "markdown": "openapi/markdown/createTemplate.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "deleteTemplate",
@@ -222,7 +342,12 @@
     "group": "templates",
     "slug": "delete",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/deleteTemplate.md"
+    "markdown": "openapi/markdown/deleteTemplate.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "getTemplate",
@@ -231,7 +356,12 @@
     "group": "templates",
     "slug": "get",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/getTemplate.md"
+    "markdown": "openapi/markdown/getTemplate.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "listTemplates",
@@ -240,7 +370,12 @@
     "group": "templates",
     "slug": "list",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/listTemplates.md"
+    "markdown": "openapi/markdown/listTemplates.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "startTemplateBuild",
@@ -249,7 +384,12 @@
     "group": "templates",
     "slug": "start-build",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/startTemplateBuild.md"
+    "markdown": "openapi/markdown/startTemplateBuild.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "updateTemplate",
@@ -258,7 +398,12 @@
     "group": "templates",
     "slug": "update",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/updateTemplate.md"
+    "markdown": "openapi/markdown/updateTemplate.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "getTemplateUploadUrl",
@@ -267,7 +412,12 @@
     "group": "templates",
     "slug": "upload-url",
     "spec": "control-plane",
-    "markdown": "openapi/markdown/getTemplateUploadUrl.md"
+    "markdown": "openapi/markdown/getTemplateUploadUrl.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-API-Key",
+      "required": true
+    }
   },
   {
     "operationId": "getEnvironmentHealth",
@@ -276,7 +426,8 @@
     "group": "environment",
     "slug": "health",
     "spec": "envd",
-    "markdown": "openapi/markdown/getEnvironmentHealth.md"
+    "markdown": "openapi/markdown/getEnvironmentHealth.md",
+    "auth": null
   },
   {
     "operationId": "getEnvironmentMetrics",
@@ -285,7 +436,12 @@
     "group": "environment",
     "slug": "metrics",
     "spec": "envd",
-    "markdown": "openapi/markdown/getEnvironmentMetrics.md"
+    "markdown": "openapi/markdown/getEnvironmentMetrics.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-Access-Token",
+      "required": false
+    }
   },
   {
     "operationId": "getEnvironmentVariables",
@@ -294,7 +450,12 @@
     "group": "environment",
     "slug": "variables",
     "spec": "envd",
-    "markdown": "openapi/markdown/getEnvironmentVariables.md"
+    "markdown": "openapi/markdown/getEnvironmentVariables.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-Access-Token",
+      "required": false
+    }
   },
   {
     "operationId": "composeFiles",
@@ -303,7 +464,12 @@
     "group": "files",
     "slug": "compose",
     "spec": "envd",
-    "markdown": "openapi/markdown/composeFiles.md"
+    "markdown": "openapi/markdown/composeFiles.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-Access-Token",
+      "required": false
+    }
   },
   {
     "operationId": "downloadFile",
@@ -312,7 +478,12 @@
     "group": "files",
     "slug": "download",
     "spec": "envd",
-    "markdown": "openapi/markdown/downloadFile.md"
+    "markdown": "openapi/markdown/downloadFile.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-Access-Token",
+      "required": false
+    }
   },
   {
     "operationId": "uploadFile",
@@ -321,6 +492,11 @@
     "group": "files",
     "slug": "upload",
     "spec": "envd",
-    "markdown": "openapi/markdown/uploadFile.md"
+    "markdown": "openapi/markdown/uploadFile.md",
+    "auth": {
+      "type": "apiKey",
+      "header": "X-Access-Token",
+      "required": false
+    }
   }
 ]

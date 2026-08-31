@@ -18,6 +18,52 @@ BANNED_ENVD_PATHS = {
     "/fsfreeze",
     "/fsthaw",
 }
+FORBIDDEN_REFERENCE_PROPERTIES = {
+    "clientID",
+    "envdAccessToken",
+    "trafficAccessToken",
+    "volumeMounts",
+}
+FORBIDDEN_SECURITY_SCHEMES = {
+    "AccessTokenAuth",
+    "AdminApiKeyAuth",
+    "AdminTeamAuth",
+    "AuthProviderBearerAuth",
+    "AuthProviderTeamAuth",
+}
+
+
+def assert_local_refs_resolve(document: dict) -> None:
+    def visit(value):
+        if isinstance(value, dict):
+            reference = value.get("$ref")
+            if isinstance(reference, str) and reference.startswith("#/"):
+                resolved = document
+                for part in reference[2:].split("/"):
+                    resolved = resolved[part.replace("~1", "/").replace("~0", "~")]
+            for child in value.values():
+                visit(child)
+        elif isinstance(value, list):
+            for child in value:
+                visit(child)
+
+    visit(document)
+
+
+def assert_public_schema(value) -> None:
+    if isinstance(value, dict):
+        properties = value.get("properties")
+        if isinstance(properties, dict):
+            assert not (set(properties) & FORBIDDEN_REFERENCE_PROPERTIES)
+            assert not any(
+                isinstance(schema, dict) and schema.get("deprecated") is True
+                for schema in properties.values()
+            )
+        for child in value.values():
+            assert_public_schema(child)
+    elif isinstance(value, list):
+        for child in value:
+            assert_public_schema(child)
 
 
 def main() -> None:
@@ -35,6 +81,22 @@ def main() -> None:
     }
     assert len(ids) == len(set(ids)), "operationId values must be unique"
     for operation in operations:
+        assert "auth" in operation, operation["operationId"]
+        auth = operation["auth"]
+        if operation["spec"] == "control-plane":
+            assert auth == {
+                "type": "apiKey",
+                "header": "X-API-Key",
+                "required": True,
+            }, operation["operationId"]
+        elif operation["path"] == "/health":
+            assert auth is None, operation["operationId"]
+        else:
+            assert auth == {
+                "type": "apiKey",
+                "header": "X-Access-Token",
+                "required": False,
+            }, operation["operationId"]
         markdown = REFERENCE / operation["markdown"]
         assert markdown.is_file(), operation["operationId"]
         rendered = markdown.read_text()
@@ -72,6 +134,24 @@ def main() -> None:
     )
     assert "x-not-implemented" not in rendered_specs
     assert "SandboxEgressProxyConfig" not in rendered_specs
+    for forbidden in FORBIDDEN_REFERENCE_PROPERTIES | FORBIDDEN_SECURITY_SCHEMES:
+        assert forbidden not in rendered_specs
+
+    for name in ("openapi/control-plane.yml", "openapi/envd.yml"):
+        document = yaml.safe_load((REFERENCE / name).read_text())
+        assert "securitySchemes" not in document.get("components", {})
+        for path_item in document["paths"].values():
+            for method, operation in path_item.items():
+                if method.lower() in {"get", "post", "put", "patch", "delete"}:
+                    assert "security" not in operation
+        assert_public_schema(document)
+        assert_local_refs_resolve(document)
+
+    rendered_markdown = "\n".join(
+        path.read_text() for path in (REFERENCE / "openapi/markdown").glob("*.md")
+    )
+    for forbidden in FORBIDDEN_REFERENCE_PROPERTIES:
+        assert forbidden not in rendered_markdown
 
     javascript_files = {
         str(path.relative_to(REFERENCE))
@@ -83,14 +163,10 @@ def main() -> None:
     assert not any("parseOutput" in path for path in javascript_files)
     assert not any("extractError" in path for path in javascript_files)
 
-    list_sandboxes = (
-        REFERENCE / "openapi/markdown/listSandboxes.md"
-    ).read_text()
+    list_sandboxes = (REFERENCE / "openapi/markdown/listSandboxes.md").read_text()
     assert "Metadata query used to filter the sandboxes" in list_sandboxes
     assert "### 200" in list_sandboxes
-    create_sandbox = (
-        REFERENCE / "openapi/markdown/createSandbox.md"
-    ).read_text()
+    create_sandbox = (REFERENCE / "openapi/markdown/createSandbox.md").read_text()
     assert "Schema: `NewSandbox`" in create_sandbox
 
 

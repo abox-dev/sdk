@@ -5,11 +5,6 @@ info:
 servers:
 - url: https://api.agentbox-runtime.ru
 components:
-  securitySchemes:
-    ApiKeyAuth:
-      type: apiKey
-      in: header
-      name: X-API-Key
   parameters:
     idempotencyKey:
       name: Idempotency-Key
@@ -179,18 +174,11 @@ components:
     TeamUser:
       required:
       - id
-      - email
       properties:
         id:
           type: string
           format: uuid
           description: Identifier of the user
-        email:
-          type: string
-          nullable: true
-          deprecated: true
-          default: null
-          description: Email of the user
     TemplateUpdateRequest:
       properties:
         public:
@@ -444,7 +432,6 @@ components:
     SandboxMetric:
       description: Metric entry with timestamp and line
       required:
-      - timestamp
       - timestampUnix
       - cpuCount
       - cpuUsedPct
@@ -454,11 +441,6 @@ components:
       - diskUsed
       - diskTotal
       properties:
-        timestamp:
-          type: string
-          format: date-time
-          deprecated: true
-          description: Timestamp of the metric entry
         timestampUnix:
           type: integer
           format: int64
@@ -491,23 +473,10 @@ components:
           type: integer
           format: int64
           description: Total disk space in bytes
-    SandboxVolumeMount:
-      type: object
-      properties:
-        name:
-          type: string
-          description: Name of the volume
-        path:
-          type: string
-          description: Path of the volume
-      required:
-      - name
-      - path
     Sandbox:
       required:
       - templateID
       - sandboxID
-      - clientID
       - envdVersion
       properties:
         templateID:
@@ -519,19 +488,8 @@ components:
         alias:
           type: string
           description: Alias of the template
-        clientID:
-          type: string
-          deprecated: true
-          description: Identifier of the client
         envdVersion:
           $ref: '#/components/schemas/EnvdVersion'
-        envdAccessToken:
-          type: string
-          description: Access token used for envd communication
-        trafficAccessToken:
-          type: string
-          nullable: true
-          description: Token required for accessing sandbox via proxy.
         domain:
           type: string
           nullable: true
@@ -540,7 +498,6 @@ components:
       required:
       - templateID
       - sandboxID
-      - clientID
       - startedAt
       - cpuCount
       - memoryMB
@@ -558,10 +515,6 @@ components:
         sandboxID:
           type: string
           description: Identifier of the sandbox
-        clientID:
-          type: string
-          deprecated: true
-          description: Identifier of the client
         startedAt:
           type: string
           format: date-time
@@ -572,9 +525,6 @@ components:
           description: Time when the sandbox will expire
         envdVersion:
           $ref: '#/components/schemas/EnvdVersion'
-        envdAccessToken:
-          type: string
-          description: Access token used for envd communication
         allowInternetAccess:
           type: boolean
           nullable: true
@@ -598,15 +548,10 @@ components:
           $ref: '#/components/schemas/SandboxNetworkConfig'
         lifecycle:
           $ref: '#/components/schemas/SandboxLifecycle'
-        volumeMounts:
-          type: array
-          items:
-            $ref: '#/components/schemas/SandboxVolumeMount'
     ListedSandbox:
       required:
       - templateID
       - sandboxID
-      - clientID
       - startedAt
       - cpuCount
       - memoryMB
@@ -624,10 +569,6 @@ components:
         sandboxID:
           type: string
           description: Identifier of the sandbox
-        clientID:
-          type: string
-          deprecated: true
-          description: Identifier of the client
         startedAt:
           type: string
           format: date-time
@@ -648,10 +589,6 @@ components:
           $ref: '#/components/schemas/SandboxState'
         envdVersion:
           $ref: '#/components/schemas/EnvdVersion'
-        volumeMounts:
-          type: array
-          items:
-            $ref: '#/components/schemas/SandboxVolumeMount'
     SandboxesWithMetrics:
       required:
       - sandboxes
@@ -705,10 +642,6 @@ components:
           $ref: '#/components/schemas/Mcp'
         iam:
           $ref: '#/components/schemas/SandboxIam'
-        volumeMounts:
-          type: array
-          items:
-            $ref: '#/components/schemas/SandboxVolumeMount'
     SandboxIam:
       type: object
       description: Sandbox workload identity configuration. A non-empty, valid tokens
@@ -742,10 +675,6 @@ components:
           minimum: 0
           default: 15
           description: Time to live for the sandbox in seconds.
-        autoPause:
-          type: boolean
-          deprecated: true
-          description: Automatically pauses the sandbox after the timeout
     ConnectSandbox:
       type: object
       required:
@@ -828,16 +757,10 @@ components:
     TeamMetric:
       description: Team metric with timestamp
       required:
-      - timestamp
       - timestampUnix
       - concurrentSandboxes
       - sandboxStartRate
       properties:
-        timestamp:
-          type: string
-          format: date-time
-          deprecated: true
-          description: Timestamp of the metric entry
         timestampUnix:
           type: integer
           format: int64
@@ -853,15 +776,9 @@ components:
     MaxTeamMetric:
       description: Team metric with timestamp
       required:
-      - timestamp
       - timestampUnix
       - value
       properties:
-        timestamp:
-          type: string
-          format: date-time
-          deprecated: true
-          description: Timestamp of the metric entry
         timestampUnix:
           type: integer
           format: int64
@@ -891,13 +808,6 @@ components:
         failedCount:
           type: integer
           description: Number of builds that failed to cancel
-    VolumeToken:
-      type: object
-      properties:
-        token:
-          type: string
-      required:
-      - token
     Template:
       required:
       - templateID
@@ -913,7 +823,6 @@ components:
       - spawnCount
       - buildCount
       - envdVersion
-      - aliases
       - names
       - buildStatus
       properties:
@@ -932,12 +841,6 @@ components:
         public:
           type: boolean
           description: Whether the template is public or only accessible by the team
-        aliases:
-          type: array
-          description: Aliases of the template
-          deprecated: true
-          items:
-            type: string
         names:
           type: array
           description: Names of the template (namespace/alias format when namespaced)
@@ -977,7 +880,6 @@ components:
       - templateID
       - buildID
       - public
-      - aliases
       - names
       - tags
       properties:
@@ -1000,76 +902,6 @@ components:
           description: Tags assigned to the template build
           items:
             type: string
-        aliases:
-          type: array
-          description: Aliases of the template
-          deprecated: true
-          items:
-            type: string
-    TemplateLegacy:
-      required:
-      - templateID
-      - buildID
-      - cpuCount
-      - memoryMB
-      - diskSizeMB
-      - public
-      - createdAt
-      - updatedAt
-      - createdBy
-      - lastSpawnedAt
-      - spawnCount
-      - buildCount
-      - envdVersion
-      - aliases
-      properties:
-        templateID:
-          type: string
-          description: Identifier of the template
-        buildID:
-          type: string
-          description: Identifier of the last successful build for given template
-        cpuCount:
-          $ref: '#/components/schemas/CPUCount'
-        memoryMB:
-          $ref: '#/components/schemas/MemoryMB'
-        diskSizeMB:
-          $ref: '#/components/schemas/DiskSizeMB'
-        public:
-          type: boolean
-          description: Whether the template is public or only accessible by the team
-        aliases:
-          type: array
-          description: Aliases of the template
-          items:
-            type: string
-        createdAt:
-          type: string
-          format: date-time
-          description: Time when the template was created
-        updatedAt:
-          type: string
-          format: date-time
-          description: Time when the template was last updated
-        createdBy:
-          allOf:
-          - $ref: '#/components/schemas/TeamUser'
-          nullable: true
-        lastSpawnedAt:
-          type: string
-          nullable: true
-          format: date-time
-          description: Time when the template was last used
-        spawnCount:
-          type: integer
-          format: int64
-          description: Number of times the template was used
-        buildCount:
-          type: integer
-          format: int32
-          description: Number of times the template was built
-        envdVersion:
-          $ref: '#/components/schemas/EnvdVersion'
     TemplateBuild:
       required:
       - buildID
@@ -1109,7 +941,6 @@ components:
       required:
       - templateID
       - public
-      - aliases
       - names
       - createdAt
       - updatedAt
@@ -1123,12 +954,6 @@ components:
         public:
           type: boolean
           description: Whether the template is public or only accessible by the team
-        aliases:
-          type: array
-          description: Aliases of the template
-          deprecated: true
-          items:
-            type: string
         names:
           type: array
           description: Names of the template (namespace/alias format when namespaced)
@@ -1225,15 +1050,6 @@ components:
           description: Tags to assign to the template build
           items:
             type: string
-        alias:
-          description: Alias of the template. Deprecated, use name instead.
-          type: string
-          maxLength: 128
-          deprecated: true
-        teamID:
-          deprecated: true
-          type: string
-          description: Identifier of the team
         cpuCount:
           $ref: '#/components/schemas/CPUCount'
         memoryMB:
@@ -1245,10 +1061,6 @@ components:
         alias:
           description: Alias of the template
           type: string
-        teamID:
-          deprecated: true
-          type: string
-          description: Identifier of the team
         cpuCount:
           $ref: '#/components/schemas/CPUCount'
         memoryMB:
@@ -1708,37 +1520,6 @@ components:
           type: integer
           format: uint64
           description: Number of sandbox create fails
-    CreatedAccessToken:
-      required:
-      - id
-      - name
-      - token
-      - mask
-      - createdAt
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: Identifier of the access token
-        name:
-          type: string
-          description: Name of the access token
-        token:
-          type: string
-          description: The fully created access token
-        mask:
-          $ref: '#/components/schemas/IdentifierMaskingDetails'
-        createdAt:
-          type: string
-          format: date-time
-          description: Timestamp of access token creation
-    NewAccessToken:
-      required:
-      - name
-      properties:
-        name:
-          type: string
-          description: Name of the access token
     TeamAPIKey:
       required:
       - id
@@ -1903,54 +1684,6 @@ components:
         maskedValueSuffix:
           type: string
           description: Suffix used in masked version of the token or key
-    Volume:
-      type: object
-      properties:
-        volumeID:
-          type: string
-          description: ID of the volume
-        name:
-          type: string
-          description: Name of the volume
-      required:
-      - volumeID
-      - name
-    VolumeAndToken:
-      type: object
-      properties:
-        volumeID:
-          type: string
-          description: ID of the volume
-        name:
-          type: string
-          description: Name of the volume
-        token:
-          type: string
-          description: Auth token to use for interacting with volume content
-        domain:
-          type: string
-          description: 'Domain to use as the destination for volume content requests,
-
-            replacing the default `api.<AGENTBOX_DOMAIN>`. Only returned when the
-
-            team is connected to a custom (BYOC) cluster; absent otherwise, in
-
-            which case the default domain is used.
-
-            '
-      required:
-      - volumeID
-      - name
-      - token
-    NewVolume:
-      type: object
-      properties:
-        name:
-          type: string
-          description: Name of the volume
-          pattern: ^[a-zA-Z0-9_-]+$
-      required:
-      - name
 tags:
 - name: sandboxes
 - name: snapshots
@@ -1964,12 +1697,6 @@ paths:
       description: Get metrics for the team
       tags:
       - team-metrics
-      security:
-      - ApiKeyAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       parameters:
       - $ref: '#/components/parameters/teamID'
       - in: query
@@ -2012,12 +1739,6 @@ paths:
       description: Get the maximum metrics for the team in the given interval
       tags:
       - team-metrics
-      security:
-      - ApiKeyAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       parameters:
       - $ref: '#/components/parameters/teamID'
       - in: query
@@ -2067,12 +1788,6 @@ paths:
       description: Create a sandbox from the template
       tags:
       - sandboxes
-      security:
-      - ApiKeyAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       requestBody:
         required: true
         content:
@@ -2099,12 +1814,6 @@ paths:
       description: List all sandboxes
       tags:
       - sandboxes
-      security:
-      - ApiKeyAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       parameters:
       - name: metadata
         in: query
@@ -2152,12 +1861,6 @@ paths:
       description: List metrics for given sandboxes
       tags:
       - sandboxes
-      security:
-      - ApiKeyAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       parameters:
       - name: sandbox_ids
         in: query
@@ -2190,12 +1893,6 @@ paths:
       description: Get sandbox logs
       tags:
       - sandboxes
-      security:
-      - ApiKeyAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       parameters:
       - $ref: '#/components/parameters/sandboxID'
       - in: query
@@ -2257,12 +1954,6 @@ paths:
       description: Get a sandbox by id
       tags:
       - sandboxes
-      security:
-      - ApiKeyAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       parameters:
       - $ref: '#/components/parameters/sandboxID'
       responses:
@@ -2284,12 +1975,6 @@ paths:
       description: Kill a sandbox
       tags:
       - sandboxes
-      security:
-      - ApiKeyAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       parameters:
       - $ref: '#/components/parameters/sandboxID'
       responses:
@@ -2308,12 +1993,6 @@ paths:
       description: Get sandbox metrics
       tags:
       - sandboxes
-      security:
-      - ApiKeyAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       parameters:
       - $ref: '#/components/parameters/sandboxID'
       - in: query
@@ -2356,12 +2035,6 @@ paths:
       description: Pause the sandbox
       tags:
       - sandboxes
-      security:
-      - ApiKeyAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       parameters:
       - $ref: '#/components/parameters/sandboxID'
       requestBody:
@@ -2393,12 +2066,6 @@ paths:
         status means the request failed before any fork was attempted.'
       tags:
       - sandboxes
-      security:
-      - ApiKeyAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       parameters:
       - $ref: '#/components/parameters/sandboxID'
       requestBody:
@@ -2433,12 +2100,6 @@ paths:
         TTL is only extended.
       tags:
       - sandboxes
-      security:
-      - ApiKeyAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       parameters:
       - $ref: '#/components/parameters/sandboxID'
       requestBody:
@@ -2476,12 +2137,6 @@ paths:
         from the time of the request. Calling this method multiple times overwrites
         the TTL, each time using the current timestamp as the starting point to measure
         the timeout duration.
-      security:
-      - ApiKeyAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       tags:
       - sandboxes
       requestBody:
@@ -2507,12 +2162,6 @@ paths:
       description: Update the network configuration for a running sandbox. Replaces
         the current egress rules with the provided configuration. Omitting field clears
         it.
-      security:
-      - ApiKeyAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       tags:
       - sandboxes
       requestBody:
@@ -2539,12 +2188,6 @@ paths:
     post:
       summary: Refresh sandbox
       description: Refresh the sandbox extending its time to live
-      security:
-      - ApiKeyAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       tags:
       - sandboxes
       requestBody:
@@ -2570,12 +2213,6 @@ paths:
         sandbox's lifetime.
       tags:
       - snapshots
-      security:
-      - ApiKeyAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       parameters:
       - $ref: '#/components/parameters/sandboxID'
       requestBody:
@@ -2606,12 +2243,6 @@ paths:
       description: List all snapshots for the team
       tags:
       - snapshots
-      security:
-      - ApiKeyAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       parameters:
       - name: sandboxID
         in: query
@@ -2651,12 +2282,6 @@ paths:
       description: Create a new template
       tags:
       - templates
-      security:
-      - ApiKeyAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       requestBody:
         required: true
         content:
@@ -2685,13 +2310,6 @@ paths:
       description: List all templates
       tags:
       - templates
-      security:
-      - ApiKeyAuth: []
-      - AccessTokenAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       parameters:
       - in: query
         required: false
@@ -2728,13 +2346,6 @@ paths:
       description: Get an upload link for a tar file containing build layer files
       tags:
       - templates
-      security:
-      - AccessTokenAuth: []
-      - ApiKeyAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       parameters:
       - $ref: '#/components/parameters/templateID'
       - in: path
@@ -2765,12 +2376,6 @@ paths:
       description: List all builds for a template
       tags:
       - templates
-      security:
-      - ApiKeyAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       parameters:
       - $ref: '#/components/parameters/templateID'
       - $ref: '#/components/parameters/paginationNextToken'
@@ -2795,13 +2400,6 @@ paths:
       description: Delete a template
       tags:
       - templates
-      security:
-      - ApiKeyAuth: []
-      - AccessTokenAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       parameters:
       - $ref: '#/components/parameters/templateID'
       responses:
@@ -2818,12 +2416,6 @@ paths:
       description: Start the build
       tags:
       - templates
-      security:
-      - ApiKeyAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       parameters:
       - $ref: '#/components/parameters/templateID'
       - $ref: '#/components/parameters/buildID'
@@ -2847,13 +2439,6 @@ paths:
       description: Update template
       tags:
       - templates
-      security:
-      - ApiKeyAuth: []
-      - AccessTokenAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       parameters:
       - $ref: '#/components/parameters/templateID'
       requestBody:
@@ -2882,13 +2467,6 @@ paths:
       description: Get template build info
       tags:
       - templates
-      security:
-      - AccessTokenAuth: []
-      - ApiKeyAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       parameters:
       - $ref: '#/components/parameters/templateID'
       - $ref: '#/components/parameters/buildID'
@@ -2934,13 +2512,6 @@ paths:
       description: Get template build logs
       tags:
       - templates
-      security:
-      - AccessTokenAuth: []
-      - ApiKeyAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       parameters:
       - $ref: '#/components/parameters/templateID'
       - $ref: '#/components/parameters/buildID'
@@ -3000,12 +2571,6 @@ paths:
       description: Assign tag(s) to a template build
       tags:
       - tags
-      security:
-      - ApiKeyAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       requestBody:
         required: true
         content:
@@ -3033,12 +2598,6 @@ paths:
       description: Delete multiple tags from templates
       tags:
       - tags
-      security:
-      - ApiKeyAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       requestBody:
         required: true
         content:
@@ -3063,12 +2622,6 @@ paths:
       description: List all tags for a template
       tags:
       - tags
-      security:
-      - ApiKeyAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       parameters:
       - $ref: '#/components/parameters/templateID'
       responses:
@@ -3095,12 +2648,6 @@ paths:
       description: Check if template with given alias exists
       tags:
       - templates
-      security:
-      - ApiKeyAuth: []
-      - AuthProviderBearerAuth: []
-        AuthProviderTeamAuth: []
-      - AdminApiKeyAuth: []
-        AdminTeamAuth: []
       parameters:
       - name: alias
         in: path
