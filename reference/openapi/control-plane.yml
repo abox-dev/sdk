@@ -1684,6 +1684,11 @@ components:
         maskedValueSuffix:
           type: string
           description: Suffix used in masked version of the token or key
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
 tags:
 - name: sandboxes
 - name: snapshots
@@ -1733,6 +1738,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: getTeamMetrics
+      security:
+      - ApiKeyAuth: []
   /teams/{teamID}/metrics/max:
     get:
       summary: Maximum team metrics
@@ -1782,6 +1789,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: getTeamMetricsMax
+      security:
+      - ApiKeyAuth: []
   /sandboxes:
     post:
       summary: Create sandbox
@@ -1808,6 +1817,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: createSandbox
+      security:
+      - ApiKeyAuth: []
   /v2/sandboxes:
     get:
       summary: List sandboxes (v2)
@@ -1855,6 +1866,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: listSandboxes
+      security:
+      - ApiKeyAuth: []
   /sandboxes/metrics:
     get:
       summary: List sandbox metrics
@@ -1887,6 +1900,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: listSandboxMetrics
+      security:
+      - ApiKeyAuth: []
   /v2/sandboxes/{sandboxID}/logs:
     get:
       summary: Sandbox logs (v2)
@@ -1948,6 +1963,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: getSandboxLogs
+      security:
+      - ApiKeyAuth: []
   /sandboxes/{sandboxID}:
     get:
       summary: Sandbox
@@ -1970,6 +1987,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: getSandbox
+      security:
+      - ApiKeyAuth: []
     delete:
       summary: Kill sandbox
       description: Kill a sandbox
@@ -1987,6 +2006,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: killSandbox
+      security:
+      - ApiKeyAuth: []
   /sandboxes/{sandboxID}/metrics:
     get:
       summary: Sandbox metrics
@@ -2029,6 +2050,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: getSandboxMetrics
+      security:
+      - ApiKeyAuth: []
   /sandboxes/{sandboxID}/pause:
     post:
       summary: Pause sandbox
@@ -2055,6 +2078,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: pauseSandbox
+      security:
+      - ApiKeyAuth: []
   /sandboxes/{sandboxID}/fork:
     post:
       summary: Fork sandbox
@@ -2093,6 +2118,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: forkSandbox
+      security:
+      - ApiKeyAuth: []
   /sandboxes/{sandboxID}/connect:
     post:
       summary: Connect sandbox
@@ -2130,6 +2157,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: connectSandbox
+      security:
+      - ApiKeyAuth: []
   /sandboxes/{sandboxID}/timeout:
     post:
       summary: Set sandbox timeout
@@ -2156,6 +2185,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: setSandboxTimeout
+      security:
+      - ApiKeyAuth: []
   /sandboxes/{sandboxID}/network:
     put:
       summary: Update sandbox network
@@ -2184,6 +2215,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: updateSandboxNetwork
+      security:
+      - ApiKeyAuth: []
   /sandboxes/{sandboxID}/refreshes:
     post:
       summary: Refresh sandbox
@@ -2205,6 +2238,8 @@ paths:
         '404':
           $ref: '#/components/responses/404'
       operationId: refreshSandbox
+      security:
+      - ApiKeyAuth: []
   /sandboxes/{sandboxID}/snapshots:
     post:
       summary: Create snapshot
@@ -2237,6 +2272,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: createSnapshot
+      security:
+      - ApiKeyAuth: []
   /snapshots:
     get:
       summary: List snapshots
@@ -2276,6 +2313,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: listSnapshots
+      security:
+      - ApiKeyAuth: []
   /v3/templates:
     post:
       summary: Create template (v3)
@@ -2304,6 +2343,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: createTemplate
+      security:
+      - ApiKeyAuth: []
   /v2/templates:
     get:
       summary: List templates (v2)
@@ -2340,6 +2381,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: listTemplates
+      security:
+      - ApiKeyAuth: []
   /templates/{templateID}/files/{hash}:
     get:
       summary: Template build file upload URL
@@ -2370,6 +2413,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: getTemplateUploadUrl
+      security:
+      - ApiKeyAuth: []
   /templates/{templateID}:
     get:
       summary: List template builds
@@ -2395,6 +2440,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: getTemplate
+      security:
+      - ApiKeyAuth: []
     delete:
       summary: Delete template
       description: Delete a template
@@ -2410,6 +2457,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: deleteTemplate
+      security:
+      - ApiKeyAuth: []
   /v2/templates/{templateID}/builds/{buildID}:
     post:
       summary: Start template build (v2)
@@ -2433,6 +2482,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: startTemplateBuild
+      security:
+      - ApiKeyAuth: []
   /v2/templates/{templateID}:
     patch:
       summary: Update template (v2)
@@ -2461,6 +2512,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: updateTemplate
+      security:
+      - ApiKeyAuth: []
   /templates/{templateID}/builds/{buildID}/status:
     get:
       summary: Template build status
@@ -2506,6 +2559,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: getTemplateBuildStatus
+      security:
+      - ApiKeyAuth: []
   /templates/{templateID}/builds/{buildID}/logs:
     get:
       summary: Template build logs
@@ -2565,6 +2620,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: getTemplateBuildLogs
+      security:
+      - ApiKeyAuth: []
   /templates/tags:
     post:
       summary: Assign template tags
@@ -2593,6 +2650,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: assignTemplateTags
+      security:
+      - ApiKeyAuth: []
     delete:
       summary: Delete template tags
       description: Delete multiple tags from templates
@@ -2616,6 +2675,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: deleteTemplateTags
+      security:
+      - ApiKeyAuth: []
   /templates/{templateID}/tags:
     get:
       summary: List template tags
@@ -2642,6 +2703,8 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: listTemplateTags
+      security:
+      - ApiKeyAuth: []
   /templates/aliases/{alias}:
     get:
       summary: Check template alias
@@ -2671,3 +2734,5 @@ paths:
         '500':
           $ref: '#/components/responses/500'
       operationId: getTemplateByAlias
+      security:
+      - ApiKeyAuth: []

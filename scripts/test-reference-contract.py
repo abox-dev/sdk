@@ -25,7 +25,6 @@ FORBIDDEN_REFERENCE_PROPERTIES = {
     "volumeMounts",
 }
 FORBIDDEN_SECURITY_SCHEMES = {
-    "AccessTokenAuth",
     "AdminApiKeyAuth",
     "AdminTeamAuth",
     "AuthProviderBearerAuth",
@@ -175,14 +174,40 @@ def main() -> None:
     public_documents = {}
     for name in ("openapi/control-plane.yml", "openapi/envd.yml"):
         document = yaml.safe_load((REFERENCE / name).read_text())
-        public_documents[name.removeprefix("openapi/").removesuffix(".yml")] = document
-        assert "securitySchemes" not in document.get("components", {})
-        for path_item in document["paths"].values():
-            for method, operation in path_item.items():
-                if method.lower() in {"get", "post", "put", "patch", "delete"}:
-                    assert "security" not in operation
+        spec_name = name.removeprefix("openapi/").removesuffix(".yml")
+        public_documents[spec_name] = document
+        expected_scheme = (
+            "ApiKeyAuth" if spec_name == "control-plane" else "AccessTokenAuth"
+        )
+        expected_header = (
+            "X-API-Key" if spec_name == "control-plane" else "X-Access-Token"
+        )
+        assert set(document.get("components", {}).get("securitySchemes", {})) == {
+            expected_scheme
+        }
+        assert document["components"]["securitySchemes"][expected_scheme] == {
+            "type": "apiKey",
+            "in": "header",
+            "name": expected_header,
+        }
         assert_public_schema(document)
         assert_local_refs_resolve(document)
+
+    for operation in operations:
+        document = public_documents[operation["spec"]]
+        rendered_operation = document["paths"][operation["path"]][
+            operation["method"].lower()
+        ]
+        auth = operation["auth"]
+        if auth is None:
+            assert rendered_operation["security"] == []
+            continue
+        scheme = (
+            "ApiKeyAuth" if operation["spec"] == "control-plane" else "AccessTokenAuth"
+        )
+        requirement = {scheme: []}
+        expected = [requirement] if auth["required"] else [{}, requirement]
+        assert rendered_operation["security"] == expected
 
     rendered_markdown = "\n".join(
         path.read_text() for path in (REFERENCE / "openapi/markdown").glob("*.md")

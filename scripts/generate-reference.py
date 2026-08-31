@@ -233,6 +233,46 @@ def normalize_operation_auth(
     }
 
 
+def apply_public_operation_security(
+    source: dict,
+    public: dict,
+    records: list[dict],
+    public_scheme_names: set[str],
+) -> None:
+    """Restore only the normalized public auth contract after filtering."""
+    source_schemes = source.get("components", {}).get("securitySchemes", {})
+    published_schemes = {}
+    scheme_by_header = {}
+    for name in sorted(public_scheme_names):
+        scheme = source_schemes.get(name)
+        if not isinstance(scheme, dict):
+            raise SystemExit(f"Public auth scheme is missing: {name}")
+        if scheme.get("type") != "apiKey" or scheme.get("in") != "header":
+            raise SystemExit(f"Public auth scheme {name} must be an apiKey header")
+        header = scheme.get("name")
+        if not isinstance(header, str) or not header:
+            raise SystemExit(f"Public auth scheme {name} has no header name")
+        if header in scheme_by_header:
+            raise SystemExit(f"Multiple public auth schemes use header {header}")
+        published_schemes[name] = strip_extension(scheme)
+        scheme_by_header[header] = name
+
+    public.setdefault("components", {})["securitySchemes"] = published_schemes
+    for record in records:
+        operation = public["paths"][record["path"]][record["method"].lower()]
+        auth = record["auth"]
+        if auth is None:
+            operation["security"] = []
+            continue
+        scheme_name = scheme_by_header.get(auth["header"])
+        if scheme_name is None:
+            raise SystemExit(
+                f"No public auth scheme for {record['operationId']} header {auth['header']}"
+            )
+        requirement = {scheme_name: []}
+        operation["security"] = [requirement] if auth["required"] else [{}, requirement]
+
+
 def build_openapi(name: str, config: dict) -> list[dict]:
     source = ROOT / config["source"]
     document = yaml.safe_load(source.read_text())
@@ -327,6 +367,7 @@ def build_openapi(name: str, config: dict) -> list[dict]:
         {"name": group} for group in sorted({record["group"] for record in records})
     ]
     filter_public_openapi(public, for_reference=True)
+    apply_public_operation_security(document, public, records, public_auth_schemes)
     destination = (
         OUT
         / "openapi"
