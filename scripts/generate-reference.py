@@ -255,7 +255,13 @@ def run_sdk_generators() -> None:
             subprocess.run(command, cwd=ROOT, env=environment, check=True)
 
     subprocess.run(
-        ["tsx", "src/reference.ts", str(OUT / "sdk/cli")],
+        [
+            "tsx",
+            "--tsconfig",
+            "../../reference-config/cli-reference.json",
+            "src/reference.ts",
+            str(OUT / "sdk/cli"),
+        ],
         cwd=ROOT / "packages/cli",
         check=True,
     )
