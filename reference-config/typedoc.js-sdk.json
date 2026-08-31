@@ -5,5 +5,14 @@
     "rootDir": "..",
     "ignoreDeprecations": "6.0"
   },
-  "include": ["../packages/js-sdk/src/**/*.ts", "javascript/*.ts"]
+  "include": [
+    "../packages/js-sdk/src/**/*.ts",
+    "javascript/commands.ts",
+    "javascript/errors.ts",
+    "javascript/filesystem.ts",
+    "javascript/logger.ts",
+    "javascript/ready-commands.ts",
+    "javascript/sandbox.ts",
+    "javascript/templates.ts"
+  ]
 }
