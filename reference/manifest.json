@@ -36,7 +36,7 @@
     "sdk/javascript/code-interpreter/messaging/type-aliases/MIMEType.md": "e83e73d6a0e97763e7e82b736871be2363b73f078d500b0f753d0d5085a6737c",
     "sdk/javascript/code-interpreter/messaging/type-aliases/RawData.md": "1d4c93b749bebbb87e1f2b4a335528adb16f98360a24550c1fbb4d2056ca3c9b",
     "sdk/javascript/code-interpreter/sandbox/README.md": "ce7ff81b5b0bc706ab215ebbb971aac7951fbcd82959c0884fff8c84f0aae33a",
-    "sdk/javascript/code-interpreter/sandbox/classes/Sandbox.md": "00b255364c5db61830b4fbe58c2dcf32aa80735b7c31ba9d4c07fe1552a45cbd",
+    "sdk/javascript/code-interpreter/sandbox/classes/Sandbox.md": "953be987b9939a4d498e04e2c9d9e8bd6fe3312ca7aa33add9a2cf8b0537a176",
     "sdk/javascript/code-interpreter/sandbox/interfaces/CreateCodeContextOpts.md": "9077fc89c2bc9589e19112b63158ad55cd4d75c52879af93d3b65dd391fc1eaf",
     "sdk/javascript/code-interpreter/sandbox/interfaces/RunCodeOpts.md": "b7518d5d91a0def0d7f2f10bb4153a76969f0c0c049cac930519342d93c64556",
     "sdk/javascript/code-interpreter/sandbox/type-aliases/Context.md": "01a1570ac3f1870cb303215203b7b3dddf26bfcf5cc53c863bb65ea493956825",

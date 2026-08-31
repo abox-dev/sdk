@@ -1,0 +1,11 @@
+{
+  "extends": "../packages/code-interpreter-js/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "..",
+    "rootDir": "..",
+    "ignoreDeprecations": "6.0",
+    "paths": {
+      "@abox-dev/sdk": ["packages/js-sdk/src/index.ts"]
+    }
+  }
+}

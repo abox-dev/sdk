@@ -143,7 +143,7 @@ Traffic access token for accessing sandbox services with restricted public traff
 
 ### defaultMcpTemplate
 
-> `protected` `readonly` `static` **defaultMcpTemplate**: `string`
+> `protected` `readonly` `static` **defaultMcpTemplate**: `string` = `'mcp-gateway'`
 
 #### Inherited from
 
@@ -153,7 +153,7 @@ Traffic access token for accessing sandbox services with restricted public traff
 
 ### defaultSandboxTimeoutMs
 
-> `protected` `readonly` `static` **defaultSandboxTimeoutMs**: `300000` = `300000`
+> `protected` `readonly` `static` **defaultSandboxTimeoutMs**: `300000` = `DEFAULT_SANDBOX_TIMEOUT_MS`
 
 #### Inherited from
 
@@ -416,7 +416,7 @@ Get sandbox information like sandbox ID, template, metadata, started at/end at d
 
 ##### opts?
 
-`Pick`\<`SandboxOpts`, `"requestTimeoutMs"` \| `"signal"`\>
+`Pick`\<`SandboxOpts`, `"signal"` \| `"requestTimeoutMs"`\>
 
 connection options.
 
@@ -504,7 +504,7 @@ Check if the sandbox is running.
 
 ##### opts?
 
-`Pick`\<`ConnectionOpts`, `"requestTimeoutMs"` \| `"signal"`\>
+`Pick`\<`ConnectionOpts`, `"signal"` \| `"requestTimeoutMs"`\>
 
 #### Returns
 
@@ -538,7 +538,7 @@ Kill the sandbox.
 
 ##### opts?
 
-`Pick`\<`SandboxOpts`, `"requestTimeoutMs"` \| `"signal"`\>
+`Pick`\<`SandboxOpts`, `"signal"` \| `"requestTimeoutMs"`\>
 
 connection options.
 
@@ -762,7 +762,7 @@ timeout in **milliseconds**.
 
 ##### opts?
 
-`Pick`\<`SandboxOpts`, `"requestTimeoutMs"` \| `"signal"`\>
+`Pick`\<`SandboxOpts`, `"signal"` \| `"requestTimeoutMs"`\>
 
 connection options.
 
@@ -795,7 +795,7 @@ new network configuration.
 
 ##### opts?
 
-`Pick`\<`SandboxOpts`, `"requestTimeoutMs"` \| `"signal"`\>
+`Pick`\<`SandboxOpts`, `"signal"` \| `"requestTimeoutMs"`\>
 
 connection options.
 

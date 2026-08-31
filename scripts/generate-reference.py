@@ -204,7 +204,7 @@ def run_sdk_generators() -> None:
     for name, entries in groups["javascript"].items():
         destination = OUT / "sdk/javascript" / name
         tsconfig = (
-            "packages/code-interpreter-js/tsconfig.json"
+            "reference-config/typedoc.code-interpreter.json"
             if entries[0].startswith("packages/code-interpreter-js/")
             else "packages/js-sdk/tsconfig.json"
         )
