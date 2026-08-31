@@ -24,7 +24,7 @@ agentbox sandbox connect [options] <sandboxID>
 
 - `-u, --user &lt;user&gt;`: user to start the terminal session as
 - `-c, --cwd &lt;dir&gt;`: working directory for the terminal session
-- `-e, --env &lt;KEY=VALUE&gt;`: set environment variable for the terminal session (repeatable) Default: `[object Object]`.
+- `-e, --env &lt;KEY=VALUE&gt;`: set environment variable for the terminal session (repeatable)
 
 ## agentbox sandbox create
 
@@ -44,7 +44,7 @@ agentbox sandbox create [options] [template]
 - `--timeout &lt;seconds&gt;`: sandbox timeout in seconds
 - `-u, --user &lt;user&gt;`: user to start the terminal session as
 - `-c, --cwd &lt;dir&gt;`: working directory for the terminal session
-- `-e, --env &lt;KEY=VALUE&gt;`: set environment variable for the terminal session (repeatable) Default: `[object Object]`.
+- `-e, --env &lt;KEY=VALUE&gt;`: set environment variable for the terminal session (repeatable)
 
 ## agentbox sandbox exec
 
@@ -61,7 +61,7 @@ agentbox sandbox exec [options] <sandboxID> <command...>
 - `-b, --background`: run in background and return immediately
 - `-c, --cwd &lt;dir&gt;`: working directory
 - `-u, --user &lt;user&gt;`: run as specified user
-- `-e, --env &lt;KEY=VALUE&gt;`: set environment variable (repeatable) Default: `[object Object]`.
+- `-e, --env &lt;KEY=VALUE&gt;`: set environment variable (repeatable)
 
 ## agentbox sandbox info
 
