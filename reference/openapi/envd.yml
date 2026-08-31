@@ -19,9 +19,6 @@ paths:
   /metrics:
     get:
       summary: Service stats
-      security:
-      - AccessTokenAuth: []
-      - {}
       responses:
         '200':
           description: The resource usage metrics of the service
@@ -35,9 +32,6 @@ paths:
   /envs:
     get:
       summary: Environment variables
-      security:
-      - AccessTokenAuth: []
-      - {}
       responses:
         '200':
           description: Environment variables
@@ -53,9 +47,6 @@ paths:
       summary: Download a file
       tags:
       - files
-      security:
-      - AccessTokenAuth: []
-      - {}
       parameters:
       - $ref: '#/components/parameters/FilePath'
       - $ref: '#/components/parameters/User'
@@ -120,9 +111,6 @@ paths:
         '
       tags:
       - files
-      security:
-      - AccessTokenAuth: []
-      - {}
       parameters:
       - $ref: '#/components/parameters/FilePath'
       - $ref: '#/components/parameters/User'
@@ -148,9 +136,6 @@ paths:
         Source files are deleted after successful composition.
       tags:
       - files
-      security:
-      - AccessTokenAuth: []
-      - {}
       requestBody:
         required: true
         content:
@@ -176,7 +161,6 @@ paths:
           $ref: '#/components/responses/NotEnoughDiskSpace'
       operationId: composeFiles
 components:
-  securitySchemes: {}
   parameters:
     FilePath:
       name: path

@@ -26,7 +26,6 @@ Schema: `NewSandbox`
 | `envVars` | `EnvVars` | no |  |
 | `mcp` | `Mcp` | no | MCP configuration for the sandbox |
 | `iam` | `SandboxIam` | no | Sandbox workload identity configuration. A non-empty, valid tokens map enables workload identity for the sandbox. |
-| `volumeMounts` | `array<SandboxVolumeMount>` | no |  |
 
 ## Responses
 
@@ -43,10 +42,7 @@ Schema: `Sandbox`
 | `templateID` | `string` | yes | Identifier of the template from which is the sandbox created |
 | `sandboxID` | `string` | yes | Identifier of the sandbox |
 | `alias` | `string` | no | Alias of the template |
-| `clientID` | `string` | yes | Identifier of the client |
 | `envdVersion` | `EnvdVersion` | yes | Version of the envd running in the sandbox |
-| `envdAccessToken` | `string` | no | Access token used for envd communication |
-| `trafficAccessToken` | `string` | no | Token required for accessing sandbox via proxy. |
 | `domain` | `string` | no | Base domain where the sandbox traffic is accessible |
 
 ### 401

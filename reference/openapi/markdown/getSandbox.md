@@ -25,11 +25,9 @@ Schema: `SandboxDetail`
 | `templateID` | `string` | yes | Identifier of the template from which is the sandbox created |
 | `alias` | `string` | no | Alias of the template |
 | `sandboxID` | `string` | yes | Identifier of the sandbox |
-| `clientID` | `string` | yes | Identifier of the client |
 | `startedAt` | `string` | yes | Time when the sandbox was started |
 | `endAt` | `string` | yes | Time when the sandbox will expire |
 | `envdVersion` | `EnvdVersion` | yes | Version of the envd running in the sandbox |
-| `envdAccessToken` | `string` | no | Access token used for envd communication |
 | `allowInternetAccess` | `boolean` | no | Whether internet access was explicitly enabled or disabled for the sandbox. Null means it was not explicitly set. |
 | `domain` | `string` | no | Base domain where the sandbox traffic is accessible |
 | `cpuCount` | `CPUCount` | yes | CPU cores for the sandbox |
@@ -39,7 +37,6 @@ Schema: `SandboxDetail`
 | `state` | `SandboxState` | yes | State of the sandbox |
 | `network` | `SandboxNetworkConfig` | no |  |
 | `lifecycle` | `SandboxLifecycle` | no | Sandbox lifecycle policy returned by sandbox info. |
-| `volumeMounts` | `array<SandboxVolumeMount>` | no |  |
 
 ### 404
 

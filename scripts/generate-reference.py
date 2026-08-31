@@ -14,6 +14,8 @@ from pathlib import Path
 
 import yaml
 
+from public_openapi import filter_public_openapi
+
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "reference"
 HTTP_METHODS = {"get", "post", "put", "patch", "delete"}
@@ -243,12 +245,7 @@ def build_openapi(name: str, config: dict) -> list[dict]:
     public["tags"] = [
         {"name": group} for group in sorted({record["group"] for record in records})
     ]
-    if "components" in public and "securitySchemes" in public["components"]:
-        public["components"]["securitySchemes"] = {
-            key: value
-            for key, value in public["components"]["securitySchemes"].items()
-            if key == "ApiKeyAuth"
-        }
+    filter_public_openapi(public, for_reference=True)
     destination = (
         OUT
         / "openapi"
