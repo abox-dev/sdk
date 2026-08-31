@@ -42,19 +42,23 @@ jobs:
   npm:
     needs: build
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: 22
-          registry-url: https://registry.npmjs.org
+          node-version: 24
+      # npm Trusted Publishing requires an OIDC-capable npm CLI. Keep this
+      # version explicit so the release does not depend on the runner default.
+      - run: npm install --global npm@11.19.0
+      - run: npm --version
       - uses: actions/download-artifact@v4
         with:
           name: release-${{ github.ref_name }}
           path: release
       - run: node scripts/publish-npm.mjs release/npm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   pypi-core:
     needs: build
