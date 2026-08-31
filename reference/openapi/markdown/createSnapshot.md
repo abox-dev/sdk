@@ -6,9 +6,7 @@ Create a persistent snapshot from the sandbox's current state. Snapshots can be 
 
 ## Parameters
 
-| Name | In | Required | Type | Description |
-| --- | --- | --- | --- | --- |
-| `sandboxID` | path | yes | `string` |  |
+- **`sandboxID`** · `string` · path · required
 
 ## Request body
 
@@ -18,9 +16,9 @@ Required: yes
 
 Schema: `SandboxSnapshotRequest`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `name` | `string` | no | Optional name for the snapshot template. If a snapshot template with this name already exists, a new build will be assigned to the existing template instead of creating a new one. |
+- **`name`** · `string` · optional
+
+  Optional name for the snapshot template. If a snapshot template with this name already exists, a new build will be assigned to the existing template instead of creating a new one.
 
 ## Responses
 
@@ -32,10 +30,13 @@ Content-Type: `application/json`
 
 Schema: `SnapshotInfo`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `snapshotID` | `string` | yes | Identifier of the snapshot template including the tag. Uses namespace/alias when a name was provided (e.g. team-slug/my-snapshot:default), otherwise falls back to the raw template ID (e.g. abc123:default). |
-| `names` | `array<string>` | yes | Full names of the snapshot template including team namespace and tag (e.g. team-slug/my-snapshot:v2) |
+- **`snapshotID`** · `string` · required
+
+  Identifier of the snapshot template including the tag. Uses namespace/alias when a name was provided (e.g. team-slug/my-snapshot:default), otherwise falls back to the raw template ID (e.g. abc123:default).
+
+- **`names`** · `array<string>` · required
+
+  Full names of the snapshot template including team namespace and tag (e.g. team-slug/my-snapshot:v2)
 
 ### 400
 
@@ -45,10 +46,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 401
 
@@ -58,10 +62,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 404
 
@@ -71,10 +78,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 500
 
@@ -84,7 +94,10 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error

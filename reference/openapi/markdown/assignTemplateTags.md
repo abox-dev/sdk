@@ -12,10 +12,13 @@ Required: yes
 
 Schema: `AssignTemplateTagsRequest`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `target` | `string` | yes | Target template in "name:tag" format |
-| `tags` | `array<string>` | yes | Tags to assign to the template |
+- **`target`** · `string` · required
+
+  Target template in "name:tag" format
+
+- **`tags`** · `array<string>` · required
+
+  Tags to assign to the template
 
 ## Responses
 
@@ -27,10 +30,13 @@ Content-Type: `application/json`
 
 Schema: `AssignedTemplateTags`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `tags` | `array<string>` | yes | Assigned tags of the template |
-| `buildID` | `string` | yes | Identifier of the build associated with these tags |
+- **`tags`** · `array<string>` · required
+
+  Assigned tags of the template
+
+- **`buildID`** · `string` · required
+
+  Identifier of the build associated with these tags
 
 ### 400
 
@@ -40,10 +46,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 401
 
@@ -53,10 +62,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 404
 
@@ -66,10 +78,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 500
 
@@ -79,7 +94,10 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error

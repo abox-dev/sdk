@@ -59,8 +59,8 @@ def resolve_ref(document: dict, value: dict) -> tuple[dict, str | None]:
     return current, reference_name
 
 
-def markdown_cell(value: object) -> str:
-    return str(value or "").replace("\n", " ").replace("|", "\\|").strip()
+def markdown_text(value: object) -> str:
+    return " ".join(str(value or "").split())
 
 
 def schema_type(document: dict, schema: dict) -> str:
@@ -78,27 +78,51 @@ def schema_type(document: dict, schema: dict) -> str:
     return resolved.get("type", "object")
 
 
+def render_named_item(
+    name: str, type_name: str, qualifiers: list[str], description: object
+) -> list[str]:
+    details = " · ".join([f"`{type_name}`", *qualifiers])
+    lines = [f"- **`{name}`** · {details}", ""]
+    normalized_description = markdown_text(description)
+    if normalized_description:
+        lines.extend([f"  {normalized_description}", ""])
+    return lines
+
+
+def schema_fields(document: dict, schema: dict) -> dict:
+    """Return the object schema whose fields describe a response value."""
+    resolved, _ = resolve_ref(document, schema)
+    visited = set()
+    while isinstance(resolved, dict) and resolved.get("type") == "array":
+        marker = id(resolved)
+        if marker in visited:
+            return {}
+        visited.add(marker)
+        items = resolved.get("items")
+        if not isinstance(items, dict):
+            return {}
+        resolved, _ = resolve_ref(document, items)
+    return resolved if isinstance(resolved, dict) else {}
+
+
 def render_schema(document: dict, schema: dict) -> list[str]:
     resolved, reference_name = resolve_ref(document, schema)
     lines = [f"Schema: `{reference_name or schema_type(document, resolved)}`", ""]
-    properties = resolved.get("properties", {})
+    fields = schema_fields(document, resolved)
+    properties = fields.get("properties", {})
     if not properties:
         return lines
-    required = set(resolved.get("required", []))
-    lines.extend(
-        [
-            "| Field | Type | Required | Description |",
-            "| --- | --- | --- | --- |",
-        ]
-    )
+    required = set(fields.get("required", []))
     for name, property_schema in properties.items():
         property_value, _ = resolve_ref(document, property_schema)
-        lines.append(
-            f"| `{name}` | `{markdown_cell(schema_type(document, property_schema))}` "
-            f"| {'yes' if name in required else 'no'} "
-            f"| {markdown_cell(property_value.get('description', ''))} |"
+        lines.extend(
+            render_named_item(
+                name,
+                schema_type(document, property_schema),
+                ["required" if name in required else "optional"],
+                property_value.get("description", ""),
+            )
         )
-    lines.append("")
     return lines
 
 
@@ -115,22 +139,19 @@ def render_operation_markdown(document: dict, record: dict) -> str:
         resolved, _ = resolve_ref(document, parameter)
         parameters.append(resolved)
     if parameters:
-        lines.extend(
-            [
-                "## Parameters",
-                "",
-                "| Name | In | Required | Type | Description |",
-                "| --- | --- | --- | --- | --- |",
-            ]
-        )
+        lines.extend(["## Parameters", ""])
         for parameter in parameters:
-            lines.append(
-                f"| `{parameter.get('name', '')}` | {parameter.get('in', '')} "
-                f"| {'yes' if parameter.get('required') else 'no'} "
-                f"| `{markdown_cell(schema_type(document, parameter.get('schema', {})))}` "
-                f"| {markdown_cell(parameter.get('description', ''))} |"
+            lines.extend(
+                render_named_item(
+                    parameter.get("name", ""),
+                    schema_type(document, parameter.get("schema", {})),
+                    [
+                        parameter.get("in", ""),
+                        "required" if parameter.get("required") else "optional",
+                    ],
+                    parameter.get("description", ""),
+                )
             )
-        lines.append("")
 
     if operation.get("requestBody"):
         request_body, _ = resolve_ref(document, operation["requestBody"])
@@ -243,7 +264,7 @@ def build_openapi(name: str, config: dict) -> list[dict]:
         missing = sorted(candidates - set(assigned))
         if missing:
             raise SystemExit(
-                "Public operations require an id, group and slug:\n  "
+                "Public operations require an id, group, slug and summary:\n  "
                 + "\n  ".join(missing)
             )
 
@@ -254,9 +275,14 @@ def build_openapi(name: str, config: dict) -> list[dict]:
             if key not in assigned:
                 continue
             metadata = assigned[key]
-            required = {"id", "group", "slug"}
+            required = {"id", "group", "slug", "summary"}
             if set(metadata) != required:
                 raise SystemExit(f"{key} must define exactly {sorted(required)}")
+            if (
+                not isinstance(metadata["summary"], str)
+                or not metadata["summary"].strip()
+            ):
+                raise SystemExit(f"{key} must define a non-empty summary")
             if metadata["id"] in seen:
                 raise SystemExit(f"Duplicate operation id: {metadata['id']}")
             seen.add(metadata["id"])
@@ -271,6 +297,7 @@ def build_openapi(name: str, config: dict) -> list[dict]:
                     "path": path,
                     "group": metadata["group"],
                     "slug": metadata["slug"],
+                    "summary": markdown_text(metadata["summary"]),
                     "spec": "control-plane" if name == "controlPlane" else "envd",
                     "markdown": f"openapi/markdown/{metadata['id']}.md",
                     "auth": normalize_operation_auth(

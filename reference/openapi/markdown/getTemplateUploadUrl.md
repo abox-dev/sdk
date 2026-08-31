@@ -6,10 +6,9 @@ Get an upload link for a tar file containing build layer files
 
 ## Parameters
 
-| Name | In | Required | Type | Description |
-| --- | --- | --- | --- | --- |
-| `templateID` | path | yes | `string` |  |
-| `hash` | path | yes | `string` |  |
+- **`templateID`** · `string` · path · required
+
+- **`hash`** · `string` · path · required
 
 ## Responses
 
@@ -21,10 +20,13 @@ Content-Type: `application/json`
 
 Schema: `TemplateBuildFileUpload`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `present` | `boolean` | yes | Whether the file is already present in the cache |
-| `url` | `string` | no | Url where the file should be uploaded to |
+- **`present`** · `boolean` · required
+
+  Whether the file is already present in the cache
+
+- **`url`** · `string` · optional
+
+  Url where the file should be uploaded to
 
 ### 400
 
@@ -34,10 +36,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 401
 
@@ -47,10 +52,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 404
 
@@ -60,10 +68,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 500
 
@@ -73,7 +84,10 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error

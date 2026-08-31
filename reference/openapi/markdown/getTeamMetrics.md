@@ -6,11 +6,13 @@ Get metrics for the team
 
 ## Parameters
 
-| Name | In | Required | Type | Description |
-| --- | --- | --- | --- | --- |
-| `teamID` | path | yes | `string` |  |
-| `start` | query | no | `integer` | Unix timestamp for the start of the interval, in seconds, for which the metrics |
-| `end` | query | no | `integer` |  |
+- **`teamID`** · `string` · path · required
+
+- **`start`** · `integer` · query · optional
+
+  Unix timestamp for the start of the interval, in seconds, for which the metrics
+
+- **`end`** · `integer` · query · optional
 
 ## Responses
 
@@ -22,6 +24,18 @@ Content-Type: `application/json`
 
 Schema: `array<TeamMetric>`
 
+- **`timestampUnix`** · `integer` · required
+
+  Timestamp of the metric entry in Unix time (seconds since epoch)
+
+- **`concurrentSandboxes`** · `integer` · required
+
+  The number of concurrent sandboxes for the team
+
+- **`sandboxStartRate`** · `number` · required
+
+  Number of sandboxes started per second
+
 ### 400
 
 Bad request
@@ -30,10 +44,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 401
 
@@ -43,10 +60,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 403
 
@@ -56,10 +76,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 500
 
@@ -69,7 +92,10 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error

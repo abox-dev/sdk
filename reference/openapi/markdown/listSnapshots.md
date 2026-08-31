@@ -6,12 +6,19 @@ List all snapshots for the team
 
 ## Parameters
 
-| Name | In | Required | Type | Description |
-| --- | --- | --- | --- | --- |
-| `sandboxID` | query | no | `string` |  |
-| `name` | query | no | `string` | Filter snapshots by name or ID, optionally tag-qualified (e.g. "my-snapshot", "my-team/my-snapshot" or "my-snapshot:v1"). |
-| `limit` | query | no | `integer` | Maximum number of items to return per page |
-| `nextToken` | query | no | `string` | Cursor to start the list from |
+- **`sandboxID`** · `string` · query · optional
+
+- **`name`** · `string` · query · optional
+
+  Filter snapshots by name or ID, optionally tag-qualified (e.g. "my-snapshot", "my-team/my-snapshot" or "my-snapshot:v1").
+
+- **`limit`** · `integer` · query · optional
+
+  Maximum number of items to return per page
+
+- **`nextToken`** · `string` · query · optional
+
+  Cursor to start the list from
 
 ## Responses
 
@@ -23,6 +30,14 @@ Content-Type: `application/json`
 
 Schema: `array<SnapshotInfo>`
 
+- **`snapshotID`** · `string` · required
+
+  Identifier of the snapshot template including the tag. Uses namespace/alias when a name was provided (e.g. team-slug/my-snapshot:default), otherwise falls back to the raw template ID (e.g. abc123:default).
+
+- **`names`** · `array<string>` · required
+
+  Full names of the snapshot template including team namespace and tag (e.g. team-slug/my-snapshot:v2)
+
 ### 401
 
 Authentication error
@@ -31,10 +46,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 500
 
@@ -44,7 +62,10 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error

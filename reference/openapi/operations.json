@@ -5,6 +5,7 @@
     "path": "/sandboxes/{sandboxID}/connect",
     "group": "sandboxes",
     "slug": "connect",
+    "summary": "Connect sandbox",
     "spec": "control-plane",
     "markdown": "openapi/markdown/connectSandbox.md",
     "auth": {
@@ -19,6 +20,7 @@
     "path": "/sandboxes",
     "group": "sandboxes",
     "slug": "create",
+    "summary": "Create sandbox",
     "spec": "control-plane",
     "markdown": "openapi/markdown/createSandbox.md",
     "auth": {
@@ -33,6 +35,7 @@
     "path": "/sandboxes/{sandboxID}/fork",
     "group": "sandboxes",
     "slug": "fork",
+    "summary": "Fork sandbox",
     "spec": "control-plane",
     "markdown": "openapi/markdown/forkSandbox.md",
     "auth": {
@@ -47,6 +50,7 @@
     "path": "/sandboxes/{sandboxID}",
     "group": "sandboxes",
     "slug": "get",
+    "summary": "Get sandbox",
     "spec": "control-plane",
     "markdown": "openapi/markdown/getSandbox.md",
     "auth": {
@@ -61,6 +65,7 @@
     "path": "/sandboxes/{sandboxID}",
     "group": "sandboxes",
     "slug": "kill",
+    "summary": "Kill sandbox",
     "spec": "control-plane",
     "markdown": "openapi/markdown/killSandbox.md",
     "auth": {
@@ -75,6 +80,7 @@
     "path": "/v2/sandboxes",
     "group": "sandboxes",
     "slug": "list",
+    "summary": "List sandboxes",
     "spec": "control-plane",
     "markdown": "openapi/markdown/listSandboxes.md",
     "auth": {
@@ -89,6 +95,7 @@
     "path": "/sandboxes/metrics",
     "group": "sandboxes",
     "slug": "list-metrics",
+    "summary": "List sandbox metrics",
     "spec": "control-plane",
     "markdown": "openapi/markdown/listSandboxMetrics.md",
     "auth": {
@@ -103,6 +110,7 @@
     "path": "/v2/sandboxes/{sandboxID}/logs",
     "group": "sandboxes",
     "slug": "logs",
+    "summary": "Get sandbox logs",
     "spec": "control-plane",
     "markdown": "openapi/markdown/getSandboxLogs.md",
     "auth": {
@@ -117,6 +125,7 @@
     "path": "/sandboxes/{sandboxID}/metrics",
     "group": "sandboxes",
     "slug": "metrics",
+    "summary": "Get sandbox metrics",
     "spec": "control-plane",
     "markdown": "openapi/markdown/getSandboxMetrics.md",
     "auth": {
@@ -131,6 +140,7 @@
     "path": "/sandboxes/{sandboxID}/network",
     "group": "sandboxes",
     "slug": "network",
+    "summary": "Update sandbox network",
     "spec": "control-plane",
     "markdown": "openapi/markdown/updateSandboxNetwork.md",
     "auth": {
@@ -145,6 +155,7 @@
     "path": "/sandboxes/{sandboxID}/pause",
     "group": "sandboxes",
     "slug": "pause",
+    "summary": "Pause sandbox",
     "spec": "control-plane",
     "markdown": "openapi/markdown/pauseSandbox.md",
     "auth": {
@@ -159,6 +170,7 @@
     "path": "/sandboxes/{sandboxID}/refreshes",
     "group": "sandboxes",
     "slug": "refresh",
+    "summary": "Refresh sandbox",
     "spec": "control-plane",
     "markdown": "openapi/markdown/refreshSandbox.md",
     "auth": {
@@ -173,6 +185,7 @@
     "path": "/sandboxes/{sandboxID}/timeout",
     "group": "sandboxes",
     "slug": "timeout",
+    "summary": "Set sandbox timeout",
     "spec": "control-plane",
     "markdown": "openapi/markdown/setSandboxTimeout.md",
     "auth": {
@@ -187,6 +200,7 @@
     "path": "/sandboxes/{sandboxID}/snapshots",
     "group": "snapshots",
     "slug": "create",
+    "summary": "Create snapshot",
     "spec": "control-plane",
     "markdown": "openapi/markdown/createSnapshot.md",
     "auth": {
@@ -201,6 +215,7 @@
     "path": "/snapshots",
     "group": "snapshots",
     "slug": "list",
+    "summary": "List snapshots",
     "spec": "control-plane",
     "markdown": "openapi/markdown/listSnapshots.md",
     "auth": {
@@ -215,6 +230,7 @@
     "path": "/templates/tags",
     "group": "tags",
     "slug": "assign",
+    "summary": "Assign template tags",
     "spec": "control-plane",
     "markdown": "openapi/markdown/assignTemplateTags.md",
     "auth": {
@@ -229,6 +245,7 @@
     "path": "/templates/tags",
     "group": "tags",
     "slug": "delete",
+    "summary": "Delete template tags",
     "spec": "control-plane",
     "markdown": "openapi/markdown/deleteTemplateTags.md",
     "auth": {
@@ -243,6 +260,7 @@
     "path": "/templates/{templateID}/tags",
     "group": "tags",
     "slug": "list",
+    "summary": "List template tags",
     "spec": "control-plane",
     "markdown": "openapi/markdown/listTemplateTags.md",
     "auth": {
@@ -257,6 +275,7 @@
     "path": "/teams/{teamID}/metrics",
     "group": "team-metrics",
     "slug": "team-metrics",
+    "summary": "Get team metrics",
     "spec": "control-plane",
     "markdown": "openapi/markdown/getTeamMetrics.md",
     "auth": {
@@ -271,6 +290,7 @@
     "path": "/teams/{teamID}/metrics/max",
     "group": "team-metrics",
     "slug": "team-metrics-max",
+    "summary": "Get maximum team metrics",
     "spec": "control-plane",
     "markdown": "openapi/markdown/getTeamMetricsMax.md",
     "auth": {
@@ -285,6 +305,7 @@
     "path": "/templates/aliases/{alias}",
     "group": "templates",
     "slug": "alias",
+    "summary": "Get template by alias",
     "spec": "control-plane",
     "markdown": "openapi/markdown/getTemplateByAlias.md",
     "auth": {
@@ -299,6 +320,7 @@
     "path": "/templates/{templateID}/builds/{buildID}/logs",
     "group": "templates",
     "slug": "build-logs",
+    "summary": "Get template build logs",
     "spec": "control-plane",
     "markdown": "openapi/markdown/getTemplateBuildLogs.md",
     "auth": {
@@ -313,6 +335,7 @@
     "path": "/templates/{templateID}/builds/{buildID}/status",
     "group": "templates",
     "slug": "build-status",
+    "summary": "Get template build status",
     "spec": "control-plane",
     "markdown": "openapi/markdown/getTemplateBuildStatus.md",
     "auth": {
@@ -327,6 +350,7 @@
     "path": "/v3/templates",
     "group": "templates",
     "slug": "create",
+    "summary": "Create template",
     "spec": "control-plane",
     "markdown": "openapi/markdown/createTemplate.md",
     "auth": {
@@ -341,6 +365,7 @@
     "path": "/templates/{templateID}",
     "group": "templates",
     "slug": "delete",
+    "summary": "Delete template",
     "spec": "control-plane",
     "markdown": "openapi/markdown/deleteTemplate.md",
     "auth": {
@@ -355,6 +380,7 @@
     "path": "/templates/{templateID}",
     "group": "templates",
     "slug": "get",
+    "summary": "Get template",
     "spec": "control-plane",
     "markdown": "openapi/markdown/getTemplate.md",
     "auth": {
@@ -369,6 +395,7 @@
     "path": "/v2/templates",
     "group": "templates",
     "slug": "list",
+    "summary": "List templates",
     "spec": "control-plane",
     "markdown": "openapi/markdown/listTemplates.md",
     "auth": {
@@ -383,6 +410,7 @@
     "path": "/v2/templates/{templateID}/builds/{buildID}",
     "group": "templates",
     "slug": "start-build",
+    "summary": "Start template build",
     "spec": "control-plane",
     "markdown": "openapi/markdown/startTemplateBuild.md",
     "auth": {
@@ -397,6 +425,7 @@
     "path": "/v2/templates/{templateID}",
     "group": "templates",
     "slug": "update",
+    "summary": "Update template",
     "spec": "control-plane",
     "markdown": "openapi/markdown/updateTemplate.md",
     "auth": {
@@ -411,6 +440,7 @@
     "path": "/templates/{templateID}/files/{hash}",
     "group": "templates",
     "slug": "upload-url",
+    "summary": "Get template upload URL",
     "spec": "control-plane",
     "markdown": "openapi/markdown/getTemplateUploadUrl.md",
     "auth": {
@@ -425,6 +455,7 @@
     "path": "/health",
     "group": "environment",
     "slug": "health",
+    "summary": "Check environment health",
     "spec": "envd",
     "markdown": "openapi/markdown/getEnvironmentHealth.md",
     "auth": null
@@ -435,6 +466,7 @@
     "path": "/metrics",
     "group": "environment",
     "slug": "metrics",
+    "summary": "Get environment metrics",
     "spec": "envd",
     "markdown": "openapi/markdown/getEnvironmentMetrics.md",
     "auth": {
@@ -449,6 +481,7 @@
     "path": "/envs",
     "group": "environment",
     "slug": "variables",
+    "summary": "Get environment variables",
     "spec": "envd",
     "markdown": "openapi/markdown/getEnvironmentVariables.md",
     "auth": {
@@ -463,6 +496,7 @@
     "path": "/files/compose",
     "group": "files",
     "slug": "compose",
+    "summary": "Compose files",
     "spec": "envd",
     "markdown": "openapi/markdown/composeFiles.md",
     "auth": {
@@ -477,6 +511,7 @@
     "path": "/files",
     "group": "files",
     "slug": "download",
+    "summary": "Download file",
     "spec": "envd",
     "markdown": "openapi/markdown/downloadFile.md",
     "auth": {
@@ -491,6 +526,7 @@
     "path": "/files",
     "group": "files",
     "slug": "upload",
+    "summary": "Upload file",
     "spec": "envd",
     "markdown": "openapi/markdown/uploadFile.md",
     "auth": {

@@ -6,16 +6,29 @@ Get template build logs
 
 ## Parameters
 
-| Name | In | Required | Type | Description |
-| --- | --- | --- | --- | --- |
-| `templateID` | path | yes | `string` |  |
-| `buildID` | path | yes | `string` |  |
-| `pageCursor` | query | no | `string` | Opaque continuation cursor returned as nextCursor by the previous page |
-| `cursor` | query | no | `integer` | Starting timestamp of the logs that should be returned in milliseconds |
-| `limit` | query | no | `integer` | Maximum number of logs that should be returned |
-| `direction` | query | no | `LogsDirection` |  |
-| `level` | query | no | `LogLevel` |  |
-| `source` | query | no | `LogsSource` | Source of the logs that should be returned from |
+- **`templateID`** · `string` · path · required
+
+- **`buildID`** · `string` · path · required
+
+- **`pageCursor`** · `string` · query · optional
+
+  Opaque continuation cursor returned as nextCursor by the previous page
+
+- **`cursor`** · `integer` · query · optional
+
+  Starting timestamp of the logs that should be returned in milliseconds
+
+- **`limit`** · `integer` · query · optional
+
+  Maximum number of logs that should be returned
+
+- **`direction`** · `LogsDirection` · query · optional
+
+- **`level`** · `LogLevel` · query · optional
+
+- **`source`** · `LogsSource` · query · optional
+
+  Source of the logs that should be returned from
 
 ## Responses
 
@@ -27,11 +40,17 @@ Content-Type: `application/json`
 
 Schema: `TemplateBuildLogsResponse`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `logs` | `array<BuildLogEntry>` | yes | Build logs structured |
-| `nextCursor` | `string` | no | Opaque continuation cursor for the next page |
-| `source` | `LogsSource` | no | Source of the logs that should be returned |
+- **`logs`** · `array<BuildLogEntry>` · required
+
+  Build logs structured
+
+- **`nextCursor`** · `string` · optional
+
+  Opaque continuation cursor for the next page
+
+- **`source`** · `LogsSource` · optional
+
+  Source of the logs that should be returned
 
 ### 401
 
@@ -41,10 +60,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 404
 
@@ -54,10 +76,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 500
 
@@ -67,7 +92,10 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error

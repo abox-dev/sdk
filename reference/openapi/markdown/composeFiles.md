@@ -10,11 +10,17 @@ Required: yes
 
 Schema: `ComposeRequest`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `source_paths` | `array<string>` | yes | Ordered list of source file paths to concatenate |
-| `destination` | `string` | yes | Destination file path for the composed file |
-| `username` | `string` | no | User for setting ownership and resolving relative paths |
+- **`source_paths`** · `array<string>` · required
+
+  Ordered list of source file paths to concatenate
+
+- **`destination`** · `string` · required
+
+  Destination file path for the composed file
+
+- **`username`** · `string` · optional
+
+  User for setting ownership and resolving relative paths
 
 ## Responses
 
@@ -26,12 +32,21 @@ Content-Type: `application/json`
 
 Schema: `EntryInfo`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `path` | `string` | yes | Path to the file |
-| `name` | `string` | yes | Name of the file |
-| `type` | `file` | yes | Type of the file |
-| `metadata` | `object` | no | User-defined metadata stored as extended attributes on the file. |
+- **`path`** · `string` · required
+
+  Path to the file
+
+- **`name`** · `string` · required
+
+  Name of the file
+
+- **`type`** · `file` · required
+
+  Type of the file
+
+- **`metadata`** · `object` · optional
+
+  User-defined metadata stored as extended attributes on the file.
 
 ### 400
 
@@ -41,10 +56,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `message` | `string` | yes | Error message |
-| `code` | `integer` | yes | Error code |
+- **`message`** · `string` · required
+
+  Error message
+
+- **`code`** · `integer` · required
+
+  Error code
 
 ### 401
 
@@ -54,10 +72,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `message` | `string` | yes | Error message |
-| `code` | `integer` | yes | Error code |
+- **`message`** · `string` · required
+
+  Error message
+
+- **`code`** · `integer` · required
+
+  Error code
 
 ### 404
 
@@ -67,10 +88,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `message` | `string` | yes | Error message |
-| `code` | `integer` | yes | Error code |
+- **`message`** · `string` · required
+
+  Error message
+
+- **`code`** · `integer` · required
+
+  Error code
 
 ### 500
 
@@ -80,10 +104,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `message` | `string` | yes | Error message |
-| `code` | `integer` | yes | Error code |
+- **`message`** · `string` · required
+
+  Error message
+
+- **`code`** · `integer` · required
+
+  Error code
 
 ### 507
 
@@ -93,7 +120,10 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `message` | `string` | yes | Error message |
-| `code` | `integer` | yes | Error code |
+- **`message`** · `string` · required
+
+  Error message
+
+- **`code`** · `integer` · required
+
+  Error code

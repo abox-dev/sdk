@@ -6,9 +6,7 @@ Update the network configuration for a running sandbox. Replaces the current egr
 
 ## Parameters
 
-| Name | In | Required | Type | Description |
-| --- | --- | --- | --- | --- |
-| `sandboxID` | path | yes | `string` |  |
+- **`sandboxID`** · `string` · path · required
 
 ## Request body
 
@@ -18,12 +16,21 @@ Required: yes
 
 Schema: `SandboxNetworkUpdateConfig`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `allowOut` | `array<string>` | no | List of allowed destinations for egress traffic. Each entry can be a CIDR block (e.g. "8.8.8.8/32"), a bare IP address (e.g. "8.8.8.8"), or a domain name (e.g. "example.com", "*.example.com"). Allowed entries always take precedence over denied entries. |
-| `denyOut` | `array<string>` | no | List of denied CIDR blocks or IP addresses for egress traffic. Domain names are not supported for deny rules. |
-| `rules` | `object` | no | Per-domain transform rules. Replaces all existing rules when provided. |
-| `allow_internet_access` | `boolean` | no | Allow sandbox to access the internet. When set to false, it behaves the same as specifying denyOut to 0.0.0.0/0 in the network config. |
+- **`allowOut`** · `array<string>` · optional
+
+  List of allowed destinations for egress traffic. Each entry can be a CIDR block (e.g. "8.8.8.8/32"), a bare IP address (e.g. "8.8.8.8"), or a domain name (e.g. "example.com", "*.example.com"). Allowed entries always take precedence over denied entries.
+
+- **`denyOut`** · `array<string>` · optional
+
+  List of denied CIDR blocks or IP addresses for egress traffic. Domain names are not supported for deny rules.
+
+- **`rules`** · `object` · optional
+
+  Per-domain transform rules. Replaces all existing rules when provided.
+
+- **`allow_internet_access`** · `boolean` · optional
+
+  Allow sandbox to access the internet. When set to false, it behaves the same as specifying denyOut to 0.0.0.0/0 in the network config.
 
 ## Responses
 
@@ -39,10 +46,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 404
 
@@ -52,10 +62,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 409
 
@@ -65,10 +78,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 500
 
@@ -78,7 +94,10 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error

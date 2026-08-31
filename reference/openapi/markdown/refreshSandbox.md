@@ -6,9 +6,7 @@ Refresh the sandbox extending its time to live
 
 ## Parameters
 
-| Name | In | Required | Type | Description |
-| --- | --- | --- | --- | --- |
-| `sandboxID` | path | yes | `string` |  |
+- **`sandboxID`** · `string` · path · required
 
 ## Request body
 
@@ -18,9 +16,9 @@ Required: no
 
 Schema: `SandboxRefreshRequest`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `duration` | `integer` | no | Duration for which the sandbox should be kept alive in seconds |
+- **`duration`** · `integer` · optional
+
+  Duration for which the sandbox should be kept alive in seconds
 
 ## Responses
 
@@ -36,10 +34,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 404
 
@@ -49,7 +50,10 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error

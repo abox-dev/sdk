@@ -33,6 +33,38 @@ FORBIDDEN_SECURITY_SCHEMES = {
 }
 
 
+def resolve_local_ref(document: dict, value: dict) -> dict:
+    current = value
+    visited = set()
+    while isinstance(current, dict) and "$ref" in current:
+        reference = current["$ref"]
+        if not reference.startswith("#/") or reference in visited:
+            break
+        visited.add(reference)
+        resolved = document
+        for part in reference[2:].split("/"):
+            resolved = resolved[part.replace("~1", "/").replace("~0", "~")]
+        current = resolved
+    return current
+
+
+def array_item_properties(document: dict, schema: dict) -> dict:
+    resolved = resolve_local_ref(document, schema)
+    if not isinstance(resolved, dict) or resolved.get("type") != "array":
+        return {}
+    visited = set()
+    while isinstance(resolved, dict) and resolved.get("type") == "array":
+        marker = id(resolved)
+        if marker in visited:
+            return {}
+        visited.add(marker)
+        items = resolved.get("items")
+        if not isinstance(items, dict):
+            return {}
+        resolved = resolve_local_ref(document, items)
+    return resolved.get("properties", {}) if isinstance(resolved, dict) else {}
+
+
 def assert_local_refs_resolve(document: dict) -> None:
     def visit(value):
         if isinstance(value, dict):
@@ -81,6 +113,9 @@ def main() -> None:
     }
     assert len(ids) == len(set(ids)), "operationId values must be unique"
     for operation in operations:
+        assert isinstance(operation.get("summary"), str), operation["operationId"]
+        assert operation["summary"].strip() == operation["summary"]
+        assert operation["summary"], operation["operationId"]
         assert "auth" in operation, operation["operationId"]
         auth = operation["auth"]
         if operation["spec"] == "control-plane":
@@ -137,8 +172,10 @@ def main() -> None:
     for forbidden in FORBIDDEN_REFERENCE_PROPERTIES | FORBIDDEN_SECURITY_SCHEMES:
         assert forbidden not in rendered_specs
 
+    public_documents = {}
     for name in ("openapi/control-plane.yml", "openapi/envd.yml"):
         document = yaml.safe_load((REFERENCE / name).read_text())
+        public_documents[name.removeprefix("openapi/").removesuffix(".yml")] = document
         assert "securitySchemes" not in document.get("components", {})
         for path_item in document["paths"].values():
             for method, operation in path_item.items():
@@ -152,6 +189,23 @@ def main() -> None:
     )
     for forbidden in FORBIDDEN_REFERENCE_PROPERTIES:
         assert forbidden not in rendered_markdown
+    assert "| Field | Type | Required | Description |" not in rendered_markdown
+    assert "| Name | In | Required | Type | Description |" not in rendered_markdown
+
+    for operation in operations:
+        document = public_documents[operation["spec"]]
+        operation_schema = document["paths"][operation["path"]][
+            operation["method"].lower()
+        ]
+        markdown = (REFERENCE / operation["markdown"]).read_text()
+        for response in operation_schema.get("responses", {}).values():
+            resolved_response = resolve_local_ref(document, response)
+            for media in resolved_response.get("content", {}).values():
+                for field in array_item_properties(document, media.get("schema", {})):
+                    assert f"- **`{field}`** ·" in markdown, (
+                        operation["operationId"],
+                        field,
+                    )
 
     cli_markdown = "\n".join(
         path.read_text() for path in (REFERENCE / "sdk/cli").glob("*.md")
@@ -171,6 +225,9 @@ def main() -> None:
     list_sandboxes = (REFERENCE / "openapi/markdown/listSandboxes.md").read_text()
     assert "Metadata query used to filter the sandboxes" in list_sandboxes
     assert "### 200" in list_sandboxes
+    assert "Schema: `array<ListedSandbox>`" in list_sandboxes
+    assert "- **`sandboxID`** · `string` · required" in list_sandboxes
+    assert "- **`metadata`** · `string` · query · optional" in list_sandboxes
     create_sandbox = (REFERENCE / "openapi/markdown/createSandbox.md").read_text()
     assert "Schema: `NewSandbox`" in create_sandbox
 

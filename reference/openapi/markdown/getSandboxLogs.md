@@ -6,15 +6,31 @@ Get sandbox logs
 
 ## Parameters
 
-| Name | In | Required | Type | Description |
-| --- | --- | --- | --- | --- |
-| `sandboxID` | path | yes | `string` |  |
-| `pageCursor` | query | no | `string` | Opaque continuation cursor returned as nextCursor by the previous page |
-| `cursor` | query | no | `integer` | Starting timestamp of the logs that should be returned in milliseconds |
-| `limit` | query | no | `integer` | Maximum number of logs that should be returned |
-| `direction` | query | no | `LogsDirection` | Direction of the logs that should be returned |
-| `level` | query | no | `LogLevel` | Minimum log level to return. Logs below this level are excluded |
-| `search` | query | no | `string` | Case-sensitive substring match on log message content |
+- **`sandboxID`** · `string` · path · required
+
+- **`pageCursor`** · `string` · query · optional
+
+  Opaque continuation cursor returned as nextCursor by the previous page
+
+- **`cursor`** · `integer` · query · optional
+
+  Starting timestamp of the logs that should be returned in milliseconds
+
+- **`limit`** · `integer` · query · optional
+
+  Maximum number of logs that should be returned
+
+- **`direction`** · `LogsDirection` · query · optional
+
+  Direction of the logs that should be returned
+
+- **`level`** · `LogLevel` · query · optional
+
+  Minimum log level to return. Logs below this level are excluded
+
+- **`search`** · `string` · query · optional
+
+  Case-sensitive substring match on log message content
 
 ## Responses
 
@@ -26,10 +42,13 @@ Content-Type: `application/json`
 
 Schema: `SandboxLogsV2Response`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `logs` | `array<SandboxLogEntry>` | yes | Sandbox logs structured |
-| `nextCursor` | `string` | no | Opaque continuation cursor for the next page |
+- **`logs`** · `array<SandboxLogEntry>` · required
+
+  Sandbox logs structured
+
+- **`nextCursor`** · `string` · optional
+
+  Opaque continuation cursor for the next page
 
 ### 401
 
@@ -39,10 +58,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 404
 
@@ -52,10 +74,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 500
 
@@ -65,7 +90,10 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
