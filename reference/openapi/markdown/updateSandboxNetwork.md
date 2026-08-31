@@ -28,6 +28,18 @@ Schema: `SandboxNetworkUpdateConfig`
 
   Per-domain transform rules. Replaces all existing rules when provided.
 
+- **`rules.*`** · `array<SandboxNetworkRule>` · additional property
+
+- **`rules.*.transform`** · `SandboxNetworkTransform` · optional
+
+  Transformations applied to matching egress requests before forwarding.
+
+- **`rules.*.transform.headers`** · `object` · optional
+
+  HTTP headers to inject or override in matching requests. An existing header with the same name is replaced. Values are plain strings; secret resolution happens client-side before sending to the API.
+
+- **`rules.*.transform.headers.*`** · `string` · additional property
+
 - **`allow_internet_access`** · `boolean` · optional
 
   Allow sandbox to access the internet. When set to false, it behaves the same as specifying denyOut to 0.0.0.0/0 in the network config.

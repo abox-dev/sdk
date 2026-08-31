@@ -22,6 +22,42 @@ Schema: `SandboxesWithMetrics`
 
 - **`sandboxes`** · `object` · required
 
+- **`sandboxes.*`** · `SandboxMetric` · additional property
+
+  Metric entry with timestamp and line
+
+- **`sandboxes.*.timestampUnix`** · `integer` · required
+
+  Timestamp of the metric entry in Unix time (seconds since epoch)
+
+- **`sandboxes.*.cpuCount`** · `integer` · required
+
+  Number of CPU cores
+
+- **`sandboxes.*.cpuUsedPct`** · `number` · required
+
+  CPU usage percentage
+
+- **`sandboxes.*.memUsed`** · `integer` · required
+
+  Memory used in bytes
+
+- **`sandboxes.*.memTotal`** · `integer` · required
+
+  Total memory in bytes
+
+- **`sandboxes.*.memCache`** · `integer` · required
+
+  Cached memory (page cache) in bytes
+
+- **`sandboxes.*.diskUsed`** · `integer` · required
+
+  Disk used in bytes
+
+- **`sandboxes.*.diskTotal`** · `integer` · required
+
+  Total disk space in bytes
+
 ### 401
 
 Authentication error

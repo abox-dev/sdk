@@ -89,40 +89,74 @@ def render_named_item(
     return lines
 
 
-def schema_fields(document: dict, schema: dict) -> dict:
-    """Return the object schema whose fields describe a response value."""
-    resolved, _ = resolve_ref(document, schema)
+def schema_fields(document: dict, schema: dict) -> tuple[dict, str | None]:
+    """Return the object schema whose fields describe a value."""
+    resolved, reference_name = resolve_ref(document, schema)
     visited = set()
     while isinstance(resolved, dict) and resolved.get("type") == "array":
         marker = id(resolved)
         if marker in visited:
-            return {}
+            return {}, reference_name
         visited.add(marker)
         items = resolved.get("items")
         if not isinstance(items, dict):
-            return {}
-        resolved, _ = resolve_ref(document, items)
-    return resolved if isinstance(resolved, dict) else {}
+            return {}, reference_name
+        resolved, item_reference = resolve_ref(document, items)
+        reference_name = item_reference or reference_name
+    return (resolved if isinstance(resolved, dict) else {}), reference_name
 
 
-def render_schema(document: dict, schema: dict) -> list[str]:
-    resolved, reference_name = resolve_ref(document, schema)
-    lines = [f"Schema: `{reference_name or schema_type(document, resolved)}`", ""]
-    fields = schema_fields(document, resolved)
-    properties = fields.get("properties", {})
-    if not properties:
-        return lines
+def render_schema_fields(
+    document: dict,
+    schema: dict,
+    prefix: str = "",
+    ancestors: frozenset[tuple[str, object]] = frozenset(),
+) -> list[str]:
+    """Render public fields recursively with cycle-safe dotted paths."""
+    fields, reference_name = schema_fields(document, schema)
+    marker = ("reference", reference_name) if reference_name else ("schema", id(fields))
+    if marker in ancestors:
+        return []
+    descendants = ancestors | {marker}
+    lines = []
     required = set(fields.get("required", []))
-    for name, property_schema in properties.items():
+    for name, property_schema in fields.get("properties", {}).items():
+        field_name = f"{prefix}.{name}" if prefix else name
         property_value, _ = resolve_ref(document, property_schema)
         lines.extend(
             render_named_item(
-                name,
+                field_name,
                 schema_type(document, property_schema),
                 ["required" if name in required else "optional"],
                 property_value.get("description", ""),
             )
         )
+        lines.extend(
+            render_schema_fields(document, property_schema, field_name, descendants)
+        )
+
+    additional = fields.get("additionalProperties")
+    if isinstance(additional, dict):
+        field_name = f"{prefix}.*" if prefix else "*"
+        additional_value, _ = resolve_ref(document, additional)
+        lines.extend(
+            render_named_item(
+                field_name,
+                schema_type(document, additional),
+                ["additional property"],
+                additional_value.get("description", ""),
+            )
+        )
+        lines.extend(
+            render_schema_fields(document, additional, field_name, descendants)
+        )
+    return lines
+
+
+def render_schema(document: dict, schema: dict) -> list[str]:
+    resolved, reference_name = resolve_ref(document, schema)
+    lines = [f"Schema: `{reference_name or schema_type(document, resolved)}`", ""]
+    lines.extend(render_schema_fields(document, resolved))
     return lines
 
 
@@ -273,6 +307,40 @@ def apply_public_operation_security(
         operation["security"] = [requirement] if auth["required"] else [{}, requirement]
 
 
+def apply_envd_routing(public: dict, records: list[dict]) -> None:
+    """Publish the stable sandbox proxy contract required by envd operations."""
+    public["servers"] = [
+        {
+            "url": "https://sandbox.agentbox-runtime.ru",
+            "description": "AgentBox sandbox proxy. Routing headers are required.",
+        }
+    ]
+    parameters = {
+        "AgentboxSandboxId": {
+            "name": "Agentbox-Sandbox-Id",
+            "in": "header",
+            "required": True,
+            "description": "Identifier of the sandbox that receives the request.",
+            "schema": {"type": "string"},
+        },
+        "AgentboxSandboxPort": {
+            "name": "Agentbox-Sandbox-Port",
+            "in": "header",
+            "required": True,
+            "description": "Internal envd HTTP port exposed through the sandbox proxy.",
+            "schema": {"type": "integer", "default": 49983},
+        },
+    }
+    public.setdefault("components", {}).setdefault("parameters", {}).update(parameters)
+    for record in records:
+        operation = public["paths"][record["path"]][record["method"].lower()]
+        operation["parameters"] = [
+            {"$ref": "#/components/parameters/AgentboxSandboxId"},
+            {"$ref": "#/components/parameters/AgentboxSandboxPort"},
+            *operation.get("parameters", []),
+        ]
+
+
 def build_openapi(name: str, config: dict) -> list[dict]:
     source = ROOT / config["source"]
     document = yaml.safe_load(source.read_text())
@@ -367,6 +435,8 @@ def build_openapi(name: str, config: dict) -> list[dict]:
         {"name": group} for group in sorted({record["group"] for record in records})
     ]
     filter_public_openapi(public, for_reference=True)
+    if name == "envd":
+        apply_envd_routing(public, records)
     apply_public_operation_security(document, public, records, public_auth_schemes)
     destination = (
         OUT

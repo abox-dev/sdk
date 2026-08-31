@@ -66,6 +66,10 @@ Schema: `array<ListedSandbox>`
 
 - **`metadata`** · `SandboxMetadata` · optional
 
+- **`metadata.*`** · `string` · additional property
+
+  Metadata of the sandbox
+
 - **`state`** · `SandboxState` · required
 
   State of the sandbox

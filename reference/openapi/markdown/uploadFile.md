@@ -25,6 +25,14 @@ value is used.
 
 ## Parameters
 
+- **`Agentbox-Sandbox-Id`** · `string` · header · required
+
+  Identifier of the sandbox that receives the request.
+
+- **`Agentbox-Sandbox-Port`** · `integer` · header · required
+
+  Internal envd HTTP port exposed through the sandbox proxy.
+
 - **`path`** · `string` · query · optional
 
   Path to the file, URL encoded. Can be relative to the user's home directory (e.g. "file.txt" resolves to ~/file.txt).
@@ -80,6 +88,8 @@ Schema: `array<EntryInfo>`
 - **`metadata`** · `object` · optional
 
   User-defined metadata stored as extended attributes on the file.
+
+- **`metadata.*`** · `string` · additional property
 
 ### 400
 

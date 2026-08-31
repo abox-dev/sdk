@@ -58,6 +58,42 @@ Schema: `TemplateWithBuilds`
 
   List of builds for the template
 
+- **`builds.buildID`** · `string` · required
+
+  Identifier of the build
+
+- **`builds.status`** · `TemplateBuildStatus` · required
+
+  Status of the template build
+
+- **`builds.createdAt`** · `string` · required
+
+  Time when the build was created
+
+- **`builds.updatedAt`** · `string` · required
+
+  Time when the build was last updated
+
+- **`builds.finishedAt`** · `string` · optional
+
+  Time when the build was finished
+
+- **`builds.cpuCount`** · `CPUCount` · required
+
+  CPU cores for the sandbox
+
+- **`builds.memoryMB`** · `MemoryMB` · required
+
+  Memory for the sandbox in MiB
+
+- **`builds.diskSizeMB`** · `DiskSizeMB` · optional
+
+  Disk size for the sandbox in MiB
+
+- **`builds.envdVersion`** · `EnvdVersion` · optional
+
+  Version of the envd running in the sandbox
+
 ### 401
 
 Authentication error

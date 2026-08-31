@@ -238,6 +238,32 @@ def main() -> None:
             "in": "header",
             "name": expected_header,
         }
+        if spec_name == "envd":
+            assert document["servers"] == [
+                {
+                    "url": "https://sandbox.agentbox-runtime.ru",
+                    "description": (
+                        "AgentBox sandbox proxy. Routing headers are required."
+                    ),
+                }
+            ]
+            for path_item in document["paths"].values():
+                for method, operation in path_item.items():
+                    if method not in {"get", "post", "put", "patch", "delete"}:
+                        continue
+                    headers = {
+                        parameter["name"]: parameter
+                        for parameter in (
+                            resolve_local_ref(document, value)
+                            for value in operation.get("parameters", [])
+                        )
+                        if parameter.get("in") == "header"
+                    }
+                    assert headers["Agentbox-Sandbox-Id"]["required"] is True
+                    assert headers["Agentbox-Sandbox-Port"]["required"] is True
+                    assert (
+                        headers["Agentbox-Sandbox-Port"]["schema"]["default"] == 49983
+                    )
         assert_public_schema(document)
         assert_local_refs_resolve(document)
         assert_only_reachable_components(document)
@@ -315,6 +341,14 @@ def main() -> None:
     assert "- **`metadata`** · `string` · query · optional" in list_sandboxes
     create_sandbox = (REFERENCE / "openapi/markdown/createSandbox.md").read_text()
     assert "Schema: `NewSandbox`" in create_sandbox
+    for field in (
+        "autoResume.enabled",
+        "network.allowPublicTraffic",
+        "network.maskRequestHost",
+        "iam.tokens",
+        "iam.tokens.*.audience",
+    ):
+        assert f"- **`{field}`** ·" in create_sandbox
 
 
 if __name__ == "__main__":

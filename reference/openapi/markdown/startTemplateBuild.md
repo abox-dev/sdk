@@ -36,6 +36,22 @@ Schema: `TemplateBuildStartV2`
 
   List of steps to execute in the template build
 
+- **`steps.type`** · `string` · required
+
+  Type of the step
+
+- **`steps.args`** · `array<string>` · optional
+
+  Arguments for the step
+
+- **`steps.filesHash`** · `string` · optional
+
+  Hash of the files used in the step
+
+- **`steps.force`** · `boolean` · optional
+
+  Whether the step should be forced to run regardless of the cache
+
 - **`startCmd`** · `string` · optional
 
   Start command to execute in the template after the build

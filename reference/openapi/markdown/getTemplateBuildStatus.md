@@ -38,6 +38,26 @@ Schema: `TemplateBuildInfo`
 
   Build logs structured
 
+- **`logEntries.id`** · `string` · optional
+
+  Stable identifier used to reconcile overlapping live log pages
+
+- **`logEntries.timestamp`** · `string` · required
+
+  Timestamp of the log entry
+
+- **`logEntries.message`** · `string` · required
+
+  Log message content
+
+- **`logEntries.level`** · `LogLevel` · required
+
+  State of the sandbox
+
+- **`logEntries.step`** · `string` · optional
+
+  Step in the build process related to the log entry
+
 - **`templateID`** · `string` · required
 
   Identifier of the template
@@ -51,6 +71,38 @@ Schema: `TemplateBuildInfo`
   Status of the template build
 
 - **`reason`** · `BuildStatusReason` · optional
+
+- **`reason.message`** · `string` · required
+
+  Message with the status reason, currently reporting only for error status
+
+- **`reason.step`** · `string` · optional
+
+  Step that failed
+
+- **`reason.logEntries`** · `array<BuildLogEntry>` · optional
+
+  Log entries related to the status reason
+
+- **`reason.logEntries.id`** · `string` · optional
+
+  Stable identifier used to reconcile overlapping live log pages
+
+- **`reason.logEntries.timestamp`** · `string` · required
+
+  Timestamp of the log entry
+
+- **`reason.logEntries.message`** · `string` · required
+
+  Log message content
+
+- **`reason.logEntries.level`** · `LogLevel` · required
+
+  State of the sandbox
+
+- **`reason.logEntries.step`** · `string` · optional
+
+  Step in the build process related to the log entry
 
 ### 401
 

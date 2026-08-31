@@ -44,6 +44,26 @@ Schema: `TemplateBuildLogsResponse`
 
   Build logs structured
 
+- **`logs.id`** · `string` · optional
+
+  Stable identifier used to reconcile overlapping live log pages
+
+- **`logs.timestamp`** · `string` · required
+
+  Timestamp of the log entry
+
+- **`logs.message`** · `string` · required
+
+  Log message content
+
+- **`logs.level`** · `LogLevel` · required
+
+  State of the sandbox
+
+- **`logs.step`** · `string` · optional
+
+  Step in the build process related to the log entry
+
 - **`nextCursor`** · `string` · optional
 
   Opaque continuation cursor for the next page

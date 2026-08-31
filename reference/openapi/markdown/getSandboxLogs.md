@@ -46,6 +46,26 @@ Schema: `SandboxLogsV2Response`
 
   Sandbox logs structured
 
+- **`logs.id`** · `string` · optional
+
+  Stable identifier used to reconcile overlapping live log pages
+
+- **`logs.timestamp`** · `string` · required
+
+  Timestamp of the log entry
+
+- **`logs.message`** · `string` · required
+
+  Log message content
+
+- **`logs.level`** · `LogLevel` · required
+
+  State of the sandbox
+
+- **`logs.fields`** · `object` · required
+
+- **`logs.fields.*`** · `string` · additional property
+
 - **`nextCursor`** · `string` · optional
 
   Opaque continuation cursor for the next page

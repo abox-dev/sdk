@@ -32,6 +32,10 @@ Schema: `NewSandbox`
 
   Auto-resume configuration for paused sandboxes.
 
+- **`autoResume.enabled`** · `SandboxAutoResumeEnabled` · required
+
+  Auto-resume enabled flag for paused sandboxes. Default false.
+
 - **`secure`** · `boolean` · optional
 
   Secure all system communication with sandbox
@@ -42,17 +46,73 @@ Schema: `NewSandbox`
 
 - **`network`** · `SandboxNetworkConfig` · optional
 
+- **`network.allowPublicTraffic`** · `boolean` · optional
+
+  Specify if the sandbox URLs should be accessible only with authentication.
+
+- **`network.allowOut`** · `array<string>` · optional
+
+  List of allowed destinations for egress traffic. Each entry can be a CIDR block (e.g. "8.8.8.8/32"), a bare IP address (e.g. "8.8.8.8"), or a domain name (e.g. "example.com", "*.example.com"). Allowed entries always take precedence over denied entries.
+
+- **`network.denyOut`** · `array<string>` · optional
+
+  List of denied CIDR blocks or IP addresses for egress traffic. Domain names are not supported for deny rules.
+
+- **`network.maskRequestHost`** · `string` · optional
+
+  Specify host mask which will be used for all sandbox requests
+
+- **`network.rules`** · `object` · optional
+
+  Per-domain transform rules applied to matching egress HTTP/HTTPS requests. Keys are domains (e.g. "api.example.com", "example.com"). A domain listed here is not automatically allowed - use allowOut to permit the traffic.
+
+- **`network.rules.*`** · `array<SandboxNetworkRule>` · additional property
+
+- **`network.rules.*.transform`** · `SandboxNetworkTransform` · optional
+
+  Transformations applied to matching egress requests before forwarding.
+
+- **`network.rules.*.transform.headers`** · `object` · optional
+
+  HTTP headers to inject or override in matching requests. An existing header with the same name is replaced. Values are plain strings; secret resolution happens client-side before sending to the API.
+
+- **`network.rules.*.transform.headers.*`** · `string` · additional property
+
 - **`metadata`** · `SandboxMetadata` · optional
 
+- **`metadata.*`** · `string` · additional property
+
+  Metadata of the sandbox
+
 - **`envVars`** · `EnvVars` · optional
+
+- **`envVars.*`** · `string` · additional property
+
+  Environment variables for the sandbox
 
 - **`mcp`** · `Mcp` · optional
 
   MCP configuration for the sandbox
 
+- **`mcp.*`** · `object` · additional property
+
 - **`iam`** · `SandboxIam` · optional
 
   Sandbox workload identity configuration. A non-empty, valid tokens map enables workload identity for the sandbox.
+
+- **`iam.tokens`** · `SandboxIamTokens` · optional
+
+  Named workload-token definitions, keyed by a caller-chosen token name.
+
+- **`iam.tokens.*`** · `SandboxIamToken` · additional property
+
+- **`iam.tokens.*.audience`** · `string` · required
+
+  Audience of the workload token, stored exactly as provided.
+
+- **`iam.tokens.*.tokenType`** · `string` · required
+
+  Workload token type.
 
 ## Responses
 

@@ -16,6 +16,9 @@ paths:
       operationId: getEnvironmentHealth
       tags:
       - environment
+      parameters:
+      - $ref: '#/components/parameters/AgentboxSandboxId'
+      - $ref: '#/components/parameters/AgentboxSandboxPort'
       security: []
   /metrics:
     get:
@@ -30,6 +33,9 @@ paths:
       operationId: getEnvironmentMetrics
       tags:
       - environment
+      parameters:
+      - $ref: '#/components/parameters/AgentboxSandboxId'
+      - $ref: '#/components/parameters/AgentboxSandboxPort'
       security:
       - {}
       - AccessTokenAuth: []
@@ -46,6 +52,9 @@ paths:
       operationId: getEnvironmentVariables
       tags:
       - environment
+      parameters:
+      - $ref: '#/components/parameters/AgentboxSandboxId'
+      - $ref: '#/components/parameters/AgentboxSandboxPort'
       security:
       - {}
       - AccessTokenAuth: []
@@ -55,6 +64,8 @@ paths:
       tags:
       - files
       parameters:
+      - $ref: '#/components/parameters/AgentboxSandboxId'
+      - $ref: '#/components/parameters/AgentboxSandboxPort'
       - $ref: '#/components/parameters/FilePath'
       - $ref: '#/components/parameters/User'
       - $ref: '#/components/parameters/Signature'
@@ -122,6 +133,8 @@ paths:
       tags:
       - files
       parameters:
+      - $ref: '#/components/parameters/AgentboxSandboxId'
+      - $ref: '#/components/parameters/AgentboxSandboxPort'
       - $ref: '#/components/parameters/FilePath'
       - $ref: '#/components/parameters/User'
       - $ref: '#/components/parameters/Signature'
@@ -173,6 +186,9 @@ paths:
         '507':
           $ref: '#/components/responses/NotEnoughDiskSpace'
       operationId: composeFiles
+      parameters:
+      - $ref: '#/components/parameters/AgentboxSandboxId'
+      - $ref: '#/components/parameters/AgentboxSandboxPort'
       security:
       - {}
       - AccessTokenAuth: []
@@ -209,6 +225,21 @@ components:
         used with the signature parameter.
       schema:
         type: integer
+    AgentboxSandboxId:
+      name: Agentbox-Sandbox-Id
+      in: header
+      required: true
+      description: Identifier of the sandbox that receives the request.
+      schema:
+        type: string
+    AgentboxSandboxPort:
+      name: Agentbox-Sandbox-Port
+      in: header
+      required: true
+      description: Internal envd HTTP port exposed through the sandbox proxy.
+      schema:
+        type: integer
+        default: 49983
   requestBodies:
     File:
       required: true
@@ -399,3 +430,6 @@ components:
       type: apiKey
       in: header
       name: X-Access-Token
+servers:
+- url: https://sandbox.agentbox-runtime.ru
+  description: AgentBox sandbox proxy. Routing headers are required.

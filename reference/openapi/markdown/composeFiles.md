@@ -2,6 +2,16 @@
 
 Compose multiple files into a single file using zero-copy concatenation. Source files are deleted after successful composition.
 
+## Parameters
+
+- **`Agentbox-Sandbox-Id`** · `string` · header · required
+
+  Identifier of the sandbox that receives the request.
+
+- **`Agentbox-Sandbox-Port`** · `integer` · header · required
+
+  Internal envd HTTP port exposed through the sandbox proxy.
+
 ## Request body
 
 Required: yes
@@ -47,6 +57,8 @@ Schema: `EntryInfo`
 - **`metadata`** · `object` · optional
 
   User-defined metadata stored as extended attributes on the file.
+
+- **`metadata.*`** · `string` · additional property
 
 ### 400
 
