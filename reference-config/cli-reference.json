@@ -1,0 +1,13 @@
+{
+  "extends": "../packages/cli/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "..",
+    "rootDir": "..",
+    "ignoreDeprecations": "6.0",
+    "paths": {
+      "@abox-dev/sdk": ["packages/js-sdk/src/index.ts"],
+      "src": ["packages/cli/src/index.ts"],
+      "src/*": ["packages/cli/src/*"]
+    }
+  }
+}

@@ -12,6 +12,8 @@ codegen-image:
 generate-in-container:
 	cd packages/js-sdk && pnpm generate
 	cd packages/python-sdk && make generate
+	python scripts/generate-reference.py
+	python scripts/test-reference-contract.py
 
 # Maintainer-only update from a local mono checkout.
 sync-specs:

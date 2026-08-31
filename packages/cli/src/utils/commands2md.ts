@@ -1,85 +1,73 @@
-import { Command } from 'commander'
-import fs from 'fs'
-import json2md from 'json2md'
-import path from 'path'
+import { Command, Option } from 'commander'
+import fs from 'node:fs'
+import path from 'node:path'
 
-/**
- * Converts command objects to Markdown documentation.
- * This function takes an array of command objects and generates a structured
- * Markdown document describing each command, its usage, options, and subcommands.
- * @returns A string containing the entire markdown documentation for all commands.
- */
-export function commands2md(commands: Command[]): void {
-  const outputDir = 'sdk_ref'
-  if (!fs.existsSync(outputDir)) {
-    fs.mkdirSync(outputDir, { recursive: true })
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+}
+
+function renderOption(option: Option): string {
+  const fallback =
+    option.defaultValue === undefined
+      ? ''
+      : ` Default: \`${String(option.defaultValue)}\`.`
+  return `- \`${escapeHtml(option.flags)}\`: ${escapeHtml(option.description || 'No description.')}${fallback}`
+}
+
+function renderCommand(command: Command, parents: string[] = []): string {
+  const fullName = [...parents, command.name()].join(' ')
+  const usage = command.usage() || '[options]'
+  const lines = [
+    `## agentbox ${fullName}`,
+    '',
+    escapeHtml(command.description() || 'No description.'),
+    '',
+    '### Usage',
+    '',
+    '```bash',
+    `agentbox ${fullName} ${usage}`.trimEnd(),
+    '```',
+    '',
+  ]
+
+  if (command.options.length) {
+    lines.push('### Options', '', ...command.options.map(renderOption), '')
   }
 
-  function commandToMd(
-    command: any,
-    parentName: string = ''
-  ): [string, string] {
-    const commandName = command.name() as string
-    const fullName = parentName ? `${parentName} ${commandName}` : commandName
-
-    const mdStructure = [
-      { h2: `agentbox ${fullName}` },
-      { p: command.description() },
-      { h3: 'Usage' },
-      {
-        code: {
-          language: 'bash',
-          content: `agentbox ${fullName} ${command.usage()}`,
-        },
-      },
-      ...(command.options.length > 0
-        ? [
-            { h3: 'Options' },
-            {
-              ul: command.options.map(
-                (y: any) =>
-                  `\`${y.flags}: ${y.description} ${
-                    y.defaultValue !== undefined
-                      ? `[default: ${y.defaultValue}]`
-                      : ''
-                  }\``
-              ),
-            },
-          ]
-        : []),
-    ]
-
-    let mdContent = json2md(mdStructure)
-
-    // Process subcommands
-    command.commands.forEach((subcommand: any) => {
-      const [, subMdContent] = commandToMd(subcommand, fullName)
-      mdContent += subMdContent + '\n\n'
-    })
-
-    // Clean the mdContent from terminal colors and escape HTML characters
-    mdContent = mdContent
-      .replace(/</g, '<')
-      .replace(/>/g, '>')
-      .replace(/\[1m/g, '')
-      .replace(/\[22m/g, '')
-      .replace(/\[34m/g, '')
-      .replace(/\[39m/g, '')
-      .replace(/\[38;2;255;183;102m/g, '')
-
-    return [fullName, mdContent]
+  for (const subcommand of [...command.commands].sort((a, b) =>
+    a.name().localeCompare(b.name())
+  )) {
+    lines.push(renderCommand(subcommand, [...parents, command.name()]))
   }
+  return lines.join('\n')
+}
 
-  commands.forEach((command: any) => {
-    try {
-      const [commandName, mdContent] = commandToMd(command)
-      const fileName = `${commandName}.md`
-      const filePath = path.join(outputDir, fileName)
-      fs.writeFileSync(filePath, mdContent)
-      console.log(`Generated documentation for ${commandName} at ${filePath}`)
-    } catch (error) {
-      console.error(`Error processing command: ${command.name()}`)
-      console.error(error)
+export function commands2md(
+  commands: readonly Command[],
+  outputDir: string
+): void {
+  fs.rmSync(outputDir, { recursive: true, force: true })
+  fs.mkdirSync(outputDir, { recursive: true })
+
+  const groups = new Map<string, Command[]>([
+    ['auth', commands.filter((command) => command.name() === 'configure')],
+    ['sandbox', commands.filter((command) => command.name() === 'sandbox')],
+    ['template', commands.filter((command) => command.name() === 'template')],
+  ])
+
+  for (const [group, groupCommands] of groups) {
+    if (!groupCommands.length) {
+      throw new Error(`CLI reference group ${group} has no commands`)
     }
-  })
+    const title = group[0].toUpperCase() + group.slice(1)
+    const markdown = [
+      `# ${title} commands`,
+      '',
+      ...groupCommands.map((command) => renderCommand(command)),
+    ].join('\n')
+    fs.writeFileSync(path.join(outputDir, `${group}.md`), `${markdown}\n`)
+  }
 }

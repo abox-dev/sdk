@@ -15,7 +15,7 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://docs.agentbox.ru/en/sdk/code-interpreter/"
-Documentation = "https://docs.agentbox.ru/en/sdk/api-reference/python/code-interpreter/"
+Documentation = "https://docs.agentbox.ru/en/sdk-reference/python/code-interpreter/"
 Repository = "https://github.com/abox-dev/sdk/tree/main/packages/code-interpreter-python"
 "Bug Tracker" = "https://github.com/abox-dev/sdk/issues"
 

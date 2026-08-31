@@ -1,0 +1,34 @@
+{
+  "javascript": {
+    "errors": ["packages/js-sdk/src/errors.ts"],
+    "sandbox": [
+      "packages/js-sdk/src/sandbox/index.ts",
+      "packages/js-sdk/src/sandbox/sandboxApi.ts"
+    ],
+    "commands": ["packages/js-sdk/src/sandbox/commands/index.ts"],
+    "filesystem": ["packages/js-sdk/src/sandbox/filesystem/index.ts"],
+    "templates": ["packages/js-sdk/src/template/index.ts"],
+    "logger": ["packages/js-sdk/src/template/logger.ts"],
+    "ready-commands": ["packages/js-sdk/src/template/readycmd.ts"],
+    "code-interpreter": [
+      "packages/code-interpreter-js/src/sandbox.ts",
+      "packages/code-interpreter-js/src/messaging.ts",
+      "packages/code-interpreter-js/src/charts.ts"
+    ]
+  },
+  "python": {
+    "exceptions": ["agentbox.exceptions"],
+    "sandbox-sync": ["agentbox.sandbox_sync.main"],
+    "sandbox-async": ["agentbox.sandbox_async.main"],
+    "templates-sync": ["agentbox.template_sync.main"],
+    "templates-async": ["agentbox.template_async.main"],
+    "logger": ["agentbox.template.logger"],
+    "ready-commands": ["agentbox.template.readycmd"],
+    "code-interpreter-sync": [
+      "agentbox_code_interpreter.code_interpreter_sync"
+    ],
+    "code-interpreter-async": [
+      "agentbox_code_interpreter.code_interpreter_async"
+    ]
+  }
+}

@@ -18,4 +18,4 @@ with Sandbox.create() as sandbox:
     print(execution.text)
 ```
 
-`AsyncSandbox` provides the equivalent async API. See the [Code Interpreter guide](https://docs.agentbox.ru/en/sdk/code-interpreter/) and [API reference](https://docs.agentbox.ru/en/sdk/api-reference/python/code-interpreter/).
+`AsyncSandbox` provides the equivalent async API. See the [Code Interpreter guide](https://docs.agentbox.ru/en/sdk/code-interpreter/) and [API reference](https://docs.agentbox.ru/en/sdk-reference/python/code-interpreter/).

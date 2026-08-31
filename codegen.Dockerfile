@@ -45,4 +45,8 @@ RUN npm install -g \
     @bufbuild/protoc-gen-es@2.6.2 \
     @redocly/cli@2.46.1
 
+RUN pip install griffe2md==1.5.0
+
+RUN npm install -g tsx@4.20.6
+
 CMD ["make", "generate"]

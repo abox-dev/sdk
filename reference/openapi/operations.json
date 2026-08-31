@@ -1,0 +1,290 @@
+[
+  {
+    "operationId": "connectSandbox",
+    "method": "POST",
+    "path": "/sandboxes/{sandboxID}/connect",
+    "group": "sandboxes",
+    "slug": "connect",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "createSandbox",
+    "method": "POST",
+    "path": "/sandboxes",
+    "group": "sandboxes",
+    "slug": "create",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "forkSandbox",
+    "method": "POST",
+    "path": "/sandboxes/{sandboxID}/fork",
+    "group": "sandboxes",
+    "slug": "fork",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "getSandbox",
+    "method": "GET",
+    "path": "/sandboxes/{sandboxID}",
+    "group": "sandboxes",
+    "slug": "get",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "killSandbox",
+    "method": "DELETE",
+    "path": "/sandboxes/{sandboxID}",
+    "group": "sandboxes",
+    "slug": "kill",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "listSandboxes",
+    "method": "GET",
+    "path": "/v2/sandboxes",
+    "group": "sandboxes",
+    "slug": "list",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "listSandboxMetrics",
+    "method": "GET",
+    "path": "/sandboxes/metrics",
+    "group": "sandboxes",
+    "slug": "list-metrics",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "getSandboxLogs",
+    "method": "GET",
+    "path": "/v2/sandboxes/{sandboxID}/logs",
+    "group": "sandboxes",
+    "slug": "logs",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "getSandboxMetrics",
+    "method": "GET",
+    "path": "/sandboxes/{sandboxID}/metrics",
+    "group": "sandboxes",
+    "slug": "metrics",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "updateSandboxNetwork",
+    "method": "PUT",
+    "path": "/sandboxes/{sandboxID}/network",
+    "group": "sandboxes",
+    "slug": "network",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "pauseSandbox",
+    "method": "POST",
+    "path": "/sandboxes/{sandboxID}/pause",
+    "group": "sandboxes",
+    "slug": "pause",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "refreshSandbox",
+    "method": "POST",
+    "path": "/sandboxes/{sandboxID}/refreshes",
+    "group": "sandboxes",
+    "slug": "refresh",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "setSandboxTimeout",
+    "method": "POST",
+    "path": "/sandboxes/{sandboxID}/timeout",
+    "group": "sandboxes",
+    "slug": "timeout",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "createSnapshot",
+    "method": "POST",
+    "path": "/sandboxes/{sandboxID}/snapshots",
+    "group": "snapshots",
+    "slug": "create",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "listSnapshots",
+    "method": "GET",
+    "path": "/snapshots",
+    "group": "snapshots",
+    "slug": "list",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "assignTemplateTags",
+    "method": "POST",
+    "path": "/templates/tags",
+    "group": "tags",
+    "slug": "assign",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "deleteTemplateTags",
+    "method": "DELETE",
+    "path": "/templates/tags",
+    "group": "tags",
+    "slug": "delete",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "listTemplateTags",
+    "method": "GET",
+    "path": "/templates/{templateID}/tags",
+    "group": "tags",
+    "slug": "list",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "getTeamMetrics",
+    "method": "GET",
+    "path": "/teams/{teamID}/metrics",
+    "group": "team-metrics",
+    "slug": "team-metrics",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "getTeamMetricsMax",
+    "method": "GET",
+    "path": "/teams/{teamID}/metrics/max",
+    "group": "team-metrics",
+    "slug": "team-metrics-max",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "getTemplateByAlias",
+    "method": "GET",
+    "path": "/templates/aliases/{alias}",
+    "group": "templates",
+    "slug": "alias",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "getTemplateBuildLogs",
+    "method": "GET",
+    "path": "/templates/{templateID}/builds/{buildID}/logs",
+    "group": "templates",
+    "slug": "build-logs",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "getTemplateBuildStatus",
+    "method": "GET",
+    "path": "/templates/{templateID}/builds/{buildID}/status",
+    "group": "templates",
+    "slug": "build-status",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "createTemplate",
+    "method": "POST",
+    "path": "/v3/templates",
+    "group": "templates",
+    "slug": "create",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "deleteTemplate",
+    "method": "DELETE",
+    "path": "/templates/{templateID}",
+    "group": "templates",
+    "slug": "delete",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "getTemplate",
+    "method": "GET",
+    "path": "/templates/{templateID}",
+    "group": "templates",
+    "slug": "get",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "listTemplates",
+    "method": "GET",
+    "path": "/v2/templates",
+    "group": "templates",
+    "slug": "list",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "startTemplateBuild",
+    "method": "POST",
+    "path": "/v2/templates/{templateID}/builds/{buildID}",
+    "group": "templates",
+    "slug": "start-build",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "updateTemplate",
+    "method": "PATCH",
+    "path": "/v2/templates/{templateID}",
+    "group": "templates",
+    "slug": "update",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "getTemplateUploadUrl",
+    "method": "GET",
+    "path": "/templates/{templateID}/files/{hash}",
+    "group": "templates",
+    "slug": "upload-url",
+    "spec": "control-plane"
+  },
+  {
+    "operationId": "getEnvironmentHealth",
+    "method": "GET",
+    "path": "/health",
+    "group": "environment",
+    "slug": "health",
+    "spec": "envd"
+  },
+  {
+    "operationId": "getEnvironmentMetrics",
+    "method": "GET",
+    "path": "/metrics",
+    "group": "environment",
+    "slug": "metrics",
+    "spec": "envd"
+  },
+  {
+    "operationId": "getEnvironmentVariables",
+    "method": "GET",
+    "path": "/envs",
+    "group": "environment",
+    "slug": "variables",
+    "spec": "envd"
+  },
+  {
+    "operationId": "composeFiles",
+    "method": "POST",
+    "path": "/files/compose",
+    "group": "files",
+    "slug": "compose",
+    "spec": "envd"
+  },
+  {
+    "operationId": "downloadFile",
+    "method": "GET",
+    "path": "/files",
+    "group": "files",
+    "slug": "download",
+    "spec": "envd"
+  },
+  {
+    "operationId": "uploadFile",
+    "method": "POST",
+    "path": "/files",
+    "group": "files",
+    "slug": "upload",
+    "spec": "envd"
+  }
+]
