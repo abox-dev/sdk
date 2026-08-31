@@ -9,11 +9,28 @@ function escapeHtml(value: string): string {
     .replaceAll('>', '&gt;')
 }
 
+function renderDefaultValue(value: unknown): string | undefined {
+  if (value === undefined || typeof value === 'function') return undefined
+  if (typeof value === 'symbol') return undefined
+  if (typeof value !== 'object' || value === null) return String(value)
+
+  const serialized = JSON.stringify(value, (_key, item: unknown) => {
+    if (item && typeof item === 'object' && !Array.isArray(item)) {
+      return Object.fromEntries(
+        Object.entries(item).sort(([left], [right]) =>
+          left.localeCompare(right)
+        )
+      )
+    }
+    return item
+  })
+  return serialized === '{}' ? undefined : serialized
+}
+
 function renderOption(option: Option): string {
+  const defaultValue = renderDefaultValue(option.defaultValue)
   const fallback =
-    option.defaultValue === undefined
-      ? ''
-      : ` Default: \`${String(option.defaultValue)}\`.`
+    defaultValue === undefined ? '' : ` Default: \`${defaultValue}\`.`
   return `- \`${escapeHtml(option.flags)}\`: ${escapeHtml(option.description || 'No description.')}${fallback}`
 }
 

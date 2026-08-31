@@ -153,6 +153,11 @@ def main() -> None:
     for forbidden in FORBIDDEN_REFERENCE_PROPERTIES:
         assert forbidden not in rendered_markdown
 
+    cli_markdown = "\n".join(
+        path.read_text() for path in (REFERENCE / "sdk/cli").glob("*.md")
+    )
+    assert "[object Object]" not in cli_markdown
+
     javascript_files = {
         str(path.relative_to(REFERENCE))
         for path in (REFERENCE / "sdk/javascript").rglob("*.md")
