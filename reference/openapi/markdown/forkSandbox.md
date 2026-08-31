@@ -6,9 +6,7 @@ Fork the sandbox: checkpoint the running sandbox in place (it is briefly paused,
 
 ## Parameters
 
-| Name | In | Required | Type | Description |
-| --- | --- | --- | --- | --- |
-| `sandboxID` | path | yes | `string` |  |
+- **`sandboxID`** · `string` · path · required
 
 ## Request body
 
@@ -18,10 +16,13 @@ Required: no
 
 Schema: `SandboxForkRequest`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `timeout` | `integer` | no | Time to live for the new forked sandboxes in seconds. |
-| `count` | `integer` | no | Number of forked sandboxes to create. All forks boot from the same snapshot, so the snapshot is captured once regardless of count. Each fork succeeds or fails independently; the outcome of each is reported in its entry of the response list. |
+- **`timeout`** · `integer` · optional
+
+  Time to live for the new forked sandboxes in seconds.
+
+- **`count`** · `integer` · optional
+
+  Number of forked sandboxes to create. All forks boot from the same snapshot, so the snapshot is captured once regardless of count. Each fork succeeds or fails independently; the outcome of each is reported in its entry of the response list.
 
 ## Responses
 
@@ -33,6 +34,10 @@ Content-Type: `application/json`
 
 Schema: `array<SandboxForkResult>`
 
+- **`sandbox`** · `Sandbox` · optional
+
+- **`error`** · `Error` · optional
+
 ### 409
 
 Conflict
@@ -41,10 +46,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 404
 
@@ -54,10 +62,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 401
 
@@ -67,10 +78,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 500
 
@@ -80,7 +94,10 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error

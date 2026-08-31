@@ -6,9 +6,7 @@ Check if template with given alias exists
 
 ## Parameters
 
-| Name | In | Required | Type | Description |
-| --- | --- | --- | --- | --- |
-| `alias` | path | yes | `string` |  |
+- **`alias`** · `string` · path · required
 
 ## Responses
 
@@ -20,10 +18,13 @@ Content-Type: `application/json`
 
 Schema: `TemplateAliasResponse`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `templateID` | `string` | yes | Identifier of the template |
-| `public` | `boolean` | yes | Whether the template is public or only accessible by the team |
+- **`templateID`** · `string` · required
+
+  Identifier of the template
+
+- **`public`** · `boolean` · required
+
+  Whether the template is public or only accessible by the team
 
 ### 400
 
@@ -33,10 +34,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 403
 
@@ -46,10 +50,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 404
 
@@ -59,10 +66,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 500
 
@@ -72,7 +82,10 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error

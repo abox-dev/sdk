@@ -6,9 +6,7 @@ Set the timeout for the sandbox. The sandbox will expire x seconds from the time
 
 ## Parameters
 
-| Name | In | Required | Type | Description |
-| --- | --- | --- | --- | --- |
-| `sandboxID` | path | yes | `string` |  |
+- **`sandboxID`** · `string` · path · required
 
 ## Request body
 
@@ -18,9 +16,9 @@ Required: no
 
 Schema: `SandboxTimeoutRequest`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `timeout` | `integer` | yes | Timeout in seconds from the current time after which the sandbox should expire |
+- **`timeout`** · `integer` · required
+
+  Timeout in seconds from the current time after which the sandbox should expire
 
 ## Responses
 
@@ -36,10 +34,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 404
 
@@ -49,10 +50,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 500
 
@@ -62,7 +66,10 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error

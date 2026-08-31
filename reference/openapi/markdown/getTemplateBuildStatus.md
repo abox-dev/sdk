@@ -6,13 +6,19 @@ Get template build info
 
 ## Parameters
 
-| Name | In | Required | Type | Description |
-| --- | --- | --- | --- | --- |
-| `templateID` | path | yes | `string` |  |
-| `buildID` | path | yes | `string` |  |
-| `logsOffset` | query | no | `integer` | Index of the starting build log that should be returned with the template |
-| `limit` | query | no | `integer` | Maximum number of logs that should be returned |
-| `level` | query | no | `LogLevel` |  |
+- **`templateID`** · `string` · path · required
+
+- **`buildID`** · `string` · path · required
+
+- **`logsOffset`** · `integer` · query · optional
+
+  Index of the starting build log that should be returned with the template
+
+- **`limit`** · `integer` · query · optional
+
+  Maximum number of logs that should be returned
+
+- **`level`** · `LogLevel` · query · optional
 
 ## Responses
 
@@ -24,14 +30,27 @@ Content-Type: `application/json`
 
 Schema: `TemplateBuildInfo`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `logs` | `array<string>` | yes | Build logs |
-| `logEntries` | `array<BuildLogEntry>` | yes | Build logs structured |
-| `templateID` | `string` | yes | Identifier of the template |
-| `buildID` | `string` | yes | Identifier of the build |
-| `status` | `TemplateBuildStatus` | yes | Status of the template build |
-| `reason` | `BuildStatusReason` | no |  |
+- **`logs`** · `array<string>` · required
+
+  Build logs
+
+- **`logEntries`** · `array<BuildLogEntry>` · required
+
+  Build logs structured
+
+- **`templateID`** · `string` · required
+
+  Identifier of the template
+
+- **`buildID`** · `string` · required
+
+  Identifier of the build
+
+- **`status`** · `TemplateBuildStatus` · required
+
+  Status of the template build
+
+- **`reason`** · `BuildStatusReason` · optional
 
 ### 401
 
@@ -41,10 +60,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 404
 
@@ -54,10 +76,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 500
 
@@ -67,7 +92,10 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error

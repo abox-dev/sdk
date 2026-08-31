@@ -6,9 +6,9 @@ List metrics for given sandboxes
 
 ## Parameters
 
-| Name | In | Required | Type | Description |
-| --- | --- | --- | --- | --- |
-| `sandbox_ids` | query | yes | `array<string>` | Comma-separated list of sandbox IDs to get metrics for |
+- **`sandbox_ids`** · `array<string>` · query · required
+
+  Comma-separated list of sandbox IDs to get metrics for
 
 ## Responses
 
@@ -20,9 +20,7 @@ Content-Type: `application/json`
 
 Schema: `SandboxesWithMetrics`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `sandboxes` | `object` | yes |  |
+- **`sandboxes`** · `object` · required
 
 ### 401
 
@@ -32,10 +30,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 400
 
@@ -45,10 +46,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 500
 
@@ -58,7 +62,10 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error

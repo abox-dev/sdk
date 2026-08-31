@@ -6,9 +6,7 @@ Returns sandbox details. If the sandbox is paused, it will be resumed. TTL is on
 
 ## Parameters
 
-| Name | In | Required | Type | Description |
-| --- | --- | --- | --- | --- |
-| `sandboxID` | path | yes | `string` |  |
+- **`sandboxID`** · `string` · path · required
 
 ## Request body
 
@@ -18,9 +16,9 @@ Required: yes
 
 Schema: `ConnectSandbox`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `timeout` | `integer` | yes | Timeout in seconds from the current time after which the sandbox should expire |
+- **`timeout`** · `integer` · required
+
+  Timeout in seconds from the current time after which the sandbox should expire
 
 ## Responses
 
@@ -32,13 +30,25 @@ Content-Type: `application/json`
 
 Schema: `Sandbox`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `templateID` | `string` | yes | Identifier of the template from which is the sandbox created |
-| `sandboxID` | `string` | yes | Identifier of the sandbox |
-| `alias` | `string` | no | Alias of the template |
-| `envdVersion` | `EnvdVersion` | yes | Version of the envd running in the sandbox |
-| `domain` | `string` | no | Base domain where the sandbox traffic is accessible |
+- **`templateID`** · `string` · required
+
+  Identifier of the template from which is the sandbox created
+
+- **`sandboxID`** · `string` · required
+
+  Identifier of the sandbox
+
+- **`alias`** · `string` · optional
+
+  Alias of the template
+
+- **`envdVersion`** · `EnvdVersion` · required
+
+  Version of the envd running in the sandbox
+
+- **`domain`** · `string` · optional
+
+  Base domain where the sandbox traffic is accessible
 
 ### 201
 
@@ -48,13 +58,25 @@ Content-Type: `application/json`
 
 Schema: `Sandbox`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `templateID` | `string` | yes | Identifier of the template from which is the sandbox created |
-| `sandboxID` | `string` | yes | Identifier of the sandbox |
-| `alias` | `string` | no | Alias of the template |
-| `envdVersion` | `EnvdVersion` | yes | Version of the envd running in the sandbox |
-| `domain` | `string` | no | Base domain where the sandbox traffic is accessible |
+- **`templateID`** · `string` · required
+
+  Identifier of the template from which is the sandbox created
+
+- **`sandboxID`** · `string` · required
+
+  Identifier of the sandbox
+
+- **`alias`** · `string` · optional
+
+  Alias of the template
+
+- **`envdVersion`** · `EnvdVersion` · required
+
+  Version of the envd running in the sandbox
+
+- **`domain`** · `string` · optional
+
+  Base domain where the sandbox traffic is accessible
 
 ### 400
 
@@ -64,10 +86,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 401
 
@@ -77,10 +102,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 404
 
@@ -90,10 +118,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 500
 
@@ -103,7 +134,10 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error

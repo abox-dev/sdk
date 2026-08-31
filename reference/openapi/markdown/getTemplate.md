@@ -6,11 +6,15 @@ List all builds for a template
 
 ## Parameters
 
-| Name | In | Required | Type | Description |
-| --- | --- | --- | --- | --- |
-| `templateID` | path | yes | `string` |  |
-| `nextToken` | query | no | `string` | Cursor to start the list from |
-| `limit` | query | no | `integer` | Maximum number of items to return per page |
+- **`templateID`** · `string` · path · required
+
+- **`nextToken`** · `string` · query · optional
+
+  Cursor to start the list from
+
+- **`limit`** · `integer` · query · optional
+
+  Maximum number of items to return per page
 
 ## Responses
 
@@ -22,16 +26,37 @@ Content-Type: `application/json`
 
 Schema: `TemplateWithBuilds`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `templateID` | `string` | yes | Identifier of the template |
-| `public` | `boolean` | yes | Whether the template is public or only accessible by the team |
-| `names` | `array<string>` | yes | Names of the template (namespace/alias format when namespaced) |
-| `createdAt` | `string` | yes | Time when the template was created |
-| `updatedAt` | `string` | yes | Time when the template was last updated |
-| `lastSpawnedAt` | `string` | yes | Time when the template was last used |
-| `spawnCount` | `integer` | yes | Number of times the template was used |
-| `builds` | `array<TemplateBuild>` | yes | List of builds for the template |
+- **`templateID`** · `string` · required
+
+  Identifier of the template
+
+- **`public`** · `boolean` · required
+
+  Whether the template is public or only accessible by the team
+
+- **`names`** · `array<string>` · required
+
+  Names of the template (namespace/alias format when namespaced)
+
+- **`createdAt`** · `string` · required
+
+  Time when the template was created
+
+- **`updatedAt`** · `string` · required
+
+  Time when the template was last updated
+
+- **`lastSpawnedAt`** · `string` · required
+
+  Time when the template was last used
+
+- **`spawnCount`** · `integer` · required
+
+  Number of times the template was used
+
+- **`builds`** · `array<TemplateBuild>` · required
+
+  List of builds for the template
 
 ### 401
 
@@ -41,10 +66,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 500
 
@@ -54,7 +82,10 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error

@@ -6,9 +6,7 @@ Update template
 
 ## Parameters
 
-| Name | In | Required | Type | Description |
-| --- | --- | --- | --- | --- |
-| `templateID` | path | yes | `string` |  |
+- **`templateID`** · `string` · path · required
 
 ## Request body
 
@@ -18,9 +16,9 @@ Required: yes
 
 Schema: `TemplateUpdateRequest`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `public` | `boolean` | no | Whether the template is public or only accessible by the team |
+- **`public`** · `boolean` · optional
+
+  Whether the template is public or only accessible by the team
 
 ## Responses
 
@@ -32,9 +30,9 @@ Content-Type: `application/json`
 
 Schema: `TemplateUpdateResponse`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `names` | `array<string>` | yes | Names of the template (namespace/alias format when namespaced) |
+- **`names`** · `array<string>` · required
+
+  Names of the template (namespace/alias format when namespaced)
 
 ### 400
 
@@ -44,10 +42,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 401
 
@@ -57,10 +58,13 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error
 
 ### 500
 
@@ -70,7 +74,10 @@ Content-Type: `application/json`
 
 Schema: `Error`
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `code` | `integer` | yes | Error code |
-| `message` | `string` | yes | Error |
+- **`code`** · `integer` · required
+
+  Error code
+
+- **`message`** · `string` · required
+
+  Error

@@ -10,45 +10,45 @@ controlPlane:
     - templates
     - tags
   operations:
-    GET /teams/{teamID}/metrics: { id: getTeamMetrics, group: team-metrics, slug: team-metrics }
-    GET /teams/{teamID}/metrics/max: { id: getTeamMetricsMax, group: team-metrics, slug: team-metrics-max }
-    POST /sandboxes: { id: createSandbox, group: sandboxes, slug: create }
-    GET /v2/sandboxes: { id: listSandboxes, group: sandboxes, slug: list }
-    GET /sandboxes/metrics: { id: listSandboxMetrics, group: sandboxes, slug: list-metrics }
-    GET /v2/sandboxes/{sandboxID}/logs: { id: getSandboxLogs, group: sandboxes, slug: logs }
-    GET /sandboxes/{sandboxID}: { id: getSandbox, group: sandboxes, slug: get }
-    DELETE /sandboxes/{sandboxID}: { id: killSandbox, group: sandboxes, slug: kill }
-    GET /sandboxes/{sandboxID}/metrics: { id: getSandboxMetrics, group: sandboxes, slug: metrics }
-    POST /sandboxes/{sandboxID}/pause: { id: pauseSandbox, group: sandboxes, slug: pause }
-    POST /sandboxes/{sandboxID}/fork: { id: forkSandbox, group: sandboxes, slug: fork }
-    POST /sandboxes/{sandboxID}/connect: { id: connectSandbox, group: sandboxes, slug: connect }
-    POST /sandboxes/{sandboxID}/timeout: { id: setSandboxTimeout, group: sandboxes, slug: timeout }
-    PUT /sandboxes/{sandboxID}/network: { id: updateSandboxNetwork, group: sandboxes, slug: network }
-    POST /sandboxes/{sandboxID}/refreshes: { id: refreshSandbox, group: sandboxes, slug: refresh }
-    POST /sandboxes/{sandboxID}/snapshots: { id: createSnapshot, group: snapshots, slug: create }
-    GET /snapshots: { id: listSnapshots, group: snapshots, slug: list }
-    POST /v3/templates: { id: createTemplate, group: templates, slug: create }
-    GET /v2/templates: { id: listTemplates, group: templates, slug: list }
-    GET /templates/{templateID}/files/{hash}: { id: getTemplateUploadUrl, group: templates, slug: upload-url }
-    GET /templates/{templateID}: { id: getTemplate, group: templates, slug: get }
-    DELETE /templates/{templateID}: { id: deleteTemplate, group: templates, slug: delete }
-    POST /v2/templates/{templateID}/builds/{buildID}: { id: startTemplateBuild, group: templates, slug: start-build }
-    PATCH /v2/templates/{templateID}: { id: updateTemplate, group: templates, slug: update }
-    GET /templates/{templateID}/builds/{buildID}/status: { id: getTemplateBuildStatus, group: templates, slug: build-status }
-    GET /templates/{templateID}/builds/{buildID}/logs: { id: getTemplateBuildLogs, group: templates, slug: build-logs }
-    POST /templates/tags: { id: assignTemplateTags, group: tags, slug: assign }
-    DELETE /templates/tags: { id: deleteTemplateTags, group: tags, slug: delete }
-    GET /templates/{templateID}/tags: { id: listTemplateTags, group: tags, slug: list }
-    GET /templates/aliases/{alias}: { id: getTemplateByAlias, group: templates, slug: alias }
+    GET /teams/{teamID}/metrics: { id: getTeamMetrics, group: team-metrics, slug: team-metrics, summary: Get team metrics }
+    GET /teams/{teamID}/metrics/max: { id: getTeamMetricsMax, group: team-metrics, slug: team-metrics-max, summary: Get maximum team metrics }
+    POST /sandboxes: { id: createSandbox, group: sandboxes, slug: create, summary: Create sandbox }
+    GET /v2/sandboxes: { id: listSandboxes, group: sandboxes, slug: list, summary: List sandboxes }
+    GET /sandboxes/metrics: { id: listSandboxMetrics, group: sandboxes, slug: list-metrics, summary: List sandbox metrics }
+    GET /v2/sandboxes/{sandboxID}/logs: { id: getSandboxLogs, group: sandboxes, slug: logs, summary: Get sandbox logs }
+    GET /sandboxes/{sandboxID}: { id: getSandbox, group: sandboxes, slug: get, summary: Get sandbox }
+    DELETE /sandboxes/{sandboxID}: { id: killSandbox, group: sandboxes, slug: kill, summary: Kill sandbox }
+    GET /sandboxes/{sandboxID}/metrics: { id: getSandboxMetrics, group: sandboxes, slug: metrics, summary: Get sandbox metrics }
+    POST /sandboxes/{sandboxID}/pause: { id: pauseSandbox, group: sandboxes, slug: pause, summary: Pause sandbox }
+    POST /sandboxes/{sandboxID}/fork: { id: forkSandbox, group: sandboxes, slug: fork, summary: Fork sandbox }
+    POST /sandboxes/{sandboxID}/connect: { id: connectSandbox, group: sandboxes, slug: connect, summary: Connect sandbox }
+    POST /sandboxes/{sandboxID}/timeout: { id: setSandboxTimeout, group: sandboxes, slug: timeout, summary: Set sandbox timeout }
+    PUT /sandboxes/{sandboxID}/network: { id: updateSandboxNetwork, group: sandboxes, slug: network, summary: Update sandbox network }
+    POST /sandboxes/{sandboxID}/refreshes: { id: refreshSandbox, group: sandboxes, slug: refresh, summary: Refresh sandbox }
+    POST /sandboxes/{sandboxID}/snapshots: { id: createSnapshot, group: snapshots, slug: create, summary: Create snapshot }
+    GET /snapshots: { id: listSnapshots, group: snapshots, slug: list, summary: List snapshots }
+    POST /v3/templates: { id: createTemplate, group: templates, slug: create, summary: Create template }
+    GET /v2/templates: { id: listTemplates, group: templates, slug: list, summary: List templates }
+    GET /templates/{templateID}/files/{hash}: { id: getTemplateUploadUrl, group: templates, slug: upload-url, summary: Get template upload URL }
+    GET /templates/{templateID}: { id: getTemplate, group: templates, slug: get, summary: Get template }
+    DELETE /templates/{templateID}: { id: deleteTemplate, group: templates, slug: delete, summary: Delete template }
+    POST /v2/templates/{templateID}/builds/{buildID}: { id: startTemplateBuild, group: templates, slug: start-build, summary: Start template build }
+    PATCH /v2/templates/{templateID}: { id: updateTemplate, group: templates, slug: update, summary: Update template }
+    GET /templates/{templateID}/builds/{buildID}/status: { id: getTemplateBuildStatus, group: templates, slug: build-status, summary: Get template build status }
+    GET /templates/{templateID}/builds/{buildID}/logs: { id: getTemplateBuildLogs, group: templates, slug: build-logs, summary: Get template build logs }
+    POST /templates/tags: { id: assignTemplateTags, group: tags, slug: assign, summary: Assign template tags }
+    DELETE /templates/tags: { id: deleteTemplateTags, group: tags, slug: delete, summary: Delete template tags }
+    GET /templates/{templateID}/tags: { id: listTemplateTags, group: tags, slug: list, summary: List template tags }
+    GET /templates/aliases/{alias}: { id: getTemplateByAlias, group: templates, slug: alias, summary: Get template by alias }
 
 envd:
   source: spec/envd/envd.yaml
   publicAuthSchemes:
     - AccessTokenAuth
   operations:
-    GET /health: { id: getEnvironmentHealth, group: environment, slug: health }
-    GET /metrics: { id: getEnvironmentMetrics, group: environment, slug: metrics }
-    GET /envs: { id: getEnvironmentVariables, group: environment, slug: variables }
-    GET /files: { id: downloadFile, group: files, slug: download }
-    POST /files: { id: uploadFile, group: files, slug: upload }
-    POST /files/compose: { id: composeFiles, group: files, slug: compose }
+    GET /health: { id: getEnvironmentHealth, group: environment, slug: health, summary: Check environment health }
+    GET /metrics: { id: getEnvironmentMetrics, group: environment, slug: metrics, summary: Get environment metrics }
+    GET /envs: { id: getEnvironmentVariables, group: environment, slug: variables, summary: Get environment variables }
+    GET /files: { id: downloadFile, group: files, slug: download, summary: Download file }
+    POST /files: { id: uploadFile, group: files, slug: upload, summary: Upload file }
+    POST /files/compose: { id: composeFiles, group: files, slug: compose, summary: Compose files }
