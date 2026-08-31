@@ -68,6 +68,10 @@ The CLI stores local configuration in `~/.agentbox/config.json`; environment var
 
 Install JavaScript dependencies with `pnpm install --frozen-lockfile` and Python dependencies with `uv sync --frozen` in each Python package. `make generate` regenerates clients only from the checked-in snapshots under `spec/`; maintainers update them with `make sync-specs MONO_DIR=/path/to/mono`.
 
+The complete maintainer workflow for synchronized package versions, artifact
+verification, KVM checks, tagging, Trusted Publishing, and post-release checks
+is documented in [RELEASING.md](RELEASING.md).
+
 Run the complete local verification before publishing:
 
 ```bash
@@ -93,7 +97,8 @@ AGENTBOX_SANDBOX_URL=http://localhost:3002 \
 The runtime smoke covers the JavaScript and Python sync/async SDKs, both Code Interpreter packages, the CLI lifecycle, private traffic routing, and a real temporary template build. It removes the test sandboxes and template when it finishes.
 
 After publishing, run the same checks from clean npm and PyPI installs with
-`./scripts/test-published-runtime.sh`. It defaults to version `0.1.0` and does
-not use workspace links or local package artifacts.
+`./scripts/test-published-runtime.sh X.Y.Z`. With no argument it reads the
+current version from the core SDK manifest. It does not use workspace links or
+local package artifacts.
 
 AgentBox SDK is derived from upstream work described in [UPSTREAM.md](UPSTREAM.md). Licensing notices are in [LICENSE](LICENSE) and [NOTICE](NOTICE).

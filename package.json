@@ -10,6 +10,7 @@
     "test:release": "./scripts/test-release-artifacts.sh",
     "test:runtime": "./scripts/test-release-runtime.sh",
     "test:runtime:published": "./scripts/test-published-runtime.sh",
+    "release:version": "node scripts/set-release-version.mjs",
     "lint": "pnpm --if-present --recursive run lint",
     "typecheck": "pnpm --dir packages/js-sdk build && pnpm --if-present --recursive run typecheck",
     "format": "pnpm --if-present --recursive run format",

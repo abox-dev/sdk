@@ -9,6 +9,8 @@ const manifests = [
   'packages/js-sdk/package.json',
   'packages/code-interpreter-js/package.json',
   'packages/cli/package.json',
+  'packages/python-sdk/package.json',
+  'packages/code-interpreter-python/package.json',
 ]
 
 for (const manifest of manifests) {
@@ -25,6 +27,29 @@ for (const manifest of [
   const value = content.match(/^version\s*=\s*"([^"]+)"/m)?.[1]
   if (value !== expected)
     throw new Error(`${manifest}: expected ${expected}, got ${value}`)
+}
+
+for (const [manifest, packages] of [
+  ['packages/python-sdk/uv.lock', ['abox-sdk']],
+  [
+    'packages/code-interpreter-python/uv.lock',
+    ['abox-code-interpreter', 'abox-sdk'],
+  ],
+]) {
+  const blocks = fs.readFileSync(manifest, 'utf8').split('[[package]]')
+  for (const packageName of packages) {
+    const versions = blocks
+      .filter((block) =>
+        new RegExp(`^name\\s*=\\s*"${packageName}"$`, 'm').test(block)
+      )
+      .map((block) => block.match(/^version\s*=\s*"([^"]+)"/m)?.[1])
+      .filter(Boolean)
+    if (versions.length === 0 || versions.some((value) => value !== expected)) {
+      throw new Error(
+        `${manifest}: expected every ${packageName} entry to be ${expected}, got ${versions.join(', ') || 'none'}`
+      )
+    }
+  }
 }
 
 for (const directory of [

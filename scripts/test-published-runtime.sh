@@ -2,7 +2,8 @@
 set -euo pipefail
 
 root_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-version=${1:-0.1.0}
+version=${1:-$(node -p 'require(process.argv[1]).version' \
+  "$root_dir/packages/js-sdk/package.json")}
 test_dir=$(mktemp -d)
 trap 'rm -rf "$test_dir"' EXIT
 
