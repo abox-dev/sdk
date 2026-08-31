@@ -1,5 +1,7 @@
 <p align="center">
-  <img src="readme-assets/agentbox-logo-email.png" alt="AgentBox" width="240">
+  <a href="https://agentbox.ru">
+    <img src="readme-assets/agentbox-logo-email.png" alt="AgentBox" width="240">
+  </a>
 </p>
 
 # AgentBox SDK
