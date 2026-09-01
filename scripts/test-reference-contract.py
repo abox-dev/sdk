@@ -409,6 +409,7 @@ def main() -> None:
         "Default: `100`",
         "Minimum: `1`",
         "Maximum: `100`",
+        "Serialization: style `form`; explode `false`; wire format `state=value1,value2`",
     ):
         assert expected in list_sandboxes
 
@@ -441,6 +442,10 @@ def main() -> None:
     assert "- **`sandbox_ids`** · `array<string>` · query · required" in list_metrics
     assert "Maximum items: `100`" in list_metrics
     assert "Unique items: `yes`" in list_metrics
+    assert (
+        "Serialization: style `form`; explode `false`; wire format `sandbox_ids=value1,value2`"
+        in list_metrics
+    )
 
     list_templates = (REFERENCE / "openapi/markdown/listTemplates.md").read_text()
     assert "- **`createdBy`** · `TeamUser | null` · required" in list_templates

@@ -300,6 +300,37 @@ def render_schema(document: dict, schema: dict) -> list[str]:
     return lines
 
 
+def render_parameter_serialization(document: dict, parameter: dict) -> list[str]:
+    if "style" not in parameter and "explode" not in parameter:
+        return []
+    location = parameter.get("in")
+    style = parameter.get(
+        "style",
+        {"query": "form", "cookie": "form", "path": "simple", "header": "simple"}.get(
+            location
+        ),
+    )
+    if not style:
+        raise SystemExit(
+            f"Cannot infer serialization style for parameter {parameter.get('name')}"
+        )
+    explode = parameter.get("explode", style == "form")
+    details = [f"style `{style}`", f"explode `{'true' if explode else 'false'}`"]
+    schema, _ = normalize_schema(document, parameter.get("schema", {}))
+    if location == "query" and schema.get("type") == "array":
+        name = parameter.get("name", "parameter")
+        if style == "form":
+            wire_format = (
+                f"{name}=value1&{name}=value2" if explode else f"{name}=value1,value2"
+            )
+            details.append(f"wire format `{wire_format}`")
+        elif style == "spaceDelimited":
+            details.append(f"wire format `{name}=value1%20value2`")
+        elif style == "pipeDelimited":
+            details.append(f"wire format `{name}=value1|value2`")
+    return [f"  Serialization: {'; '.join(details)}", ""]
+
+
 def render_operation_markdown(document: dict, record: dict) -> str:
     operation = document["paths"][record["path"]][record["method"].lower()]
     lines = [f"# {record['method']} {record['path']}", ""]
@@ -328,6 +359,7 @@ def render_operation_markdown(document: dict, record: dict) -> str:
                 )
             )
             lines.extend(render_schema_metadata(document, parameter_schema, "  "))
+            lines.extend(render_parameter_serialization(document, parameter))
 
     if operation.get("requestBody"):
         request_body, _ = resolve_ref(document, operation["requestBody"])

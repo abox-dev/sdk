@@ -14,6 +14,8 @@ List metrics for given sandboxes
 
   Unique items: `yes`
 
+  Serialization: style `form`; explode `false`; wire format `sandbox_ids=value1,value2`
+
 ## Responses
 
 ### 200

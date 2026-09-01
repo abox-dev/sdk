@@ -16,6 +16,8 @@ List all sandboxes
 
   Allowed values for `SandboxState`: `running` | `paused`
 
+  Serialization: style `form`; explode `false`; wire format `state=value1,value2`
+
 - **`nextToken`** · `string` · query · optional
 
   Cursor to start the list from
