@@ -33,6 +33,8 @@ value is used.
 
   Internal envd HTTP port exposed through the sandbox proxy.
 
+  Default: `49983`
+
 - **`path`** · `string` · query · optional
 
   Path to the file, URL encoded. Can be relative to the user's home directory (e.g. "file.txt" resolves to ~/file.txt).
@@ -59,9 +61,15 @@ Schema: `object`
 
 - **`file`** · `string` · optional
 
+  Format: `binary`
+
 ### application/octet-stream
 
 Schema: `string`
+
+Raw file content. The 'path' query parameter is required when using this content type.
+
+Format: `binary`
 
 ## Responses
 
@@ -84,6 +92,8 @@ Schema: `array<EntryInfo>`
 - **`type`** · `file` · required
 
   Type of the file
+
+  Allowed values: `file`
 
 - **`metadata`** · `object` · optional
 

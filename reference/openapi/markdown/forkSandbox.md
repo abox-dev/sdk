@@ -20,9 +20,23 @@ Schema: `SandboxForkRequest`
 
   Time to live for the new forked sandboxes in seconds.
 
+  Format: `int32`
+
+  Default: `15`
+
+  Minimum: `0`
+
 - **`count`** · `integer` · optional
 
   Number of forked sandboxes to create. All forks boot from the same snapshot, so the snapshot is captured once regardless of count. Each fork succeeds or fails independently; the outcome of each is reported in its entry of the response list.
+
+  Format: `int32`
+
+  Default: `1`
+
+  Minimum: `1`
+
+  Maximum: `100`
 
 ## Responses
 
@@ -62,6 +76,8 @@ Schema: `array<SandboxForkResult>`
 
   Error code
 
+  Format: `int32`
+
 - **`error.message`** · `string` · required
 
   Error
@@ -77,6 +93,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 
@@ -94,6 +112,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -110,6 +130,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -125,6 +147,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 

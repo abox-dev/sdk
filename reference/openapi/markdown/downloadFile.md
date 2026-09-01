@@ -12,6 +12,8 @@ Download a file
 
   Internal envd HTTP port exposed through the sandbox proxy.
 
+  Default: `49983`
+
 - **`path`** · `string` · query · optional
 
   Path to the file, URL encoded. Can be relative to the user's home directory (e.g. "file.txt" resolves to ~/file.txt).
@@ -37,6 +39,10 @@ Entire file downloaded successfully.
 Content-Type: `application/octet-stream`
 
 Schema: `string`
+
+The raw file content
+
+Format: `binary`
 
 ### 400
 

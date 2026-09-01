@@ -16,6 +16,8 @@ Required: yes
 
 Schema: `SandboxNetworkUpdateConfig`
 
+Network configuration update for a running sandbox. Replaces the current egress rules with the provided configuration. Omitting a field clears it.
+
 - **`allowOut`** · `array<string>` · optional
 
   List of allowed destinations for egress traffic. Each entry can be a CIDR block (e.g. "8.8.8.8/32"), a bare IP address (e.g. "8.8.8.8"), or a domain name (e.g. "example.com", "*.example.com"). Allowed entries always take precedence over denied entries.
@@ -62,6 +64,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -77,6 +81,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 
@@ -94,6 +100,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -109,6 +117,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 

@@ -12,6 +12,8 @@ Compose multiple files into a single file using zero-copy concatenation. Source 
 
   Internal envd HTTP port exposed through the sandbox proxy.
 
+  Default: `49983`
+
 ## Request body
 
 Required: yes
@@ -53,6 +55,8 @@ Schema: `EntryInfo`
 - **`type`** · `file` · required
 
   Type of the file
+
+  Allowed values: `file`
 
 - **`metadata`** · `object` · optional
 

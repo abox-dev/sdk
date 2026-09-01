@@ -16,11 +16,25 @@ List all templates
 
   Maximum number of items to return per page
 
+  Format: `int32`
+
+  Default: `100`
+
+  Minimum: `1`
+
+  Maximum: `100`
+
 ## Responses
 
 ### 200
 
 Successfully returned all templates
+
+#### Response headers
+
+- **`X-Next-Token`** · `string` · response header
+
+  Cursor to fetch the next page of results, if more exist
 
 Content-Type: `application/json`
 
@@ -38,13 +52,25 @@ Schema: `array<Template>`
 
   CPU cores for the sandbox
 
+  Format: `int32`
+
+  Minimum: `1`
+
 - **`memoryMB`** · `MemoryMB` · required
 
   Memory for the sandbox in MiB
 
+  Format: `int32`
+
+  Minimum: `128`
+
 - **`diskSizeMB`** · `DiskSizeMB` · required
 
   Disk size for the sandbox in MiB
+
+  Format: `int32`
+
+  Minimum: `0`
 
 - **`public`** · `boolean` · required
 
@@ -58,9 +84,13 @@ Schema: `array<Template>`
 
   Time when the template was created
 
+  Format: `date-time`
+
 - **`updatedAt`** · `string` · required
 
   Time when the template was last updated
+
+  Format: `date-time`
 
 - **`createdBy`** · `object` · required
 
@@ -68,13 +98,19 @@ Schema: `array<Template>`
 
   Time when the template was last used
 
+  Format: `date-time`
+
 - **`spawnCount`** · `integer` · required
 
   Number of times the template was used
 
+  Format: `int64`
+
 - **`buildCount`** · `integer` · required
 
   Number of times the template was built
+
+  Format: `int32`
 
 - **`envdVersion`** · `EnvdVersion` · required
 
@@ -83,6 +119,8 @@ Schema: `array<Template>`
 - **`buildStatus`** · `TemplateBuildStatus` · required
 
   Status of the template build
+
+  Allowed values for `TemplateBuildStatus`: `building` | `waiting` | `ready` | `error`
 
 ### 400
 
@@ -95,6 +133,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 
@@ -112,6 +152,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -128,6 +170,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -143,6 +187,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 

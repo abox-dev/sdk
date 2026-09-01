@@ -14,6 +14,8 @@ List all sandboxes
 
   Filter sandboxes by one or more states
 
+  Allowed values for `SandboxState`: `running` | `paused`
+
 - **`nextToken`** · `string` · query · optional
 
   Cursor to start the list from
@@ -22,11 +24,31 @@ List all sandboxes
 
   Maximum number of items to return per page
 
+  Format: `int32`
+
+  Default: `100`
+
+  Minimum: `1`
+
+  Maximum: `100`
+
 ## Responses
 
 ### 200
 
 Successfully returned all running sandboxes
+
+#### Response headers
+
+- **`X-Next-Token`** · `string` · response header
+
+  Cursor to fetch the next page of results, if more exist
+
+- **`X-Total-Running`** · `integer` · response header
+
+  Number of running sandboxes matching the filters, before pagination is applied. Only present when running sandboxes were requested.
+
+  Format: `int32`
 
 Content-Type: `application/json`
 
@@ -48,21 +70,37 @@ Schema: `array<ListedSandbox>`
 
   Time when the sandbox was started
 
+  Format: `date-time`
+
 - **`endAt`** · `string` · required
 
   Time when the sandbox will expire
+
+  Format: `date-time`
 
 - **`cpuCount`** · `CPUCount` · required
 
   CPU cores for the sandbox
 
+  Format: `int32`
+
+  Minimum: `1`
+
 - **`memoryMB`** · `MemoryMB` · required
 
   Memory for the sandbox in MiB
 
+  Format: `int32`
+
+  Minimum: `128`
+
 - **`diskSizeMB`** · `DiskSizeMB` · required
 
   Disk size for the sandbox in MiB
+
+  Format: `int32`
+
+  Minimum: `0`
 
 - **`metadata`** · `SandboxMetadata` · optional
 
@@ -73,6 +111,8 @@ Schema: `array<ListedSandbox>`
 - **`state`** · `SandboxState` · required
 
   State of the sandbox
+
+  Allowed values for `SandboxState`: `running` | `paused`
 
 - **`envdVersion`** · `EnvdVersion` · required
 
@@ -90,6 +130,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -106,6 +148,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -121,6 +165,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 

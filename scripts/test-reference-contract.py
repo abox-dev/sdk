@@ -339,6 +339,43 @@ def main() -> None:
     assert "Schema: `array<ListedSandbox>`" in list_sandboxes
     assert "- **`sandboxID`** · `string` · required" in list_sandboxes
     assert "- **`metadata`** · `string` · query · optional" in list_sandboxes
+    for expected in (
+        "Allowed values for `SandboxState`: `running` | `paused`",
+        "#### Response headers",
+        "- **`X-Next-Token`** · `string` · response header",
+        "- **`X-Total-Running`** · `integer` · response header",
+        "Format: `int32`",
+        "Default: `100`",
+        "Minimum: `1`",
+        "Maximum: `100`",
+    ):
+        assert expected in list_sandboxes
+
+    sandbox_logs = (REFERENCE / "openapi/markdown/getSandboxLogs.md").read_text()
+    assert "Allowed values for `LogsDirection`: `forward` | `backward`" in sandbox_logs
+
+    upload_file = (REFERENCE / "openapi/markdown/uploadFile.md").read_text()
+    assert "### application/octet-stream" in upload_file
+    assert "Raw file content. The 'path' query parameter is required" in upload_file
+    assert "Format: `binary`" in upload_file
+
+    start_build = (REFERENCE / "openapi/markdown/startTemplateBuild.md").read_text()
+    for expected in (
+        "Variant `AWSRegistry`",
+        "discriminator `type` = `aws`",
+        "fromImageRegistry<AWSRegistry>.awsAccessKeyId",
+        "fromImageRegistry<AWSRegistry>.awsSecretAccessKey",
+        "fromImageRegistry<AWSRegistry>.awsRegion",
+        "Variant `GCPRegistry`",
+        "discriminator `type` = `gcp`",
+        "fromImageRegistry<GCPRegistry>.serviceAccountJson",
+        "Variant `GeneralRegistry`",
+        "discriminator `type` = `registry`",
+        "fromImageRegistry<GeneralRegistry>.username",
+        "fromImageRegistry<GeneralRegistry>.password",
+    ):
+        assert expected in start_build
+
     create_sandbox = (REFERENCE / "openapi/markdown/createSandbox.md").read_text()
     assert "Schema: `NewSandbox`" in create_sandbox
     for field in (

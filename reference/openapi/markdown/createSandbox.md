@@ -20,13 +20,23 @@ Schema: `NewSandbox`
 
   Time to live for the sandbox in seconds.
 
+  Format: `int32`
+
+  Default: `15`
+
+  Minimum: `0`
+
 - **`autoPause`** · `boolean` · optional
 
   Automatically pauses the sandbox after the timeout
 
+  Default: `false`
+
 - **`autoPauseMemory`** · `boolean` · optional
 
   Controls the snapshot kind taken when the sandbox auto-pauses on timeout (only relevant when autoPause is true). When false, the auto-pause drops the in-memory state and persists only the filesystem (a filesystem-only snapshot); resuming it cold-boots (reboots) the sandbox from disk. Such a snapshot cannot be auto-resumed by traffic and must be resumed explicitly, so it cannot be combined with autoResume. Defaults to true (full memory snapshot).
+
+  Default: `true`
 
 - **`autoResume`** · `SandboxAutoResumeConfig` · optional
 
@@ -35,6 +45,8 @@ Schema: `NewSandbox`
 - **`autoResume.enabled`** · `SandboxAutoResumeEnabled` · required
 
   Auto-resume enabled flag for paused sandboxes. Default false.
+
+  Default: `false`
 
 - **`secure`** · `boolean` · optional
 
@@ -49,6 +61,8 @@ Schema: `NewSandbox`
 - **`network.allowPublicTraffic`** · `boolean` · optional
 
   Specify if the sandbox URLs should be accessible only with authentication.
+
+  Default: `true`
 
 - **`network.allowOut`** · `array<string>` · optional
 
@@ -156,6 +170,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -172,6 +188,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -187,6 +205,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 

@@ -20,6 +20,10 @@ Schema: `ConnectSandbox`
 
   Timeout in seconds from the current time after which the sandbox should expire
 
+  Format: `int32`
+
+  Minimum: `0`
+
 ## Responses
 
 ### 200
@@ -90,6 +94,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -105,6 +111,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 
@@ -122,6 +130,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -137,6 +147,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 

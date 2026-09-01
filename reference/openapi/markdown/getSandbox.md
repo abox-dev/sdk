@@ -34,9 +34,13 @@ Schema: `SandboxDetail`
 
   Time when the sandbox was started
 
+  Format: `date-time`
+
 - **`endAt`** · `string` · required
 
   Time when the sandbox will expire
+
+  Format: `date-time`
 
 - **`envdVersion`** · `EnvdVersion` · required
 
@@ -54,13 +58,25 @@ Schema: `SandboxDetail`
 
   CPU cores for the sandbox
 
+  Format: `int32`
+
+  Minimum: `1`
+
 - **`memoryMB`** · `MemoryMB` · required
 
   Memory for the sandbox in MiB
 
+  Format: `int32`
+
+  Minimum: `128`
+
 - **`diskSizeMB`** · `DiskSizeMB` · required
 
   Disk size for the sandbox in MiB
+
+  Format: `int32`
+
+  Minimum: `0`
 
 - **`metadata`** · `SandboxMetadata` · optional
 
@@ -72,11 +88,15 @@ Schema: `SandboxDetail`
 
   State of the sandbox
 
+  Allowed values for `SandboxState`: `running` | `paused`
+
 - **`network`** · `SandboxNetworkConfig` · optional
 
 - **`network.allowPublicTraffic`** · `boolean` · optional
 
   Specify if the sandbox URLs should be accessible only with authentication.
+
+  Default: `true`
 
 - **`network.allowOut`** · `array<string>` · optional
 
@@ -118,6 +138,8 @@ Schema: `SandboxDetail`
 
   Action taken when the sandbox times out.
 
+  Allowed values for `SandboxOnTimeout`: `kill` | `pause`
+
 ### 404
 
 Not found
@@ -129,6 +151,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 
@@ -146,6 +170,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -161,6 +187,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 

@@ -89,6 +89,45 @@ def render_named_item(
     return lines
 
 
+def schema_value(value: object) -> str:
+    if isinstance(value, (dict, list, bool)) or value is None:
+        return json.dumps(value, sort_keys=True)
+    return str(value)
+
+
+def render_schema_metadata(document: dict, schema: dict, indent: str = "") -> list[str]:
+    """Render validation and representation details without losing referenced enums."""
+    resolved, reference_name = resolve_ref(document, schema)
+    if not isinstance(resolved, dict):
+        return []
+    if resolved.get("type") == "array" and isinstance(resolved.get("items"), dict):
+        return render_schema_metadata(document, resolved["items"], indent)
+
+    lines = []
+    if resolved.get("format"):
+        lines.extend([f"{indent}Format: `{resolved['format']}`", ""])
+    if resolved.get("enum"):
+        label = f" for `{reference_name}`" if reference_name else ""
+        values = " | ".join(f"`{schema_value(value)}`" for value in resolved["enum"])
+        lines.extend([f"{indent}Allowed values{label}: {values}", ""])
+    if "default" in resolved:
+        lines.extend([f"{indent}Default: `{schema_value(resolved['default'])}`", ""])
+    for key, label in (
+        ("minimum", "Minimum"),
+        ("maximum", "Maximum"),
+        ("exclusiveMinimum", "Exclusive minimum"),
+        ("exclusiveMaximum", "Exclusive maximum"),
+        ("minLength", "Minimum length"),
+        ("maxLength", "Maximum length"),
+        ("minItems", "Minimum items"),
+        ("maxItems", "Maximum items"),
+        ("pattern", "Pattern"),
+    ):
+        if key in resolved:
+            lines.extend([f"{indent}{label}: `{schema_value(resolved[key])}`", ""])
+    return lines
+
+
 def schema_fields(document: dict, schema: dict) -> tuple[dict, str | None]:
     """Return the object schema whose fields describe a value."""
     resolved, reference_name = resolve_ref(document, schema)
@@ -119,6 +158,36 @@ def render_schema_fields(
         return []
     descendants = ancestors | {marker}
     lines = []
+
+    variants = fields.get("oneOf") or fields.get("anyOf")
+    if isinstance(variants, list):
+        discriminator = fields.get("discriminator", {})
+        discriminator_name = discriminator.get("propertyName")
+        mapping = discriminator.get("mapping", {})
+        for variant in variants:
+            if not isinstance(variant, dict):
+                continue
+            _, variant_name = resolve_ref(document, variant)
+            variant_name = variant_name or schema_type(document, variant)
+            reference = variant.get("$ref")
+            discriminator_value = next(
+                (value for value, target in mapping.items() if target == reference),
+                None,
+            )
+            qualifier = ""
+            if discriminator_name and discriminator_value is not None:
+                qualifier = (
+                    f" · discriminator `{discriminator_name}` = `{discriminator_value}`"
+                )
+            lines.extend([f"- **Variant `{variant_name}`**{qualifier}", ""])
+            variant_prefix = (
+                f"{prefix}<{variant_name}>" if prefix else f"<{variant_name}>"
+            )
+            lines.extend(
+                render_schema_fields(document, variant, variant_prefix, descendants)
+            )
+        return lines
+
     required = set(fields.get("required", []))
     for name, property_schema in fields.get("properties", {}).items():
         field_name = f"{prefix}.{name}" if prefix else name
@@ -131,6 +200,7 @@ def render_schema_fields(
                 property_value.get("description", ""),
             )
         )
+        lines.extend(render_schema_metadata(document, property_schema, "  "))
         lines.extend(
             render_schema_fields(document, property_schema, field_name, descendants)
         )
@@ -147,6 +217,7 @@ def render_schema_fields(
                 additional_value.get("description", ""),
             )
         )
+        lines.extend(render_schema_metadata(document, additional, "  "))
         lines.extend(
             render_schema_fields(document, additional, field_name, descendants)
         )
@@ -156,6 +227,9 @@ def render_schema_fields(
 def render_schema(document: dict, schema: dict) -> list[str]:
     resolved, reference_name = resolve_ref(document, schema)
     lines = [f"Schema: `{reference_name or schema_type(document, resolved)}`", ""]
+    if isinstance(resolved, dict) and resolved.get("description"):
+        lines.extend([markdown_text(resolved["description"]), ""])
+    lines.extend(render_schema_metadata(document, schema))
     lines.extend(render_schema_fields(document, resolved))
     return lines
 
@@ -175,10 +249,11 @@ def render_operation_markdown(document: dict, record: dict) -> str:
     if parameters:
         lines.extend(["## Parameters", ""])
         for parameter in parameters:
+            parameter_schema = parameter.get("schema", {})
             lines.extend(
                 render_named_item(
                     parameter.get("name", ""),
-                    schema_type(document, parameter.get("schema", {})),
+                    schema_type(document, parameter_schema),
                     [
                         parameter.get("in", ""),
                         "required" if parameter.get("required") else "optional",
@@ -186,6 +261,7 @@ def render_operation_markdown(document: dict, record: dict) -> str:
                     parameter.get("description", ""),
                 )
             )
+            lines.extend(render_schema_metadata(document, parameter_schema, "  "))
 
     if operation.get("requestBody"):
         request_body, _ = resolve_ref(document, operation["requestBody"])
@@ -210,6 +286,21 @@ def render_operation_markdown(document: dict, record: dict) -> str:
         lines.extend([f"### {status}", ""])
         if resolved.get("description"):
             lines.extend([resolved["description"].strip(), ""])
+        headers = resolved.get("headers", {})
+        if headers:
+            lines.extend(["#### Response headers", ""])
+            for name, header in headers.items():
+                resolved_header, _ = resolve_ref(document, header)
+                header_schema = resolved_header.get("schema", {})
+                lines.extend(
+                    render_named_item(
+                        name,
+                        schema_type(document, header_schema),
+                        ["response header"],
+                        resolved_header.get("description", ""),
+                    )
+                )
+                lines.extend(render_schema_metadata(document, header_schema, "  "))
         for content_type, media in resolved.get("content", {}).items():
             lines.extend([f"Content-Type: `{content_type}`", ""])
             if media.get("schema"):

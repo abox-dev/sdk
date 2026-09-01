@@ -26,9 +26,13 @@ Schema: `array<TemplateTag>`
 
   Identifier of the build associated with this tag
 
+  Format: `uuid`
+
 - **`createdAt`** · `string` · required
 
   Time when the tag was assigned
+
+  Format: `date-time`
 
 ### 401
 
@@ -41,6 +45,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 
@@ -58,6 +64,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -74,6 +82,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -89,6 +99,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 

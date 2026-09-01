@@ -12,25 +12,45 @@ Get sandbox logs
 
   Opaque continuation cursor returned as nextCursor by the previous page
 
+  Maximum length: `512`
+
 - **`cursor`** · `integer` · query · optional
 
   Starting timestamp of the logs that should be returned in milliseconds
+
+  Format: `int64`
+
+  Minimum: `0`
 
 - **`limit`** · `integer` · query · optional
 
   Maximum number of logs that should be returned
 
+  Format: `int32`
+
+  Default: `1000`
+
+  Minimum: `0`
+
+  Maximum: `1000`
+
 - **`direction`** · `LogsDirection` · query · optional
 
   Direction of the logs that should be returned
+
+  Allowed values for `LogsDirection`: `forward` | `backward`
 
 - **`level`** · `LogLevel` · query · optional
 
   Minimum log level to return. Logs below this level are excluded
 
+  Allowed values for `LogLevel`: `debug` | `info` | `warn` | `error`
+
 - **`search`** · `string` · query · optional
 
   Case-sensitive substring match on log message content
+
+  Maximum length: `256`
 
 ## Responses
 
@@ -54,6 +74,8 @@ Schema: `SandboxLogsV2Response`
 
   Timestamp of the log entry
 
+  Format: `date-time`
+
 - **`logs.message`** · `string` · required
 
   Log message content
@@ -61,6 +83,8 @@ Schema: `SandboxLogsV2Response`
 - **`logs.level`** · `LogLevel` · required
 
   State of the sandbox
+
+  Allowed values for `LogLevel`: `debug` | `info` | `warn` | `error`
 
 - **`logs.fields`** · `object` · required
 
@@ -82,6 +106,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -98,6 +124,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -113,6 +141,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 

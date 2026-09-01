@@ -16,6 +16,14 @@ List all snapshots for the team
 
   Maximum number of items to return per page
 
+  Format: `int32`
+
+  Default: `100`
+
+  Minimum: `1`
+
+  Maximum: `100`
+
 - **`nextToken`** · `string` · query · optional
 
   Cursor to start the list from
@@ -25,6 +33,12 @@ List all snapshots for the team
 ### 200
 
 Successfully returned snapshots
+
+#### Response headers
+
+- **`X-Next-Token`** · `string` · response header
+
+  Cursor to fetch the next page of results, if more exist
 
 Content-Type: `application/json`
 
@@ -50,6 +64,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -65,6 +81,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 

@@ -12,6 +12,8 @@ Environment variables
 
   Internal envd HTTP port exposed through the sandbox proxy.
 
+  Default: `49983`
+
 ## Responses
 
 ### 200
@@ -21,5 +23,7 @@ Environment variables
 Content-Type: `application/json`
 
 Schema: `EnvVars`
+
+Environment variables to set
 
 - **`*`** · `string` · additional property

@@ -12,6 +12,8 @@ Check the health of the service
 
   Internal envd HTTP port exposed through the sandbox proxy.
 
+  Default: `49983`
+
 ## Responses
 
 ### 204

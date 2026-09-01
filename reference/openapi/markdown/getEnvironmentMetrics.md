@@ -12,6 +12,8 @@ Service stats
 
   Internal envd HTTP port exposed through the sandbox proxy.
 
+  Default: `49983`
+
 ## Responses
 
 ### 200
@@ -22,9 +24,13 @@ Content-Type: `application/json`
 
 Schema: `Metrics`
 
+Resource usage metrics
+
 - **`ts`** · `integer` · optional
 
   Unix timestamp in UTC for current sandbox time
+
+  Format: `int64`
 
 - **`cpu_count`** · `integer` · optional
 
@@ -33,6 +39,8 @@ Schema: `Metrics`
 - **`cpu_used_pct`** · `number` · optional
 
   CPU usage percentage
+
+  Format: `float`
 
 - **`mem_total`** · `integer` · optional
 

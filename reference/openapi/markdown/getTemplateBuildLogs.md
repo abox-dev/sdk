@@ -14,21 +14,41 @@ Get template build logs
 
   Opaque continuation cursor returned as nextCursor by the previous page
 
+  Maximum length: `512`
+
 - **`cursor`** · `integer` · query · optional
 
   Starting timestamp of the logs that should be returned in milliseconds
+
+  Format: `int64`
+
+  Minimum: `0`
 
 - **`limit`** · `integer` · query · optional
 
   Maximum number of logs that should be returned
 
+  Format: `int32`
+
+  Default: `100`
+
+  Minimum: `0`
+
+  Maximum: `100`
+
 - **`direction`** · `LogsDirection` · query · optional
 
+  Allowed values for `LogsDirection`: `forward` | `backward`
+
 - **`level`** · `LogLevel` · query · optional
+
+  Allowed values for `LogLevel`: `debug` | `info` | `warn` | `error`
 
 - **`source`** · `LogsSource` · query · optional
 
   Source of the logs that should be returned from
+
+  Allowed values for `LogsSource`: `temporary` | `persistent`
 
 ## Responses
 
@@ -52,6 +72,8 @@ Schema: `TemplateBuildLogsResponse`
 
   Timestamp of the log entry
 
+  Format: `date-time`
+
 - **`logs.message`** · `string` · required
 
   Log message content
@@ -59,6 +81,8 @@ Schema: `TemplateBuildLogsResponse`
 - **`logs.level`** · `LogLevel` · required
 
   State of the sandbox
+
+  Allowed values for `LogLevel`: `debug` | `info` | `warn` | `error`
 
 - **`logs.step`** · `string` · optional
 
@@ -72,6 +96,8 @@ Schema: `TemplateBuildLogsResponse`
 
   Source of the logs that should be returned
 
+  Allowed values for `LogsSource`: `temporary` | `persistent`
+
 ### 401
 
 Authentication error
@@ -83,6 +109,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 
@@ -100,6 +128,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -115,6 +145,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 

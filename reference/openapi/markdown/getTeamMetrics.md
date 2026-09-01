@@ -12,7 +12,15 @@ Get metrics for the team
 
   Unix timestamp for the start of the interval, in seconds, for which the metrics
 
+  Format: `int64`
+
+  Minimum: `0`
+
 - **`end`** · `integer` · query · optional
+
+  Format: `int64`
+
+  Minimum: `0`
 
 ## Responses
 
@@ -28,13 +36,19 @@ Schema: `array<TeamMetric>`
 
   Timestamp of the metric entry in Unix time (seconds since epoch)
 
+  Format: `int64`
+
 - **`concurrentSandboxes`** · `integer` · required
 
   The number of concurrent sandboxes for the team
 
+  Format: `int32`
+
 - **`sandboxStartRate`** · `number` · required
 
   Number of sandboxes started per second
+
+  Format: `float`
 
 ### 400
 
@@ -47,6 +61,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 
@@ -64,6 +80,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -80,6 +98,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -95,6 +115,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 

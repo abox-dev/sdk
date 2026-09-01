@@ -14,11 +14,27 @@ Get template build info
 
   Index of the starting build log that should be returned with the template
 
+  Format: `int32`
+
+  Default: `0`
+
+  Minimum: `0`
+
 - **`limit`** · `integer` · query · optional
 
   Maximum number of logs that should be returned
 
+  Format: `int32`
+
+  Default: `100`
+
+  Minimum: `0`
+
+  Maximum: `100`
+
 - **`level`** · `LogLevel` · query · optional
+
+  Allowed values for `LogLevel`: `debug` | `info` | `warn` | `error`
 
 ## Responses
 
@@ -46,6 +62,8 @@ Schema: `TemplateBuildInfo`
 
   Timestamp of the log entry
 
+  Format: `date-time`
+
 - **`logEntries.message`** · `string` · required
 
   Log message content
@@ -53,6 +71,8 @@ Schema: `TemplateBuildInfo`
 - **`logEntries.level`** · `LogLevel` · required
 
   State of the sandbox
+
+  Allowed values for `LogLevel`: `debug` | `info` | `warn` | `error`
 
 - **`logEntries.step`** · `string` · optional
 
@@ -69,6 +89,8 @@ Schema: `TemplateBuildInfo`
 - **`status`** · `TemplateBuildStatus` · required
 
   Status of the template build
+
+  Allowed values for `TemplateBuildStatus`: `building` | `waiting` | `ready` | `error`
 
 - **`reason`** · `BuildStatusReason` · optional
 
@@ -92,6 +114,8 @@ Schema: `TemplateBuildInfo`
 
   Timestamp of the log entry
 
+  Format: `date-time`
+
 - **`reason.logEntries.message`** · `string` · required
 
   Log message content
@@ -99,6 +123,8 @@ Schema: `TemplateBuildInfo`
 - **`reason.logEntries.level`** · `LogLevel` · required
 
   State of the sandbox
+
+  Allowed values for `LogLevel`: `debug` | `info` | `warn` | `error`
 
 - **`reason.logEntries.step`** · `string` · optional
 
@@ -116,6 +142,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -132,6 +160,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -147,6 +177,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 
