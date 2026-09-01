@@ -16,6 +16,8 @@ Schema: `TemplateBuildRequestV3`
 
   Name of the template. Can include a tag with colon separator (e.g. "my-template" or "my-template:v1"). If tag is included, it will be treated as if the tag was provided in the tags array.
 
+  Maximum length: `128`
+
 - **`tags`** · `array<string>` · optional
 
   Tags to assign to the template build
@@ -24,9 +26,17 @@ Schema: `TemplateBuildRequestV3`
 
   CPU cores for the sandbox
 
+  Format: `int32`
+
+  Minimum: `1`
+
 - **`memoryMB`** · `MemoryMB` · optional
 
   Memory for the sandbox in MiB
+
+  Format: `int32`
+
+  Minimum: `128`
 
 ## Responses
 
@@ -70,6 +80,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -85,6 +97,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 
@@ -102,6 +116,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -117,6 +133,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 

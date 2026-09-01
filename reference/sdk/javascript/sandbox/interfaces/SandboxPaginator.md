@@ -18,26 +18,6 @@ while (paginator.hasNext) {
 
 - `Paginator`\<[`SandboxInfo`](SandboxInfo.md), [`SandboxApiOpts`](SandboxApiOpts.md)\>
 
-## Properties
-
-### limit?
-
-> `protected` `readonly` `optional` **limit?**: `number`
-
-#### Inherited from
-
-`Paginator.limit`
-
-***
-
-### opts?
-
-> `protected` `readonly` `optional` **opts?**: [`SandboxApiOpts`](SandboxApiOpts.md)
-
-#### Inherited from
-
-`Paginator.opts`
-
 ## Accessors
 
 ### hasNext
@@ -107,27 +87,3 @@ Error if there are no more items to fetch. Call this method only if `hasNext` is
 #### Overrides
 
 `Paginator.nextItems`
-
-***
-
-### updatePagination()
-
-> `protected` **updatePagination**(`response`): `void`
-
-Update the pagination state from a response, reading the `x-next-token`
-header. Concrete paginators call this from Paginator.nextItems
-after fetching a page.
-
-#### Parameters
-
-##### response
-
-`Response`
-
-#### Returns
-
-`void`
-
-#### Inherited from
-
-`Paginator.updatePagination`

@@ -4,12 +4,6 @@
 
 Module for starting and interacting with commands in the sandbox.
 
-## Properties
-
-### rpc
-
-> `protected` `readonly` **rpc**: `Client`\<*typeof* `ProcessService`\>
-
 ## Methods
 
 ### closeStdin()

@@ -34,19 +34,23 @@ Schema: `SandboxDetail`
 
   Time when the sandbox was started
 
+  Format: `date-time`
+
 - **`endAt`** · `string` · required
 
   Time when the sandbox will expire
+
+  Format: `date-time`
 
 - **`envdVersion`** · `EnvdVersion` · required
 
   Version of the envd running in the sandbox
 
-- **`allowInternetAccess`** · `boolean` · optional
+- **`allowInternetAccess`** · `boolean | null` · optional
 
   Whether internet access was explicitly enabled or disabled for the sandbox. Null means it was not explicitly set.
 
-- **`domain`** · `string` · optional
+- **`domain`** · `string | null` · optional
 
   Base domain where the sandbox traffic is accessible
 
@@ -54,25 +58,87 @@ Schema: `SandboxDetail`
 
   CPU cores for the sandbox
 
+  Format: `int32`
+
+  Minimum: `1`
+
 - **`memoryMB`** · `MemoryMB` · required
 
   Memory for the sandbox in MiB
+
+  Format: `int32`
+
+  Minimum: `128`
 
 - **`diskSizeMB`** · `DiskSizeMB` · required
 
   Disk size for the sandbox in MiB
 
+  Format: `int32`
+
+  Minimum: `0`
+
 - **`metadata`** · `SandboxMetadata` · optional
+
+- **`metadata.*`** · `string` · additional property
+
+  Metadata of the sandbox
 
 - **`state`** · `SandboxState` · required
 
   State of the sandbox
 
+  Allowed values for `SandboxState`: `running` | `paused`
+
 - **`network`** · `SandboxNetworkConfig` · optional
+
+- **`network.allowPublicTraffic`** · `boolean` · optional
+
+  Specify if the sandbox URLs should be accessible only with authentication.
+
+  Default: `true`
+
+- **`network.allowOut`** · `array<string>` · optional
+
+  List of allowed destinations for egress traffic. Each entry can be a CIDR block (e.g. "8.8.8.8/32"), a bare IP address (e.g. "8.8.8.8"), or a domain name (e.g. "example.com", "*.example.com"). Allowed entries always take precedence over denied entries.
+
+- **`network.denyOut`** · `array<string>` · optional
+
+  List of denied CIDR blocks or IP addresses for egress traffic. Domain names are not supported for deny rules.
+
+- **`network.maskRequestHost`** · `string` · optional
+
+  Specify host mask which will be used for all sandbox requests
+
+- **`network.rules`** · `object` · optional
+
+  Per-domain transform rules applied to matching egress HTTP/HTTPS requests. Keys are domains (e.g. "api.example.com", "example.com"). A domain listed here is not automatically allowed - use allowOut to permit the traffic.
+
+- **`network.rules.*`** · `array<SandboxNetworkRule>` · additional property
+
+- **`network.rules.*.transform`** · `SandboxNetworkTransform` · optional
+
+  Transformations applied to matching egress requests before forwarding.
+
+- **`network.rules.*.transform.headers`** · `object` · optional
+
+  HTTP headers to inject or override in matching requests. An existing header with the same name is replaced. Values are plain strings; secret resolution happens client-side before sending to the API.
+
+- **`network.rules.*.transform.headers.*`** · `string` · additional property
 
 - **`lifecycle`** · `SandboxLifecycle` · optional
 
   Sandbox lifecycle policy returned by sandbox info.
+
+- **`lifecycle.autoResume`** · `boolean` · required
+
+  Whether the sandbox can auto-resume.
+
+- **`lifecycle.onTimeout`** · `SandboxOnTimeout` · required
+
+  Action taken when the sandbox times out.
+
+  Allowed values for `SandboxOnTimeout`: `kill` | `pause`
 
 ### 404
 
@@ -85,6 +151,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 
@@ -102,6 +170,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -117,6 +187,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 

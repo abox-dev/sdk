@@ -54,42 +54,6 @@ AGENTBOX_API_KEY // environment variable
 
 ***
 
-### apiUrl?
-
-> `optional` **apiUrl?**: `string`
-
-**`Internal`**
-
-API Url to use for the API.
-
-#### Default
-
-AGENTBOX_API_URL // environment variable or `https://api.${domain}`
-
-#### Inherited from
-
-`ConnectionOpts.apiUrl`
-
-***
-
-### debug?
-
-> `optional` **debug?**: `boolean`
-
-**`Internal`**
-
-If true the SDK starts in the debug mode and connects to the local envd API server.
-
-#### Default
-
-AGENTBOX_DEBUG // environment variable or `false`
-
-#### Inherited from
-
-`ConnectionOpts.debug`
-
-***
-
 ### domain?
 
 > `optional` **domain?**: `string`

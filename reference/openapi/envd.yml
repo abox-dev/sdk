@@ -16,6 +16,9 @@ paths:
       operationId: getEnvironmentHealth
       tags:
       - environment
+      parameters:
+      - $ref: '#/components/parameters/AgentboxSandboxId'
+      - $ref: '#/components/parameters/AgentboxSandboxPort'
       security: []
   /metrics:
     get:
@@ -30,6 +33,9 @@ paths:
       operationId: getEnvironmentMetrics
       tags:
       - environment
+      parameters:
+      - $ref: '#/components/parameters/AgentboxSandboxId'
+      - $ref: '#/components/parameters/AgentboxSandboxPort'
       security:
       - {}
       - AccessTokenAuth: []
@@ -46,6 +52,9 @@ paths:
       operationId: getEnvironmentVariables
       tags:
       - environment
+      parameters:
+      - $ref: '#/components/parameters/AgentboxSandboxId'
+      - $ref: '#/components/parameters/AgentboxSandboxPort'
       security:
       - {}
       - AccessTokenAuth: []
@@ -55,6 +64,8 @@ paths:
       tags:
       - files
       parameters:
+      - $ref: '#/components/parameters/AgentboxSandboxId'
+      - $ref: '#/components/parameters/AgentboxSandboxPort'
       - $ref: '#/components/parameters/FilePath'
       - $ref: '#/components/parameters/User'
       - $ref: '#/components/parameters/Signature'
@@ -122,6 +133,8 @@ paths:
       tags:
       - files
       parameters:
+      - $ref: '#/components/parameters/AgentboxSandboxId'
+      - $ref: '#/components/parameters/AgentboxSandboxPort'
       - $ref: '#/components/parameters/FilePath'
       - $ref: '#/components/parameters/User'
       - $ref: '#/components/parameters/Signature'
@@ -173,6 +186,9 @@ paths:
         '507':
           $ref: '#/components/responses/NotEnoughDiskSpace'
       operationId: composeFiles
+      parameters:
+      - $ref: '#/components/parameters/AgentboxSandboxId'
+      - $ref: '#/components/parameters/AgentboxSandboxPort'
       security:
       - {}
       - AccessTokenAuth: []
@@ -209,6 +225,21 @@ components:
         used with the signature parameter.
       schema:
         type: integer
+    AgentboxSandboxId:
+      name: Agentbox-Sandbox-Id
+      in: header
+      required: true
+      description: Identifier of the sandbox that receives the request.
+      schema:
+        type: string
+    AgentboxSandboxPort:
+      name: Agentbox-Sandbox-Port
+      in: header
+      required: true
+      description: Internal envd HTTP port exposed through the sandbox proxy.
+      schema:
+        type: integer
+        default: 49983
   requestBodies:
     File:
       required: true
@@ -377,31 +408,6 @@ components:
         disk_total:
           type: integer
           description: Total disk space in bytes
-    CollapseResult:
-      type: object
-      description: Per-call statistics from a heap collapse
-      properties:
-        regions:
-          type: integer
-          description: Anonymous read-write regions scanned
-        chunks:
-          type: integer
-          description: 2 MiB chunks attempted
-        collapsed:
-          type: integer
-          description: Chunks whose base pages were actually migrated into a new hugepage
-            (real work)
-        alreadyHuge:
-          type: integer
-          description: Chunks MADV_COLLAPSE accepted but were already hugepages (no
-            work)
-        skipped:
-          type: integer
-          description: Chunks that could not be collapsed (empty or ineligible)
-        elapsedMs:
-          type: integer
-          format: int64
-          description: Wall-clock time spent collapsing, in milliseconds
     ComposeRequest:
       type: object
       required:
@@ -419,22 +425,11 @@ components:
         username:
           type: string
           description: User for setting ownership and resolving relative paths
-    VolumeMount:
-      type: object
-      description: Volume mount configuration
-      additionalProperties: false
-      properties:
-        nfs_target:
-          type: string
-          description: Server target address
-        path:
-          type: string
-          description: Mount path inside the sandbox
-      required:
-      - nfs_target
-      - path
   securitySchemes:
     AccessTokenAuth:
       type: apiKey
       in: header
       name: X-Access-Token
+servers:
+- url: https://sandbox.agentbox-runtime.ru
+  description: AgentBox sandbox proxy. Routing headers are required.

@@ -40,24 +40,6 @@ AGENTBOX_API_KEY // environment variable
 
 ***
 
-### apiUrl?
-
-> `optional` **apiUrl?**: `string`
-
-**`Internal`**
-
-API Url to use for the API.
-
-#### Default
-
-AGENTBOX_API_URL // environment variable or `https://api.${domain}`
-
-#### Inherited from
-
-`ConnectionOpts.apiUrl`
-
-***
-
 ### count?
 
 > `optional` **count?**: `number`
@@ -73,24 +55,6 @@ outcome of each is reported in its entry of the returned array.
 ```ts
 1
 ```
-
-***
-
-### debug?
-
-> `optional` **debug?**: `boolean`
-
-**`Internal`**
-
-If true the SDK starts in the debug mode and connects to the local envd API server.
-
-#### Default
-
-AGENTBOX_DEBUG // environment variable or `false`
-
-#### Inherited from
-
-`ConnectionOpts.debug`
 
 ***
 
@@ -156,24 +120,6 @@ Timeout for requests to the API in **milliseconds**.
 #### Inherited from
 
 `ConnectionOpts.requestTimeoutMs`
-
-***
-
-### sandboxUrl?
-
-> `optional` **sandboxUrl?**: `string`
-
-**`Internal`**
-
-Sandbox Url to use for the API.
-
-#### Default
-
-AGENTBOX_SANDBOX_URL // environment variable, `https://sandbox.${domain}`
-
-#### Inherited from
-
-`ConnectionOpts.sandboxUrl`
 
 ***
 

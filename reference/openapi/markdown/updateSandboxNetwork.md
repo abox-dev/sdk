@@ -16,6 +16,8 @@ Required: yes
 
 Schema: `SandboxNetworkUpdateConfig`
 
+Network configuration update for a running sandbox. Replaces the current egress rules with the provided configuration. Omitting a field clears it.
+
 - **`allowOut`** · `array<string>` · optional
 
   List of allowed destinations for egress traffic. Each entry can be a CIDR block (e.g. "8.8.8.8/32"), a bare IP address (e.g. "8.8.8.8"), or a domain name (e.g. "example.com", "*.example.com"). Allowed entries always take precedence over denied entries.
@@ -27,6 +29,18 @@ Schema: `SandboxNetworkUpdateConfig`
 - **`rules`** · `object` · optional
 
   Per-domain transform rules. Replaces all existing rules when provided.
+
+- **`rules.*`** · `array<SandboxNetworkRule>` · additional property
+
+- **`rules.*.transform`** · `SandboxNetworkTransform` · optional
+
+  Transformations applied to matching egress requests before forwarding.
+
+- **`rules.*.transform.headers`** · `object` · optional
+
+  HTTP headers to inject or override in matching requests. An existing header with the same name is replaced. Values are plain strings; secret resolution happens client-side before sending to the API.
+
+- **`rules.*.transform.headers.*`** · `string` · additional property
 
 - **`allow_internet_access`** · `boolean` · optional
 
@@ -50,6 +64,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -65,6 +81,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 
@@ -82,6 +100,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -97,6 +117,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 

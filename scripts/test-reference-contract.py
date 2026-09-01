@@ -3,6 +3,7 @@
 
 import hashlib
 import json
+import re
 from pathlib import Path
 
 import yaml
@@ -30,6 +31,34 @@ FORBIDDEN_SECURITY_SCHEMES = {
     "AuthProviderBearerAuth",
     "AuthProviderTeamAuth",
 }
+FORBIDDEN_COMPONENTS = {
+    "AdminSandboxKillResult",
+    "AdminBuildCancelResult",
+    "TeamAPIKey",
+    "CreatedTeamAPIKey",
+    "NewTeamAPIKey",
+    "UpdateTeamAPIKey",
+    "apiKeyID",
+    "accessTokenID",
+    "volumeID",
+    "VolumeMount",
+}
+
+
+def markdown_section(document: str, heading: str) -> str:
+    marker = f"### {heading}\n"
+    start = document.index(marker) + len(marker)
+    boundaries = [
+        position
+        for prefix in ("\n### ", "\n## ")
+        if (position := document.find(prefix, start)) >= 0
+    ]
+    end = min(boundaries) if boundaries else len(document)
+    return document[start:end]
+
+
+def markdown_table_names(section: str) -> list[str]:
+    return re.findall(r"^\| `([^`]+)` \|", section, re.M)
 
 
 def resolve_local_ref(document: dict, value: dict) -> dict:
@@ -97,6 +126,42 @@ def assert_public_schema(value) -> None:
             assert_public_schema(child)
 
 
+def component_references(value) -> set[tuple[str, str]]:
+    references = set()
+    if isinstance(value, dict):
+        reference = value.get("$ref")
+        if isinstance(reference, str) and reference.startswith("#/components/"):
+            section, name, *_ = reference.removeprefix("#/components/").split("/")
+            references.add((section, name))
+        for child in value.values():
+            references.update(component_references(child))
+    elif isinstance(value, list):
+        for child in value:
+            references.update(component_references(child))
+    return references
+
+
+def assert_only_reachable_components(document: dict) -> None:
+    components = document.get("components", {})
+    roots = {key: value for key, value in document.items() if key != "components"}
+    pending = list(component_references(roots))
+    reachable = set()
+    while pending:
+        component = pending.pop()
+        if component in reachable:
+            continue
+        reachable.add(component)
+        section, name = component
+        pending.extend(component_references(components[section][name]) - reachable)
+    published = {
+        (section, name)
+        for section, definitions in components.items()
+        if section != "securitySchemes"
+        for name in definitions
+    }
+    assert published == reachable
+
+
 def main() -> None:
     manifest = json.loads((REFERENCE / "manifest.json").read_text())
     assert manifest["schemaVersion"] == 1
@@ -143,6 +208,42 @@ def main() -> None:
     assert not any(operation["path"] in BANNED_ENVD_PATHS for operation in operations)
 
     config = yaml.safe_load((ROOT / "reference-config/operations.yaml").read_text())
+    connect = config["connect"]
+    connect_headers = {header["name"]: header for header in connect["headers"]}
+    assert connect["productionBaseUrl"] == "https://sandbox.agentbox-runtime.ru"
+    assert connect["method"] == "POST"
+    assert set(connect_headers) == {
+        "Agentbox-Sandbox-Id",
+        "Agentbox-Sandbox-Port",
+        "X-Access-Token",
+    }
+    assert connect_headers["Agentbox-Sandbox-Id"]["required"] is True
+    assert connect_headers["Agentbox-Sandbox-Port"] == {
+        "name": "Agentbox-Sandbox-Port",
+        "required": True,
+        "description": "Envd port routed by the sandbox proxy.",
+        "default": 49983,
+    }
+    assert connect_headers["X-Access-Token"]["required"] is False
+
+    javascript_config = (ROOT / "packages/js-sdk/src/connectionConfig.ts").read_text()
+    javascript_sandbox = (ROOT / "packages/js-sdk/src/sandbox/index.ts").read_text()
+    python_config = (
+        ROOT / "packages/python-sdk/agentbox/connection_config.py"
+    ).read_text()
+    python_sandboxes = "\n".join(
+        (ROOT / f"packages/python-sdk/agentbox/{variant}/main.py").read_text()
+        for variant in ("sandbox_sync", "sandbox_async")
+    )
+    assert "supportedDomains = ['agentbox-runtime.ru']" in javascript_config
+    assert "return `https://sandbox.${sandboxDomain}`" in javascript_config
+    assert "public static envdPort = 49983" in javascript_config
+    assert 'return f"https://sandbox.{sandbox_domain}"' in python_config
+    assert "envd_port = 49983" in python_config
+    for header in connect_headers:
+        assert header in javascript_sandbox
+        assert header in python_sandboxes
+
     control = yaml.safe_load((ROOT / config["controlPlane"]["source"]).read_text())
     public_tags = set(config["controlPlane"]["publicTags"])
     expected = set()
@@ -190,8 +291,42 @@ def main() -> None:
             "in": "header",
             "name": expected_header,
         }
+        if spec_name == "envd":
+            assert document["servers"] == [
+                {
+                    "url": connect["productionBaseUrl"],
+                    "description": (
+                        "AgentBox sandbox proxy. Routing headers are required."
+                    ),
+                }
+            ]
+            for path_item in document["paths"].values():
+                for method, operation in path_item.items():
+                    if method not in {"get", "post", "put", "patch", "delete"}:
+                        continue
+                    headers = {
+                        parameter["name"]: parameter
+                        for parameter in (
+                            resolve_local_ref(document, value)
+                            for value in operation.get("parameters", [])
+                        )
+                        if parameter.get("in") == "header"
+                    }
+                    for name in ("Agentbox-Sandbox-Id", "Agentbox-Sandbox-Port"):
+                        assert headers[name]["required"] is connect_headers[name][
+                            "required"
+                        ]
+                    assert headers["Agentbox-Sandbox-Port"]["schema"][
+                        "default"
+                    ] == connect_headers["Agentbox-Sandbox-Port"]["default"]
         assert_public_schema(document)
         assert_local_refs_resolve(document)
+        assert_only_reachable_components(document)
+        assert not any(
+            name in FORBIDDEN_COMPONENTS
+            for definitions in document.get("components", {}).values()
+            for name in definitions
+        )
 
     for operation in operations:
         document = public_documents[operation["spec"]]
@@ -237,6 +372,72 @@ def main() -> None:
     )
     assert "[object Object]" not in cli_markdown
 
+    process_reference = (REFERENCE / "connect/process.md").read_text()
+    for value in (
+        "Production base URL: `https://sandbox.agentbox-runtime.ru`",
+        "Fully qualified service: `process.Process`",
+        "RPC URL pattern: `POST https://sandbox.agentbox-runtime.ru/process.Process/{RPC}`",
+        "Endpoint: `POST https://sandbox.agentbox-runtime.ru/process.Process/List`",
+        "**`Agentbox-Sandbox-Id`** · required",
+        "**`Agentbox-Sandbox-Port`** · required",
+        "**`X-Access-Token`** · conditional",
+        "Default: `49983`",
+    ):
+        assert value in process_reference
+    assert markdown_table_names(markdown_section(process_reference, "PTY")) == ["size"]
+    assert markdown_table_names(
+        markdown_section(process_reference, "ProcessEvent")
+    ) == ["start", "data", "end", "keepalive"]
+    assert markdown_table_names(
+        markdown_section(process_reference, "StreamInputRequest")
+    ) == ["start", "data", "keepalive"]
+    assert "| `envs` | `map<string, string>` | 3 |" in markdown_section(
+        process_reference, "ProcessConfig"
+    )
+    assert "### PTY.Size" in process_reference
+    assert "### ProcessEvent.StartEvent" in process_reference
+    for value in (
+        "SIGNAL_UNSPECIFIED",
+        "SIGNAL_SIGTERM",
+        "SIGNAL_SIGKILL",
+    ):
+        assert value in markdown_section(process_reference, "Signal")
+
+    filesystem_reference = (REFERENCE / "connect/filesystem.md").read_text()
+    for value in (
+        "Production base URL: `https://sandbox.agentbox-runtime.ru`",
+        "Fully qualified service: `filesystem.Filesystem`",
+        "RPC URL pattern: `POST https://sandbox.agentbox-runtime.ru/filesystem.Filesystem/{RPC}`",
+        "Endpoint: `POST https://sandbox.agentbox-runtime.ru/filesystem.Filesystem/Stat`",
+        "**`Agentbox-Sandbox-Id`** · required",
+        "**`Agentbox-Sandbox-Port`** · required",
+        "**`X-Access-Token`** · conditional",
+        "Default: `49983`",
+    ):
+        assert value in filesystem_reference
+    assert "| `metadata` | `map<string, string>` | 11 |" in markdown_section(
+        filesystem_reference, "EntryInfo"
+    )
+    for enum, values in {
+        "FileType": (
+            "FILE_TYPE_UNSPECIFIED",
+            "FILE_TYPE_FILE",
+            "FILE_TYPE_DIRECTORY",
+            "FILE_TYPE_SYMLINK",
+        ),
+        "EventType": (
+            "EVENT_TYPE_UNSPECIFIED",
+            "EVENT_TYPE_CREATE",
+            "EVENT_TYPE_WRITE",
+            "EVENT_TYPE_REMOVE",
+            "EVENT_TYPE_RENAME",
+            "EVENT_TYPE_CHMOD",
+        ),
+    }.items():
+        section = markdown_section(filesystem_reference, enum)
+        for value in values:
+            assert value in section
+
     javascript_files = {
         str(path.relative_to(REFERENCE))
         for path in (REFERENCE / "sdk/javascript").rglob("*.md")
@@ -246,6 +447,12 @@ def main() -> None:
     assert not any("deserializeChart" in path for path in javascript_files)
     assert not any("parseOutput" in path for path in javascript_files)
     assert not any("extractError" in path for path in javascript_files)
+    javascript_markdown = "\n".join(
+        path.read_text() for path in (REFERENCE / "sdk/javascript").rglob("*.md")
+    )
+    assert "**`Internal`**" not in javascript_markdown
+    assert "envdAccessToken" not in javascript_markdown
+    assert "protected static createSandbox" not in javascript_markdown
 
     list_sandboxes = (REFERENCE / "openapi/markdown/listSandboxes.md").read_text()
     assert "Metadata query used to filter the sandboxes" in list_sandboxes
@@ -253,8 +460,85 @@ def main() -> None:
     assert "Schema: `array<ListedSandbox>`" in list_sandboxes
     assert "- **`sandboxID`** · `string` · required" in list_sandboxes
     assert "- **`metadata`** · `string` · query · optional" in list_sandboxes
+    for expected in (
+        "Allowed values for `SandboxState`: `running` | `paused`",
+        "#### Response headers",
+        "- **`X-Next-Token`** · `string` · response header",
+        "- **`X-Total-Running`** · `integer` · response header",
+        "Format: `int32`",
+        "Default: `100`",
+        "Minimum: `1`",
+        "Maximum: `100`",
+        "Serialization: style `form`; explode `false`; wire format `state=value1,value2`",
+    ):
+        assert expected in list_sandboxes
+
+    sandbox_logs = (REFERENCE / "openapi/markdown/getSandboxLogs.md").read_text()
+    assert "Allowed values for `LogsDirection`: `forward` | `backward`" in sandbox_logs
+
+    upload_file = (REFERENCE / "openapi/markdown/uploadFile.md").read_text()
+    assert "### application/octet-stream" in upload_file
+    assert "Raw file content. The 'path' query parameter is required" in upload_file
+    assert "Format: `binary`" in upload_file
+
+    start_build = (REFERENCE / "openapi/markdown/startTemplateBuild.md").read_text()
+    for expected in (
+        "Variant `AWSRegistry`",
+        "discriminator `type` = `aws`",
+        "fromImageRegistry<AWSRegistry>.awsAccessKeyId",
+        "fromImageRegistry<AWSRegistry>.awsSecretAccessKey",
+        "fromImageRegistry<AWSRegistry>.awsRegion",
+        "Variant `GCPRegistry`",
+        "discriminator `type` = `gcp`",
+        "fromImageRegistry<GCPRegistry>.serviceAccountJson",
+        "Variant `GeneralRegistry`",
+        "discriminator `type` = `registry`",
+        "fromImageRegistry<GeneralRegistry>.username",
+        "fromImageRegistry<GeneralRegistry>.password",
+    ):
+        assert expected in start_build
+
+    list_metrics = (REFERENCE / "openapi/markdown/listSandboxMetrics.md").read_text()
+    assert "- **`sandbox_ids`** · `array<string>` · query · required" in list_metrics
+    assert "Maximum items: `100`" in list_metrics
+    assert "Unique items: `yes`" in list_metrics
+    assert (
+        "Serialization: style `form`; explode `false`; wire format `sandbox_ids=value1,value2`"
+        in list_metrics
+    )
+
+    list_templates = (REFERENCE / "openapi/markdown/listTemplates.md").read_text()
+    assert "- **`createdBy`** · `TeamUser | null` · required" in list_templates
+    assert "- **`createdBy.id`** · `string` · required" in list_templates
+    assert "Format: `uuid`" in list_templates
+    assert "- **`lastSpawnedAt`** · `string | null` · required" in list_templates
+
+    for operation, parameter, description in (
+        ("listSnapshots", "sandboxID", "Filter snapshots by source sandbox ID"),
+        (
+            "getSandboxMetrics",
+            "end",
+            "Unix timestamp for the end of the interval, in seconds, for which the metrics",
+        ),
+        ("getTemplateByAlias", "alias", "Template alias"),
+        ("getTemplateUploadUrl", "hash", "Hash of the files"),
+    ):
+        markdown = (REFERENCE / f"openapi/markdown/{operation}.md").read_text()
+        assert f"- **`{parameter}`**" in markdown
+        assert description in markdown
+
     create_sandbox = (REFERENCE / "openapi/markdown/createSandbox.md").read_text()
     assert "Schema: `NewSandbox`" in create_sandbox
+    assert "- **`mcp.*`** · `any` · additional property" in create_sandbox
+    assert "- **`mcp.*`** · `object` · additional property" not in create_sandbox
+    for field in (
+        "autoResume.enabled",
+        "network.allowPublicTraffic",
+        "network.maskRequestHost",
+        "iam.tokens",
+        "iam.tokens.*.audience",
+    ):
+        assert f"- **`{field}`** ·" in create_sandbox
 
 
 if __name__ == "__main__":

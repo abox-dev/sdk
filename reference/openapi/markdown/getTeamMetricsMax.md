@@ -12,11 +12,23 @@ Get the maximum metrics for the team in the given interval
 
   Unix timestamp for the start of the interval, in seconds, for which the metrics
 
+  Format: `int64`
+
+  Minimum: `0`
+
 - **`end`** · `integer` · query · optional
+
+  Unix timestamp for the end of the interval, in seconds, for which the metrics
+
+  Format: `int64`
+
+  Minimum: `0`
 
 - **`metric`** · `concurrent_sandboxes | sandbox_start_rate` · query · required
 
   Metric to retrieve the maximum value for
+
+  Allowed values: `concurrent_sandboxes` | `sandbox_start_rate`
 
 ## Responses
 
@@ -28,9 +40,13 @@ Content-Type: `application/json`
 
 Schema: `MaxTeamMetric`
 
+Team metric with timestamp
+
 - **`timestampUnix`** · `integer` · required
 
   Timestamp of the metric entry in Unix time (seconds since epoch)
+
+  Format: `int64`
 
 - **`value`** · `number` · required
 
@@ -48,6 +64,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -63,6 +81,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 
@@ -80,6 +100,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -95,6 +117,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 

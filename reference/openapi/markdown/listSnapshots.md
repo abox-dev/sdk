@@ -8,6 +8,8 @@ List all snapshots for the team
 
 - **`sandboxID`** · `string` · query · optional
 
+  Filter snapshots by source sandbox ID
+
 - **`name`** · `string` · query · optional
 
   Filter snapshots by name or ID, optionally tag-qualified (e.g. "my-snapshot", "my-team/my-snapshot" or "my-snapshot:v1").
@@ -15,6 +17,14 @@ List all snapshots for the team
 - **`limit`** · `integer` · query · optional
 
   Maximum number of items to return per page
+
+  Format: `int32`
+
+  Default: `100`
+
+  Minimum: `1`
+
+  Maximum: `100`
 
 - **`nextToken`** · `string` · query · optional
 
@@ -25,6 +35,12 @@ List all snapshots for the team
 ### 200
 
 Successfully returned snapshots
+
+#### Response headers
+
+- **`X-Next-Token`** · `string` · response header
+
+  Cursor to fetch the next page of results, if more exist
 
 Content-Type: `application/json`
 
@@ -50,6 +66,8 @@ Schema: `Error`
 
   Error code
 
+  Format: `int32`
+
 - **`message`** · `string` · required
 
   Error
@@ -65,6 +83,8 @@ Schema: `Error`
 - **`code`** · `integer` · required
 
   Error code
+
+  Format: `int32`
 
 - **`message`** · `string` · required
 
