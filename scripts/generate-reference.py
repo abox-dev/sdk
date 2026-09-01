@@ -609,63 +609,341 @@ def build_openapi(name: str, config: dict) -> list[dict]:
     return sorted(records, key=lambda item: (item["group"], item["slug"]))
 
 
+PROTO_TOKEN = re.compile(
+    r"""
+    (?P<whitespace>\s+)
+    |(?P<line_comment>//[^\n]*)
+    |(?P<block_comment>/\*.*?\*/)
+    |(?P<string>"(?:\\.|[^"\\])*")
+    |(?P<identifier>[A-Za-z_][A-Za-z0-9_]*)
+    |(?P<number>-?(?:0[xX][0-9A-Fa-f]+|\d+))
+    |(?P<symbol>[{}()\[\]<>=;,.])
+    |(?P<unknown>.)
+    """,
+    re.S | re.X,
+)
+
+
+def proto_tokens(text: str) -> list[tuple[str, str]]:
+    tokens = []
+    for match in PROTO_TOKEN.finditer(text):
+        kind = match.lastgroup
+        value = match.group()
+        if kind == "whitespace":
+            continue
+        if kind == "unknown":
+            raise ValueError(f"Unsupported protobuf token: {value!r}")
+        if kind == "line_comment":
+            tokens.append(("comment", value.removeprefix("//").strip()))
+        elif kind == "block_comment":
+            body = value.removeprefix("/*").removesuffix("*/")
+            tokens.append(
+                (
+                    "comment",
+                    " ".join(
+                        line.strip().removeprefix("*").strip()
+                        for line in body.splitlines()
+                    ),
+                )
+            )
+        else:
+            tokens.append((kind, value))
+    return tokens
+
+
+class ProtoParser:
+    def __init__(self, text: str):
+        self.tokens = proto_tokens(text)
+        self.position = 0
+        self.services = []
+        self.messages = []
+        self.enums = []
+
+    def current(self, value: str | None = None) -> tuple[str, str] | bool | None:
+        if self.position >= len(self.tokens):
+            return None
+        token = self.tokens[self.position]
+        return token if value is None else token[1] == value
+
+    def take(self, value: str | None = None) -> tuple[str, str]:
+        token = self.current()
+        if token is None or (value is not None and token[1] != value):
+            found = token[1] if token else "end of file"
+            raise ValueError(f"Expected {value or 'token'}, found {found}")
+        self.position += 1
+        return token
+
+    def accept(self, value: str) -> bool:
+        if self.current(value):
+            self.position += 1
+            return True
+        return False
+
+    def comments(self) -> str:
+        comments = []
+        while self.current() and self.current()[0] == "comment":
+            comments.append(self.take()[1])
+        return " ".join(filter(None, comments))
+
+    def qualified_name(self) -> str:
+        parts = []
+        if self.accept("."):
+            parts.append("")
+        if not self.current() or self.current()[0] != "identifier":
+            raise ValueError("Expected protobuf type name")
+        parts.append(self.take()[1])
+        while self.accept("."):
+            if not self.current() or self.current()[0] != "identifier":
+                raise ValueError("Expected protobuf type name after '.'")
+            parts.append(self.take()[1])
+        return ".".join(parts)
+
+    def field_type(self) -> str:
+        if self.accept("map"):
+            self.take("<")
+            key = self.qualified_name()
+            self.take(",")
+            value = self.qualified_name()
+            self.take(">")
+            return f"map<{key}, {value}>"
+        return self.qualified_name()
+
+    def skip_balanced(self, opening: str, closing: str) -> None:
+        self.take(opening)
+        depth = 1
+        while depth:
+            token = self.take()[1]
+            if token == opening:
+                depth += 1
+            elif token == closing:
+                depth -= 1
+
+    def skip_statement(self) -> None:
+        while self.current() is not None:
+            value = self.current()[1]
+            if value == "}":
+                return
+            if value == ";":
+                self.take()
+                return
+            if value == "{":
+                self.skip_balanced("{", "}")
+                self.accept(";")
+                return
+            self.take()
+
+    def field(self, comment: str, oneof: str | None = None) -> dict | None:
+        start = self.position
+        modifier = None
+        if self.current() and self.current()[1] in {"optional", "repeated"}:
+            modifier = self.take()[1]
+        try:
+            field_type = self.field_type()
+            if not self.current() or self.current()[0] != "identifier":
+                raise ValueError("missing field name")
+            name = self.take()[1]
+            self.take("=")
+            if not self.current() or self.current()[0] != "number":
+                raise ValueError("missing field number")
+            number = self.take()[1]
+        except ValueError:
+            self.position = start
+            return None
+        if self.current("["):
+            self.skip_balanced("[", "]")
+        self.take(";")
+        return {
+            "name": name,
+            "type": f"{modifier} {field_type}" if modifier else field_type,
+            "number": number,
+            "comment": comment,
+            "oneof": oneof,
+        }
+
+    def oneof(self, message: dict) -> None:
+        name = self.take()[1]
+        self.take("{")
+        while True:
+            comment = self.comments()
+            if self.accept("}"):
+                break
+            field = self.field(comment, name)
+            if field:
+                message["fields"].append(field)
+            else:
+                self.skip_statement()
+
+    def message(self, comment: str, parents: tuple[str, ...] = ()) -> None:
+        name = self.take()[1]
+        qualified = ".".join((*parents, name))
+        message = {"name": qualified, "comment": comment, "fields": []}
+        self.messages.append(message)
+        self.take("{")
+        while True:
+            child_comment = self.comments()
+            if self.accept("}"):
+                break
+            if self.accept("message"):
+                self.message(child_comment, (*parents, name))
+            elif self.accept("enum"):
+                self.enum(child_comment, (*parents, name))
+            elif self.accept("oneof"):
+                self.oneof(message)
+            else:
+                field = self.field(child_comment)
+                if field:
+                    message["fields"].append(field)
+                else:
+                    self.skip_statement()
+
+    def enum(self, comment: str, parents: tuple[str, ...] = ()) -> None:
+        name = self.take()[1]
+        enum = {
+            "name": ".".join((*parents, name)),
+            "comment": comment,
+            "values": [],
+        }
+        self.enums.append(enum)
+        self.take("{")
+        while True:
+            value_comment = self.comments()
+            if self.accept("}"):
+                break
+            if self.current() and self.current()[0] == "identifier":
+                value = self.take()[1]
+                self.take("=")
+                number = self.take()[1]
+                if self.current("["):
+                    self.skip_balanced("[", "]")
+                self.take(";")
+                enum["values"].append(
+                    {"name": value, "number": number, "comment": value_comment}
+                )
+            else:
+                self.skip_statement()
+
+    def rpc(self, comment: str) -> dict:
+        name = self.take()[1]
+        self.take("(")
+        request_stream = self.accept("stream")
+        request = self.qualified_name()
+        self.take(")")
+        self.take("returns")
+        self.take("(")
+        response_stream = self.accept("stream")
+        response = self.qualified_name()
+        self.take(")")
+        self.skip_statement()
+        return {
+            "name": name,
+            "comment": comment,
+            "request": f"stream {request}" if request_stream else request,
+            "response": f"stream {response}" if response_stream else response,
+        }
+
+    def service(self, comment: str) -> None:
+        name = self.take()[1]
+        service = {"name": name, "comment": comment, "rpcs": []}
+        self.services.append(service)
+        self.take("{")
+        while True:
+            rpc_comment = self.comments()
+            if self.accept("}"):
+                break
+            if self.accept("rpc"):
+                service["rpcs"].append(self.rpc(rpc_comment))
+            else:
+                self.skip_statement()
+
+    def parse(self) -> dict:
+        while self.current() is not None:
+            comment = self.comments()
+            if self.accept("service"):
+                self.service(comment)
+            elif self.accept("message"):
+                self.message(comment)
+            elif self.accept("enum"):
+                self.enum(comment)
+            else:
+                self.skip_statement()
+        return {
+            "services": self.services,
+            "messages": self.messages,
+            "enums": self.enums,
+        }
+
+
+def markdown_cell(value: str) -> str:
+    return " ".join(value.split()).replace("|", r"\|")
+
+
 def proto_reference(source: Path, destination: Path, title: str) -> None:
-    text = source.read_text()
-    service_match = re.search(r"service\s+(\w+)\s*\{(.*?)\n\}", text, re.S)
-    if not service_match:
-        raise SystemExit(f"No service found in {source}")
-    service, body = service_match.groups()
-    rpcs = re.findall(
-        r"(?:\s*//\s*(.*?)\n)?\s*rpc\s+(\w+)\s*\(([^)]+)\)\s*returns\s*\(([^)]+)\)",
-        body,
-    )
-    lines = [f"# {title}", "", f"Service: `{service}`", ""]
-    for comment, name, request, response in rpcs:
+    document = ProtoParser(source.read_text()).parse()
+    if len(document["services"]) != 1:
+        raise SystemExit(f"Expected exactly one service in {source}")
+    service = document["services"][0]
+    lines = [f"# {title}", "", f"Service: `{service['name']}`", ""]
+    for rpc in service["rpcs"]:
         lines.extend(
             [
-                f"## {name}",
+                f"## {rpc['name']}",
                 "",
-                comment.strip() if comment else "Public RPC exposed by envd.",
+                rpc["comment"] or "Public RPC exposed by envd.",
                 "",
-                f"- Request: `{request.strip()}`",
-                f"- Response: `{response.strip()}`",
+                f"- Request: `{rpc['request']}`",
+                f"- Response: `{rpc['response']}`",
                 "",
             ]
         )
     lines.extend(["## Message types", ""])
-    for match in re.finditer(
-        r"(?:^|\n)(?:\s*//\s*(.*?)\n)?\s*message\s+(\w+)\s*\{", text
-    ):
-        comment, name = match.groups()
-        depth = 1
-        cursor = match.end()
-        while depth and cursor < len(text):
-            if text[cursor] == "{":
-                depth += 1
-            elif text[cursor] == "}":
-                depth -= 1
-            cursor += 1
-        body = text[match.end() : cursor - 1]
-        fields = re.findall(
-            r"(?:\s*//\s*(.*?)\n)?\s*(repeated\s+|optional\s+)?([.\w]+)\s+(\w+)\s*=\s*(\d+)",
-            body,
-        )
-        lines.extend([f"### {name}", ""])
-        if comment:
-            lines.extend([comment.strip(), ""])
-        if fields:
-            lines.extend(
-                [
-                    "| Field | Type | Number | Description |",
-                    "| --- | --- | ---: | --- |",
-                ]
-            )
-            for field_comment, modifier, field_type, field_name, number in fields:
-                type_name = f"{modifier.strip()} {field_type}".strip()
-                lines.append(
-                    f"| `{field_name}` | `{type_name}` | {number} | {field_comment.strip() if field_comment else ''} |"
+    for message in document["messages"]:
+        lines.extend([f"### {message['name']}", ""])
+        if message["comment"]:
+            lines.extend([message["comment"], ""])
+        if message["fields"]:
+            has_oneof = any(field["oneof"] for field in message["fields"])
+            if has_oneof:
+                lines.extend(
+                    [
+                        "| Field | Type | Number | Oneof | Description |",
+                        "| --- | --- | ---: | --- | --- |",
+                    ]
                 )
+            else:
+                lines.extend(
+                    [
+                        "| Field | Type | Number | Description |",
+                        "| --- | --- | ---: | --- |",
+                    ]
+                )
+            for field in message["fields"]:
+                cells = [
+                    f"`{field['name']}`",
+                    f"`{field['type']}`",
+                    field["number"],
+                ]
+                if has_oneof:
+                    cells.append(f"`{field['oneof']}`" if field["oneof"] else "")
+                cells.append(markdown_cell(field["comment"]))
+                lines.append(f"| {' | '.join(cells)} |")
             lines.append("")
+    if document["enums"]:
+        lines.extend(["## Enum types", ""])
+    for enum in document["enums"]:
+        lines.extend([f"### {enum['name']}", ""])
+        if enum["comment"]:
+            lines.extend([enum["comment"], ""])
+        lines.extend(
+            [
+                "| Value | Number | Description |",
+                "| --- | ---: | --- |",
+            ]
+        )
+        for value in enum["values"]:
+            lines.append(
+                f"| `{value['name']}` | {value['number']} | {markdown_cell(value['comment'])} |"
+            )
+        lines.append("")
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text("\n".join(lines))
 

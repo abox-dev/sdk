@@ -53,7 +53,7 @@ Public RPC exposed by envd.
 
 ## CloseStdin
 
-Only works for non-PTY processes. For PTY, send Ctrl+D (0x04) instead.
+Close stdin to signal EOF to the process. Only works for non-PTY processes. For PTY, send Ctrl+D (0x04) instead.
 
 - Request: `CloseStdinRequest`
 - Response: `CloseStdinResponse`
@@ -65,10 +65,8 @@ Only works for non-PTY processes. For PTY, send Ctrl+D (0x04) instead.
 | Field | Type | Number | Description |
 | --- | --- | ---: | --- |
 | `size` | `Size` | 1 |  |
-| `cols` | `uint32` | 1 |  |
-| `rows` | `uint32` | 2 |  |
 
-### Size
+### PTY.Size
 
 | Field | Type | Number | Description |
 | --- | --- | ---: | --- |
@@ -81,6 +79,7 @@ Only works for non-PTY processes. For PTY, send Ctrl+D (0x04) instead.
 | --- | --- | ---: | --- |
 | `cmd` | `string` | 1 |  |
 | `args` | `repeated string` | 2 |  |
+| `envs` | `map<string, string>` | 3 |  |
 | `cwd` | `optional string` | 4 |  |
 
 ### ListRequest
@@ -106,7 +105,7 @@ Only works for non-PTY processes. For PTY, send Ctrl+D (0x04) instead.
 | `process` | `ProcessConfig` | 1 |  |
 | `pty` | `optional PTY` | 2 |  |
 | `tag` | `optional string` | 3 |  |
-| `stdin` | `optional bool` | 4 | We default to true. New SDK versions will set this to false by default. |
+| `stdin` | `optional bool` | 4 | This is optional for backwards compatibility. We default to true. New SDK versions will set this to false by default. |
 
 ### UpdateRequest
 
@@ -119,36 +118,28 @@ Only works for non-PTY processes. For PTY, send Ctrl+D (0x04) instead.
 
 ### ProcessEvent
 
-| Field | Type | Number | Description |
-| --- | --- | ---: | --- |
-| `start` | `StartEvent` | 1 |  |
-| `data` | `DataEvent` | 2 |  |
-| `end` | `EndEvent` | 3 |  |
-| `keepalive` | `KeepAlive` | 4 |  |
-| `pid` | `uint32` | 1 |  |
-| `stdout` | `bytes` | 1 |  |
-| `stderr` | `bytes` | 2 |  |
-| `pty` | `bytes` | 3 |  |
-| `exit_code` | `sint32` | 1 |  |
-| `exited` | `bool` | 2 |  |
-| `status` | `string` | 3 |  |
-| `error` | `optional string` | 4 |  |
+| Field | Type | Number | Oneof | Description |
+| --- | --- | ---: | --- | --- |
+| `start` | `StartEvent` | 1 | `event` |  |
+| `data` | `DataEvent` | 2 | `event` |  |
+| `end` | `EndEvent` | 3 | `event` |  |
+| `keepalive` | `KeepAlive` | 4 | `event` |  |
 
-### StartEvent
+### ProcessEvent.StartEvent
 
 | Field | Type | Number | Description |
 | --- | --- | ---: | --- |
 | `pid` | `uint32` | 1 |  |
 
-### DataEvent
+### ProcessEvent.DataEvent
 
-| Field | Type | Number | Description |
-| --- | --- | ---: | --- |
-| `stdout` | `bytes` | 1 |  |
-| `stderr` | `bytes` | 2 |  |
-| `pty` | `bytes` | 3 |  |
+| Field | Type | Number | Oneof | Description |
+| --- | --- | ---: | --- | --- |
+| `stdout` | `bytes` | 1 | `output` |  |
+| `stderr` | `bytes` | 2 | `output` |  |
+| `pty` | `bytes` | 3 | `output` |  |
 
-### EndEvent
+### ProcessEvent.EndEvent
 
 | Field | Type | Number | Description |
 | --- | --- | ---: | --- |
@@ -157,7 +148,7 @@ Only works for non-PTY processes. For PTY, send Ctrl+D (0x04) instead.
 | `status` | `string` | 3 |  |
 | `error` | `optional string` | 4 |  |
 
-### KeepAlive
+### ProcessEvent.KeepAlive
 
 ### StartResponse
 
@@ -182,34 +173,32 @@ Only works for non-PTY processes. For PTY, send Ctrl+D (0x04) instead.
 
 ### ProcessInput
 
-| Field | Type | Number | Description |
-| --- | --- | ---: | --- |
-| `stdin` | `bytes` | 1 |  |
-| `pty` | `bytes` | 2 |  |
+| Field | Type | Number | Oneof | Description |
+| --- | --- | ---: | --- | --- |
+| `stdin` | `bytes` | 1 | `input` |  |
+| `pty` | `bytes` | 2 | `input` |  |
 
 ### StreamInputRequest
 
-| Field | Type | Number | Description |
-| --- | --- | ---: | --- |
-| `start` | `StartEvent` | 1 |  |
-| `data` | `DataEvent` | 2 |  |
-| `keepalive` | `KeepAlive` | 3 |  |
-| `process` | `ProcessSelector` | 1 |  |
-| `input` | `ProcessInput` | 2 |  |
+| Field | Type | Number | Oneof | Description |
+| --- | --- | ---: | --- | --- |
+| `start` | `StartEvent` | 1 | `event` |  |
+| `data` | `DataEvent` | 2 | `event` |  |
+| `keepalive` | `KeepAlive` | 3 | `event` |  |
 
-### StartEvent
+### StreamInputRequest.StartEvent
 
 | Field | Type | Number | Description |
 | --- | --- | ---: | --- |
 | `process` | `ProcessSelector` | 1 |  |
 
-### DataEvent
+### StreamInputRequest.DataEvent
 
 | Field | Type | Number | Description |
 | --- | --- | ---: | --- |
 | `input` | `ProcessInput` | 2 |  |
 
-### KeepAlive
+### StreamInputRequest.KeepAlive
 
 ### StreamInputResponse
 
@@ -238,7 +227,17 @@ Only works for non-PTY processes. For PTY, send Ctrl+D (0x04) instead.
 
 ### ProcessSelector
 
-| Field | Type | Number | Description |
-| --- | --- | ---: | --- |
-| `pid` | `uint32` | 1 |  |
-| `tag` | `string` | 2 |  |
+| Field | Type | Number | Oneof | Description |
+| --- | --- | ---: | --- | --- |
+| `pid` | `uint32` | 1 | `selector` |  |
+| `tag` | `string` | 2 | `selector` |  |
+
+## Enum types
+
+### Signal
+
+| Value | Number | Description |
+| --- | ---: | --- |
+| `SIGNAL_UNSPECIFIED` | 0 |  |
+| `SIGNAL_SIGTERM` | 15 |  |
+| `SIGNAL_SIGKILL` | 9 |  |

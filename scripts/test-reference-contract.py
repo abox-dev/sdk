@@ -3,6 +3,7 @@
 
 import hashlib
 import json
+import re
 from pathlib import Path
 
 import yaml
@@ -42,6 +43,22 @@ FORBIDDEN_COMPONENTS = {
     "volumeID",
     "VolumeMount",
 }
+
+
+def markdown_section(document: str, heading: str) -> str:
+    marker = f"### {heading}\n"
+    start = document.index(marker) + len(marker)
+    boundaries = [
+        position
+        for prefix in ("\n### ", "\n## ")
+        if (position := document.find(prefix, start)) >= 0
+    ]
+    end = min(boundaries) if boundaries else len(document)
+    return document[start:end]
+
+
+def markdown_table_names(section: str) -> list[str]:
+    return re.findall(r"^\| `([^`]+)` \|", section, re.M)
 
 
 def resolve_local_ref(document: dict, value: dict) -> dict:
@@ -316,6 +333,50 @@ def main() -> None:
         path.read_text() for path in (REFERENCE / "sdk/cli").glob("*.md")
     )
     assert "[object Object]" not in cli_markdown
+
+    process_reference = (REFERENCE / "connect/process.md").read_text()
+    assert markdown_table_names(markdown_section(process_reference, "PTY")) == ["size"]
+    assert markdown_table_names(
+        markdown_section(process_reference, "ProcessEvent")
+    ) == ["start", "data", "end", "keepalive"]
+    assert markdown_table_names(
+        markdown_section(process_reference, "StreamInputRequest")
+    ) == ["start", "data", "keepalive"]
+    assert "| `envs` | `map<string, string>` | 3 |" in markdown_section(
+        process_reference, "ProcessConfig"
+    )
+    assert "### PTY.Size" in process_reference
+    assert "### ProcessEvent.StartEvent" in process_reference
+    for value in (
+        "SIGNAL_UNSPECIFIED",
+        "SIGNAL_SIGTERM",
+        "SIGNAL_SIGKILL",
+    ):
+        assert value in markdown_section(process_reference, "Signal")
+
+    filesystem_reference = (REFERENCE / "connect/filesystem.md").read_text()
+    assert "| `metadata` | `map<string, string>` | 11 |" in markdown_section(
+        filesystem_reference, "EntryInfo"
+    )
+    for enum, values in {
+        "FileType": (
+            "FILE_TYPE_UNSPECIFIED",
+            "FILE_TYPE_FILE",
+            "FILE_TYPE_DIRECTORY",
+            "FILE_TYPE_SYMLINK",
+        ),
+        "EventType": (
+            "EVENT_TYPE_UNSPECIFIED",
+            "EVENT_TYPE_CREATE",
+            "EVENT_TYPE_WRITE",
+            "EVENT_TYPE_REMOVE",
+            "EVENT_TYPE_RENAME",
+            "EVENT_TYPE_CHMOD",
+        ),
+    }.items():
+        section = markdown_section(filesystem_reference, enum)
+        for value in values:
+            assert value in section
 
     javascript_files = {
         str(path.relative_to(REFERENCE))
