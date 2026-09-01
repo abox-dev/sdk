@@ -66,7 +66,7 @@ Schema: `array<SandboxForkResult>`
 
   Version of the envd running in the sandbox
 
-- **`sandbox.domain`** · `string` · optional
+- **`sandbox.domain`** · `string | null` · optional
 
   Base domain where the sandbox traffic is accessible
 

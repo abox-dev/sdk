@@ -64,7 +64,7 @@ Schema: `TemplateWithBuilds`
 
   Format: `date-time`
 
-- **`lastSpawnedAt`** · `string` · required
+- **`lastSpawnedAt`** · `string | null` · required
 
   Time when the template was last used
 

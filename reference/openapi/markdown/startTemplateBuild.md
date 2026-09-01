@@ -86,6 +86,8 @@ Schema: `TemplateBuildStartV2`
 
   List of steps to execute in the template build
 
+  Default: `[]`
+
 - **`steps.type`** · `string` · required
 
   Type of the step
@@ -93,6 +95,8 @@ Schema: `TemplateBuildStartV2`
 - **`steps.args`** · `array<string>` · optional
 
   Arguments for the step
+
+  Default: `[]`
 
 - **`steps.filesHash`** · `string` · optional
 

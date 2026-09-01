@@ -50,9 +50,13 @@ Schema: `TemplateBuildInfo`
 
   Build logs
 
+  Default: `[]`
+
 - **`logEntries`** · `array<BuildLogEntry>` · required
 
   Build logs structured
+
+  Default: `[]`
 
 - **`logEntries.id`** · `string` · optional
 
@@ -105,6 +109,8 @@ Schema: `TemplateBuildInfo`
 - **`reason.logEntries`** · `array<BuildLogEntry>` · optional
 
   Log entries related to the status reason
+
+  Default: `[]`
 
 - **`reason.logEntries.id`** · `string` · optional
 

@@ -92,9 +92,15 @@ Schema: `array<Template>`
 
   Format: `date-time`
 
-- **`createdBy`** · `object` · required
+- **`createdBy`** · `TeamUser | null` · required
 
-- **`lastSpawnedAt`** · `string` · required
+- **`createdBy.id`** · `string` · required
+
+  Identifier of the user
+
+  Format: `uuid`
+
+- **`lastSpawnedAt`** · `string | null` · required
 
   Time when the template was last used
 

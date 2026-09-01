@@ -64,6 +64,8 @@ Schema: `TemplateBuildLogsResponse`
 
   Build logs structured
 
+  Default: `[]`
+
 - **`logs.id`** · `string` · optional
 
   Stable identifier used to reconcile overlapping live log pages
@@ -94,7 +96,7 @@ Schema: `TemplateBuildLogsResponse`
 
 - **`source`** · `LogsSource` · optional
 
-  Source of the logs that should be returned
+  Actual source used to serve this page
 
   Allowed values for `LogsSource`: `temporary` | `persistent`
 

@@ -376,6 +376,17 @@ def main() -> None:
     ):
         assert expected in start_build
 
+    list_metrics = (REFERENCE / "openapi/markdown/listSandboxMetrics.md").read_text()
+    assert "- **`sandbox_ids`** · `array<string>` · query · required" in list_metrics
+    assert "Maximum items: `100`" in list_metrics
+    assert "Unique items: `yes`" in list_metrics
+
+    list_templates = (REFERENCE / "openapi/markdown/listTemplates.md").read_text()
+    assert "- **`createdBy`** · `TeamUser | null` · required" in list_templates
+    assert "- **`createdBy.id`** · `string` · required" in list_templates
+    assert "Format: `uuid`" in list_templates
+    assert "- **`lastSpawnedAt`** · `string | null` · required" in list_templates
+
     create_sandbox = (REFERENCE / "openapi/markdown/createSandbox.md").read_text()
     assert "Schema: `NewSandbox`" in create_sandbox
     for field in (

@@ -66,6 +66,8 @@ Schema: `SandboxLogsV2Response`
 
   Sandbox logs structured
 
+  Default: `[]`
+
 - **`logs.id`** · `string` · optional
 
   Stable identifier used to reconcile overlapping live log pages

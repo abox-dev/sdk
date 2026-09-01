@@ -46,11 +46,11 @@ Schema: `SandboxDetail`
 
   Version of the envd running in the sandbox
 
-- **`allowInternetAccess`** · `boolean` · optional
+- **`allowInternetAccess`** · `boolean | null` · optional
 
   Whether internet access was explicitly enabled or disabled for the sandbox. Null means it was not explicitly set.
 
-- **`domain`** · `string` · optional
+- **`domain`** · `string | null` · optional
 
   Base domain where the sandbox traffic is accessible
 

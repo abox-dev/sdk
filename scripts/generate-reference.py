@@ -63,19 +63,82 @@ def markdown_text(value: object) -> str:
     return " ".join(str(value or "").split())
 
 
-def schema_type(document: dict, schema: dict) -> str:
+def merge_schema(target: dict, source: dict) -> None:
+    """Merge one allOf branch into a documentation view of the schema."""
+    for key, value in source.items():
+        if key == "properties" and isinstance(value, dict):
+            target.setdefault("properties", {}).update(value)
+        elif key == "required" and isinstance(value, list):
+            target["required"] = list(
+                dict.fromkeys([*target.get("required", []), *value])
+            )
+        elif key == "nullable":
+            target[key] = bool(target.get(key)) or bool(value)
+        elif key not in target:
+            target[key] = value
+
+
+def normalize_schema(
+    document: dict,
+    schema: dict,
+    ancestors: frozenset[tuple[str, object]] = frozenset(),
+) -> tuple[dict, str | None]:
+    """Resolve refs and flatten allOf while preserving wrapper metadata."""
     resolved, reference_name = resolve_ref(document, schema)
+    if not isinstance(resolved, dict):
+        return {}, reference_name
+    normalized = dict(resolved)
+    if schema is not resolved:
+        normalized.update(
+            {key: value for key, value in schema.items() if key != "$ref"}
+        )
+
+    all_of = normalized.pop("allOf", None)
+    if not isinstance(all_of, list):
+        return normalized, reference_name
+
+    marker = (
+        ("reference", reference_name) if reference_name else ("schema", id(resolved))
+    )
+    if marker in ancestors:
+        return normalized, reference_name
+    descendants = ancestors | {marker}
+    branch_names = []
+    for branch in all_of:
+        if not isinstance(branch, dict):
+            continue
+        branch_schema, branch_name = normalize_schema(document, branch, descendants)
+        merge_schema(normalized, branch_schema)
+        if branch_name:
+            branch_names.append(branch_name)
+    if reference_name is None and len(branch_names) == 1:
+        reference_name = branch_names[0]
+    return normalized, reference_name
+
+
+def schema_type(document: dict, schema: dict) -> str:
+    resolved, reference_name = normalize_schema(document, schema)
     if reference_name:
-        return reference_name
-    if "oneOf" in resolved:
-        return " | ".join(schema_type(document, item) for item in resolved["oneOf"])
-    if "anyOf" in resolved:
-        return " | ".join(schema_type(document, item) for item in resolved["anyOf"])
-    if resolved.get("type") == "array":
-        return f"array<{schema_type(document, resolved.get('items', {}))}>"
-    if resolved.get("enum"):
-        return " | ".join(str(item) for item in resolved["enum"])
-    return resolved.get("type", "object")
+        type_name = reference_name
+    elif "oneOf" in resolved:
+        type_name = " | ".join(
+            schema_type(document, item) for item in resolved["oneOf"]
+        )
+    elif "anyOf" in resolved:
+        type_name = " | ".join(
+            schema_type(document, item) for item in resolved["anyOf"]
+        )
+    elif resolved.get("type") == "array":
+        type_name = f"array<{schema_type(document, resolved.get('items', {}))}>"
+    elif resolved.get("enum"):
+        type_name = " | ".join(str(item) for item in resolved["enum"])
+    elif resolved.get("properties"):
+        type_name = "object"
+    else:
+        type_name = resolved.get("type", "object")
+    if resolved.get("nullable") and "null" not in type_name.split(" | "):
+        return f"{type_name} | null"
+    return type_name
 
 
 def render_named_item(
@@ -97,11 +160,9 @@ def schema_value(value: object) -> str:
 
 def render_schema_metadata(document: dict, schema: dict, indent: str = "") -> list[str]:
     """Render validation and representation details without losing referenced enums."""
-    resolved, reference_name = resolve_ref(document, schema)
+    resolved, reference_name = normalize_schema(document, schema)
     if not isinstance(resolved, dict):
         return []
-    if resolved.get("type") == "array" and isinstance(resolved.get("items"), dict):
-        return render_schema_metadata(document, resolved["items"], indent)
 
     lines = []
     if resolved.get("format"):
@@ -125,12 +186,17 @@ def render_schema_metadata(document: dict, schema: dict, indent: str = "") -> li
     ):
         if key in resolved:
             lines.extend([f"{indent}{label}: `{schema_value(resolved[key])}`", ""])
+    if "uniqueItems" in resolved:
+        unique = "yes" if resolved["uniqueItems"] else "no"
+        lines.extend([f"{indent}Unique items: `{unique}`", ""])
+    if resolved.get("type") == "array" and isinstance(resolved.get("items"), dict):
+        lines.extend(render_schema_metadata(document, resolved["items"], indent))
     return lines
 
 
 def schema_fields(document: dict, schema: dict) -> tuple[dict, str | None]:
     """Return the object schema whose fields describe a value."""
-    resolved, reference_name = resolve_ref(document, schema)
+    resolved, reference_name = normalize_schema(document, schema)
     visited = set()
     while isinstance(resolved, dict) and resolved.get("type") == "array":
         marker = id(resolved)
@@ -140,7 +206,7 @@ def schema_fields(document: dict, schema: dict) -> tuple[dict, str | None]:
         items = resolved.get("items")
         if not isinstance(items, dict):
             return {}, reference_name
-        resolved, item_reference = resolve_ref(document, items)
+        resolved, item_reference = normalize_schema(document, items)
         reference_name = item_reference or reference_name
     return (resolved if isinstance(resolved, dict) else {}), reference_name
 
@@ -191,7 +257,7 @@ def render_schema_fields(
     required = set(fields.get("required", []))
     for name, property_schema in fields.get("properties", {}).items():
         field_name = f"{prefix}.{name}" if prefix else name
-        property_value, _ = resolve_ref(document, property_schema)
+        property_value, _ = normalize_schema(document, property_schema)
         lines.extend(
             render_named_item(
                 field_name,
@@ -208,7 +274,7 @@ def render_schema_fields(
     additional = fields.get("additionalProperties")
     if isinstance(additional, dict):
         field_name = f"{prefix}.*" if prefix else "*"
-        additional_value, _ = resolve_ref(document, additional)
+        additional_value, _ = normalize_schema(document, additional)
         lines.extend(
             render_named_item(
                 field_name,
@@ -225,7 +291,7 @@ def render_schema_fields(
 
 
 def render_schema(document: dict, schema: dict) -> list[str]:
-    resolved, reference_name = resolve_ref(document, schema)
+    resolved, reference_name = normalize_schema(document, schema)
     lines = [f"Schema: `{reference_name or schema_type(document, resolved)}`", ""]
     if isinstance(resolved, dict) and resolved.get("description"):
         lines.extend([markdown_text(resolved["description"]), ""])

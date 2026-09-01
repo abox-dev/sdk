@@ -104,7 +104,7 @@ Schema: `NewSandbox`
 
   Environment variables for the sandbox
 
-- **`mcp`** · `Mcp` · optional
+- **`mcp`** · `Mcp | null` · optional
 
   MCP configuration for the sandbox
 
@@ -154,7 +154,7 @@ Schema: `Sandbox`
 
   Version of the envd running in the sandbox
 
-- **`domain`** · `string` · optional
+- **`domain`** · `string | null` · optional
 
   Base domain where the sandbox traffic is accessible
 

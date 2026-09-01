@@ -10,6 +10,10 @@ List metrics for given sandboxes
 
   Comma-separated list of sandbox IDs to get metrics for
 
+  Maximum items: `100`
+
+  Unique items: `yes`
+
 ## Responses
 
 ### 200
