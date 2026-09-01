@@ -1,5 +1,20 @@
 schemaVersion: 1
 
+connect:
+  productionBaseUrl: https://sandbox.agentbox-runtime.ru
+  method: POST
+  headers:
+    - name: Agentbox-Sandbox-Id
+      required: true
+      description: Sandbox identifier.
+    - name: Agentbox-Sandbox-Port
+      required: true
+      description: Envd port routed by the sandbox proxy.
+      default: 49983
+    - name: X-Access-Token
+      required: false
+      description: Sandbox-scoped envd access token, when one was issued.
+
 controlPlane:
   source: spec/openapi.yml
   publicAuthSchemes:

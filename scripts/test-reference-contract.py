@@ -208,6 +208,42 @@ def main() -> None:
     assert not any(operation["path"] in BANNED_ENVD_PATHS for operation in operations)
 
     config = yaml.safe_load((ROOT / "reference-config/operations.yaml").read_text())
+    connect = config["connect"]
+    connect_headers = {header["name"]: header for header in connect["headers"]}
+    assert connect["productionBaseUrl"] == "https://sandbox.agentbox-runtime.ru"
+    assert connect["method"] == "POST"
+    assert set(connect_headers) == {
+        "Agentbox-Sandbox-Id",
+        "Agentbox-Sandbox-Port",
+        "X-Access-Token",
+    }
+    assert connect_headers["Agentbox-Sandbox-Id"]["required"] is True
+    assert connect_headers["Agentbox-Sandbox-Port"] == {
+        "name": "Agentbox-Sandbox-Port",
+        "required": True,
+        "description": "Envd port routed by the sandbox proxy.",
+        "default": 49983,
+    }
+    assert connect_headers["X-Access-Token"]["required"] is False
+
+    javascript_config = (ROOT / "packages/js-sdk/src/connectionConfig.ts").read_text()
+    javascript_sandbox = (ROOT / "packages/js-sdk/src/sandbox/index.ts").read_text()
+    python_config = (
+        ROOT / "packages/python-sdk/agentbox/connection_config.py"
+    ).read_text()
+    python_sandboxes = "\n".join(
+        (ROOT / f"packages/python-sdk/agentbox/{variant}/main.py").read_text()
+        for variant in ("sandbox_sync", "sandbox_async")
+    )
+    assert "supportedDomains = ['agentbox-runtime.ru']" in javascript_config
+    assert "return `https://sandbox.${sandboxDomain}`" in javascript_config
+    assert "public static envdPort = 49983" in javascript_config
+    assert 'return f"https://sandbox.{sandbox_domain}"' in python_config
+    assert "envd_port = 49983" in python_config
+    for header in connect_headers:
+        assert header in javascript_sandbox
+        assert header in python_sandboxes
+
     control = yaml.safe_load((ROOT / config["controlPlane"]["source"]).read_text())
     public_tags = set(config["controlPlane"]["publicTags"])
     expected = set()
@@ -258,7 +294,7 @@ def main() -> None:
         if spec_name == "envd":
             assert document["servers"] == [
                 {
-                    "url": "https://sandbox.agentbox-runtime.ru",
+                    "url": connect["productionBaseUrl"],
                     "description": (
                         "AgentBox sandbox proxy. Routing headers are required."
                     ),
@@ -276,11 +312,13 @@ def main() -> None:
                         )
                         if parameter.get("in") == "header"
                     }
-                    assert headers["Agentbox-Sandbox-Id"]["required"] is True
-                    assert headers["Agentbox-Sandbox-Port"]["required"] is True
-                    assert (
-                        headers["Agentbox-Sandbox-Port"]["schema"]["default"] == 49983
-                    )
+                    for name in ("Agentbox-Sandbox-Id", "Agentbox-Sandbox-Port"):
+                        assert headers[name]["required"] is connect_headers[name][
+                            "required"
+                        ]
+                    assert headers["Agentbox-Sandbox-Port"]["schema"][
+                        "default"
+                    ] == connect_headers["Agentbox-Sandbox-Port"]["default"]
         assert_public_schema(document)
         assert_local_refs_resolve(document)
         assert_only_reachable_components(document)
@@ -335,6 +373,17 @@ def main() -> None:
     assert "[object Object]" not in cli_markdown
 
     process_reference = (REFERENCE / "connect/process.md").read_text()
+    for value in (
+        "Production base URL: `https://sandbox.agentbox-runtime.ru`",
+        "Fully qualified service: `process.Process`",
+        "RPC URL pattern: `POST https://sandbox.agentbox-runtime.ru/process.Process/{RPC}`",
+        "Endpoint: `POST https://sandbox.agentbox-runtime.ru/process.Process/List`",
+        "**`Agentbox-Sandbox-Id`** · required",
+        "**`Agentbox-Sandbox-Port`** · required",
+        "**`X-Access-Token`** · conditional",
+        "Default: `49983`",
+    ):
+        assert value in process_reference
     assert markdown_table_names(markdown_section(process_reference, "PTY")) == ["size"]
     assert markdown_table_names(
         markdown_section(process_reference, "ProcessEvent")
@@ -355,6 +404,17 @@ def main() -> None:
         assert value in markdown_section(process_reference, "Signal")
 
     filesystem_reference = (REFERENCE / "connect/filesystem.md").read_text()
+    for value in (
+        "Production base URL: `https://sandbox.agentbox-runtime.ru`",
+        "Fully qualified service: `filesystem.Filesystem`",
+        "RPC URL pattern: `POST https://sandbox.agentbox-runtime.ru/filesystem.Filesystem/{RPC}`",
+        "Endpoint: `POST https://sandbox.agentbox-runtime.ru/filesystem.Filesystem/Stat`",
+        "**`Agentbox-Sandbox-Id`** · required",
+        "**`Agentbox-Sandbox-Port`** · required",
+        "**`X-Access-Token`** · conditional",
+        "Default: `49983`",
+    ):
+        assert value in filesystem_reference
     assert "| `metadata` | `map<string, string>` | 11 |" in markdown_section(
         filesystem_reference, "EntryInfo"
     )

@@ -1,11 +1,25 @@
 # Process API
 
-Service: `Process`
+## Transport
+
+AgentBox exposes this service through the Connect protocol over HTTP.
+The AgentBox SDK supplies the routing and authorization headers automatically.
+
+- Production base URL: `https://sandbox.agentbox-runtime.ru`
+- Fully qualified service: `process.Process`
+- RPC URL pattern: `POST https://sandbox.agentbox-runtime.ru/process.Process/{RPC}`
+
+### Request headers
+
+- **`Agentbox-Sandbox-Id`** · required — Sandbox identifier.
+- **`Agentbox-Sandbox-Port`** · required — Envd port routed by the sandbox proxy. Default: `49983`.
+- **`X-Access-Token`** · conditional — Sandbox-scoped envd access token, when one was issued.
 
 ## List
 
 Public RPC exposed by envd.
 
+- Endpoint: `POST https://sandbox.agentbox-runtime.ru/process.Process/List`
 - Request: `ListRequest`
 - Response: `ListResponse`
 
@@ -13,6 +27,7 @@ Public RPC exposed by envd.
 
 Public RPC exposed by envd.
 
+- Endpoint: `POST https://sandbox.agentbox-runtime.ru/process.Process/Connect`
 - Request: `ConnectRequest`
 - Response: `stream ConnectResponse`
 
@@ -20,6 +35,7 @@ Public RPC exposed by envd.
 
 Public RPC exposed by envd.
 
+- Endpoint: `POST https://sandbox.agentbox-runtime.ru/process.Process/Start`
 - Request: `StartRequest`
 - Response: `stream StartResponse`
 
@@ -27,6 +43,7 @@ Public RPC exposed by envd.
 
 Public RPC exposed by envd.
 
+- Endpoint: `POST https://sandbox.agentbox-runtime.ru/process.Process/Update`
 - Request: `UpdateRequest`
 - Response: `UpdateResponse`
 
@@ -34,6 +51,7 @@ Public RPC exposed by envd.
 
 Client input stream ensures ordering of messages
 
+- Endpoint: `POST https://sandbox.agentbox-runtime.ru/process.Process/StreamInput`
 - Request: `stream StreamInputRequest`
 - Response: `StreamInputResponse`
 
@@ -41,6 +59,7 @@ Client input stream ensures ordering of messages
 
 Public RPC exposed by envd.
 
+- Endpoint: `POST https://sandbox.agentbox-runtime.ru/process.Process/SendInput`
 - Request: `SendInputRequest`
 - Response: `SendInputResponse`
 
@@ -48,6 +67,7 @@ Public RPC exposed by envd.
 
 Public RPC exposed by envd.
 
+- Endpoint: `POST https://sandbox.agentbox-runtime.ru/process.Process/SendSignal`
 - Request: `SendSignalRequest`
 - Response: `SendSignalResponse`
 
@@ -55,6 +75,7 @@ Public RPC exposed by envd.
 
 Close stdin to signal EOF to the process. Only works for non-PTY processes. For PTY, send Ctrl+D (0x04) instead.
 
+- Endpoint: `POST https://sandbox.agentbox-runtime.ru/process.Process/CloseStdin`
 - Request: `CloseStdinRequest`
 - Response: `CloseStdinResponse`
 

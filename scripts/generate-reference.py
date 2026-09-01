@@ -687,6 +687,7 @@ class ProtoParser:
     def __init__(self, text: str):
         self.tokens = proto_tokens(text)
         self.position = 0
+        self.package = None
         self.services = []
         self.messages = []
         self.enums = []
@@ -890,7 +891,10 @@ class ProtoParser:
     def parse(self) -> dict:
         while self.current() is not None:
             comment = self.comments()
-            if self.accept("service"):
+            if self.accept("package"):
+                self.package = self.qualified_name()
+                self.take(";")
+            elif self.accept("service"):
                 self.service(comment)
             elif self.accept("message"):
                 self.message(comment)
@@ -899,6 +903,7 @@ class ProtoParser:
             else:
                 self.skip_statement()
         return {
+            "package": self.package,
             "services": self.services,
             "messages": self.messages,
             "enums": self.enums,
@@ -909,12 +914,63 @@ def markdown_cell(value: str) -> str:
     return " ".join(value.split()).replace("|", r"\|")
 
 
-def proto_reference(source: Path, destination: Path, title: str) -> None:
+def connect_transport_lines(config: dict, service_name: str) -> list[str]:
+    if set(config) != {"productionBaseUrl", "method", "headers"}:
+        raise SystemExit("Connect reference config has unsupported fields")
+    base_url = config["productionBaseUrl"].rstrip("/")
+    method = config["method"].upper()
+    headers = config["headers"]
+    if not base_url.startswith("https://") or method != "POST":
+        raise SystemExit("Connect reference requires an HTTPS base URL and POST")
+    if not isinstance(headers, list) or not headers:
+        raise SystemExit("Connect reference must define request headers")
+
+    lines = [
+        "## Transport",
+        "",
+        "AgentBox exposes this service through the Connect protocol over HTTP.",
+        "The AgentBox SDK supplies the routing and authorization headers automatically.",
+        "",
+        f"- Production base URL: `{base_url}`",
+        f"- Fully qualified service: `{service_name}`",
+        f"- RPC URL pattern: `{method} {base_url}/{service_name}/{{RPC}}`",
+        "",
+        "### Request headers",
+        "",
+    ]
+    for header in headers:
+        if set(header) not in (
+            {"name", "required", "description"},
+            {"name", "required", "description", "default"},
+        ):
+            raise SystemExit("Connect request header has unsupported fields")
+        requirement = "required" if header["required"] else "conditional"
+        description = header["description"]
+        if "default" in header:
+            description += f" Default: `{header['default']}`."
+        lines.extend(
+            [
+                f"- **`{header['name']}`** · {requirement} — {description}",
+            ]
+        )
+    lines.append("")
+    return lines
+
+
+def proto_reference(
+    source: Path, destination: Path, title: str, transport_config: dict
+) -> None:
     document = ProtoParser(source.read_text()).parse()
+    if not document["package"]:
+        raise SystemExit(f"Expected a package declaration in {source}")
     if len(document["services"]) != 1:
         raise SystemExit(f"Expected exactly one service in {source}")
     service = document["services"][0]
-    lines = [f"# {title}", "", f"Service: `{service['name']}`", ""]
+    service_name = f"{document['package']}.{service['name']}"
+    base_url = transport_config["productionBaseUrl"].rstrip("/")
+    method = transport_config["method"].upper()
+    lines = [f"# {title}", ""]
+    lines.extend(connect_transport_lines(transport_config, service_name))
     for rpc in service["rpcs"]:
         lines.extend(
             [
@@ -922,6 +978,7 @@ def proto_reference(source: Path, destination: Path, title: str) -> None:
                 "",
                 rpc["comment"] or "Public RPC exposed by envd.",
                 "",
+                f"- Endpoint: `{method} {base_url}/{service_name}/{rpc['name']}`",
                 f"- Request: `{rpc['request']}`",
                 f"- Response: `{rpc['response']}`",
                 "",
@@ -1089,11 +1146,13 @@ def main() -> None:
         ROOT / "spec/envd/process/process.proto",
         OUT / "connect/process.md",
         "Process API",
+        config["connect"],
     )
     proto_reference(
         ROOT / "spec/envd/filesystem/filesystem.proto",
         OUT / "connect/filesystem.md",
         "Filesystem API",
+        config["connect"],
     )
     run_sdk_generators()
 
