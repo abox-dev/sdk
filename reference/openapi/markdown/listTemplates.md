@@ -8,6 +8,8 @@ List all templates
 
 - **`teamID`** · `string` · query · optional
 
+  Identifier of the team
+
 - **`nextToken`** · `string` · query · optional
 
   Cursor to start the list from

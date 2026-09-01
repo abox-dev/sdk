@@ -8,6 +8,8 @@ Check if template with given alias exists
 
 - **`alias`** · `string` · path · required
 
+  Template alias
+
 ## Responses
 
 ### 200

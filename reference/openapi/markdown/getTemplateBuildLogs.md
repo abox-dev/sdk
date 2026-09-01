@@ -38,9 +38,13 @@ Get template build logs
 
 - **`direction`** · `LogsDirection` · query · optional
 
+  Direction of the logs that should be returned
+
   Allowed values for `LogsDirection`: `forward` | `backward`
 
 - **`level`** · `LogLevel` · query · optional
+
+  State of the sandbox
 
   Allowed values for `LogLevel`: `debug` | `info` | `warn` | `error`
 

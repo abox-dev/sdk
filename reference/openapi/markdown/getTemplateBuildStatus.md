@@ -34,6 +34,8 @@ Get template build info
 
 - **`level`** · `LogLevel` · query · optional
 
+  State of the sandbox
+
   Allowed values for `LogLevel`: `debug` | `info` | `warn` | `error`
 
 ## Responses

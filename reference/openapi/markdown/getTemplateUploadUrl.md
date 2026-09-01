@@ -10,6 +10,8 @@ Get an upload link for a tar file containing build layer files
 
 - **`hash`** · `string` · path · required
 
+  Hash of the files
+
 ## Responses
 
 ### 201

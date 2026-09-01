@@ -108,7 +108,7 @@ Schema: `NewSandbox`
 
   MCP configuration for the sandbox
 
-- **`mcp.*`** · `object` · additional property
+- **`mcp.*`** · `any` · additional property
 
 - **`iam`** · `SandboxIam` · optional
 

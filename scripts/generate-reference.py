@@ -120,6 +120,8 @@ def schema_type(document: dict, schema: dict) -> str:
     resolved, reference_name = normalize_schema(document, schema)
     if reference_name:
         type_name = reference_name
+    elif not resolved:
+        type_name = "any"
     elif "oneOf" in resolved:
         type_name = " | ".join(
             schema_type(document, item) for item in resolved["oneOf"]
@@ -347,6 +349,14 @@ def render_operation_markdown(document: dict, record: dict) -> str:
         lines.extend(["## Parameters", ""])
         for parameter in parameters:
             parameter_schema = parameter.get("schema", {})
+            normalized_parameter_schema, _ = normalize_schema(
+                document, parameter_schema
+            )
+            parameter_description = parameter.get("description") or (
+                normalized_parameter_schema.get("description", "")
+                if isinstance(normalized_parameter_schema, dict)
+                else ""
+            )
             lines.extend(
                 render_named_item(
                     parameter.get("name", ""),
@@ -355,7 +365,7 @@ def render_operation_markdown(document: dict, record: dict) -> str:
                         parameter.get("in", ""),
                         "required" if parameter.get("required") else "optional",
                     ],
-                    parameter.get("description", ""),
+                    parameter_description,
                 )
             )
             lines.extend(render_schema_metadata(document, parameter_schema, "  "))

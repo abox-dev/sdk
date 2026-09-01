@@ -18,6 +18,8 @@ Get sandbox metrics
 
 - **`end`** · `integer` · query · optional
 
+  Unix timestamp for the end of the interval, in seconds, for which the metrics
+
   Format: `int64`
 
   Minimum: `0`

@@ -8,6 +8,8 @@ List all snapshots for the team
 
 - **`sandboxID`** · `string` · query · optional
 
+  Filter snapshots by source sandbox ID
+
 - **`name`** · `string` · query · optional
 
   Filter snapshots by name or ID, optionally tag-qualified (e.g. "my-snapshot", "my-team/my-snapshot" or "my-snapshot:v1").

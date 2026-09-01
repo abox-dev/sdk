@@ -513,8 +513,24 @@ def main() -> None:
     assert "Format: `uuid`" in list_templates
     assert "- **`lastSpawnedAt`** · `string | null` · required" in list_templates
 
+    for operation, parameter, description in (
+        ("listSnapshots", "sandboxID", "Filter snapshots by source sandbox ID"),
+        (
+            "getSandboxMetrics",
+            "end",
+            "Unix timestamp for the end of the interval, in seconds, for which the metrics",
+        ),
+        ("getTemplateByAlias", "alias", "Template alias"),
+        ("getTemplateUploadUrl", "hash", "Hash of the files"),
+    ):
+        markdown = (REFERENCE / f"openapi/markdown/{operation}.md").read_text()
+        assert f"- **`{parameter}`**" in markdown
+        assert description in markdown
+
     create_sandbox = (REFERENCE / "openapi/markdown/createSandbox.md").read_text()
     assert "Schema: `NewSandbox`" in create_sandbox
+    assert "- **`mcp.*`** · `any` · additional property" in create_sandbox
+    assert "- **`mcp.*`** · `object` · additional property" not in create_sandbox
     for field in (
         "autoResume.enabled",
         "network.allowPublicTraffic",
