@@ -17,7 +17,7 @@ def sandbox_test_id():
 
 @pytest.fixture()
 def template():
-    return os.getenv("AGENTBOX_TESTS_TEMPLATE") or "code-interpreter-v1"
+    return os.getenv("AGENTBOX_TESTS_TEMPLATE") or "code-interpreter"
 
 
 @pytest.fixture()

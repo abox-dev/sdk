@@ -5,7 +5,7 @@ import statistics
 import matplotlib.pyplot as plt
 
 iterations_count = int(os.getenv("AGENTBOX_TESTS_BENCHMARK_ITERATIONS_COUNT", 20))
-template = os.getenv("AGENTBOX_TESTS_TEMPLATE", "code-interpreter-v1")
+template = os.getenv("AGENTBOX_TESTS_TEMPLATE", "code-interpreter")
 
 # Lists to store metrics for each iteration
 sandbox_creation_times = []

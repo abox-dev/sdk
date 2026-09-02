@@ -8,7 +8,7 @@ interface SandboxFixture {
   sandboxOpts: Partial<SandboxOpts>
 }
 
-const template = process.env.AGENTBOX_TESTS_TEMPLATE || 'code-interpreter-v1'
+const template = process.env.AGENTBOX_TESTS_TEMPLATE || 'code-interpreter'
 
 export const sandboxTest = base.extend<SandboxFixture>({
   template,

@@ -1,8 +1,11 @@
+from typing import get_args
+
 import pytest
 
 from agentbox.connection_config import ConnectionConfig
 
-from agentbox_code_interpreter import AsyncSandbox, Sandbox
+from agentbox_code_interpreter import AsyncSandbox, RunCodeLanguage, Sandbox
+from agentbox_code_interpreter.constants import DEFAULT_TEMPLATE
 
 
 def make_sandbox(cls, **config_kwargs):
@@ -14,6 +17,22 @@ def make_sandbox(cls, **config_kwargs):
         envd_version="0.2.0",
         envd_access_token=None,
         connection_config=ConnectionConfig(**config_kwargs),
+    )
+
+
+def test_default_template_matches_agentbox_runtime():
+    assert DEFAULT_TEMPLATE == "code-interpreter"
+    assert Sandbox.default_template == DEFAULT_TEMPLATE
+    assert AsyncSandbox.default_template == DEFAULT_TEMPLATE
+
+
+def test_public_language_contract_matches_agentbox_runtime():
+    assert get_args(RunCodeLanguage) == (
+        "python",
+        "javascript",
+        "typescript",
+        "js",
+        "ts",
     )
 
 

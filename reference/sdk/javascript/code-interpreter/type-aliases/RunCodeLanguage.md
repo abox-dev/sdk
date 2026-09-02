@@ -2,6 +2,6 @@
 
 # Type Alias: RunCodeLanguage
 
-> **RunCodeLanguage** = `"python"` \| `"javascript"` \| `"typescript"` \| `"r"` \| `"java"` \| `"bash"` \| `string` & `object`
+> **RunCodeLanguage** = `"python"` \| `"javascript"` \| `"typescript"` \| `"js"` \| `"ts"`
 
 Supported language for code execution.

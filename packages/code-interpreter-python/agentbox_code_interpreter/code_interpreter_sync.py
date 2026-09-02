@@ -172,7 +172,7 @@ class Sandbox(BaseSandbox):
     def run_code(
         self,
         code: str,
-        language: Optional[str] = None,
+        language: Optional[RunCodeLanguage] = None,
         context: Optional[Context] = None,
         on_stdout: Optional[OutputHandler[OutputMessage]] = None,
         on_stderr: Optional[OutputHandler[OutputMessage]] = None,

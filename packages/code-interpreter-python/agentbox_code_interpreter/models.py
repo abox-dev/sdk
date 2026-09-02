@@ -21,10 +21,7 @@ from httpx import Response
 
 from .charts import Chart, _deserialize_chart
 
-RunCodeLanguage = Union[
-    Literal["python", "javascript", "typescript", "r", "java", "bash"],
-    str,
-]
+RunCodeLanguage = Literal["python", "javascript", "typescript", "js", "ts"]
 
 T = TypeVar("T")
 OutputHandler = Union[Callable[[T], Any],]
