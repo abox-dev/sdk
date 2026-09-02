@@ -1,5 +1,7 @@
 import json
+import os
 import time
+from urllib.parse import urlsplit
 
 import httpx
 
@@ -7,6 +9,13 @@ import pytest
 
 from agentbox import SandboxNetworkOpts
 from agentbox.sandbox.commands.command_handle import CommandExitException
+
+
+def sandbox_protocol(debug: bool) -> str:
+    sandbox_url = os.getenv("AGENTBOX_SANDBOX_URL")
+    return (
+        urlsplit(sandbox_url).scheme if sandbox_url else ("http" if debug else "https")
+    )
 
 
 def wait_for_status(
@@ -118,8 +127,7 @@ def test_allow_takes_precedence_over_deny(sandbox_factory):
     assert result2.stdout.strip() == "302"
 
 
-@pytest.mark.skip_debug()
-def test_allow_public_traffic_false(sandbox_factory):
+def test_allow_public_traffic_false(sandbox_factory, debug):
     """Test that sandbox with allow_public_traffic=False requires traffic access token."""
     sandbox = sandbox_factory(
         secure=True, network=SandboxNetworkOpts(allow_public_traffic=False)
@@ -139,7 +147,7 @@ def test_allow_public_traffic_false(sandbox_factory):
     time.sleep(3)
 
     # Get the public URL for the sandbox
-    sandbox_url = f"https://{sandbox.get_host(port)}"
+    sandbox_url = f"{sandbox_protocol(debug)}://{sandbox.get_host(port)}"
 
     with httpx.Client() as client:
         # Test 1: Request without traffic access token should fail with 403
@@ -152,8 +160,7 @@ def test_allow_public_traffic_false(sandbox_factory):
         assert response.status_code == 200
 
 
-@pytest.mark.skip_debug()
-def test_allow_public_traffic_true(sandbox_factory):
+def test_allow_public_traffic_true(sandbox_factory, debug):
     """Test that sandbox with allow_public_traffic=True works without token."""
     sandbox = sandbox_factory(network=SandboxNetworkOpts(allow_public_traffic=True))
 
@@ -168,7 +175,7 @@ def test_allow_public_traffic_true(sandbox_factory):
     time.sleep(3)
 
     # Get the public URL for the sandbox
-    sandbox_url = f"https://{sandbox.get_host(port)}"
+    sandbox_url = f"{sandbox_protocol(debug)}://{sandbox.get_host(port)}"
 
     with httpx.Client() as client:
         # Request without traffic access token should succeed (public access enabled)

@@ -4,6 +4,12 @@ import { CommandExitError, Sandbox } from '../../src'
 import { sandboxTest, isDebug, template } from '../setup.js'
 import { httpbinTemplate } from '../template.js'
 
+const sandboxProtocol = process.env.AGENTBOX_SANDBOX_URL
+  ? new URL(process.env.AGENTBOX_SANDBOX_URL).protocol.slice(0, -1)
+  : isDebug
+    ? 'http'
+    : 'https'
+
 describe('allow only 1.1.1.1', () => {
   sandboxTest.override({
     sandboxOpts: {
@@ -130,37 +136,34 @@ describe('allowPublicTraffic=false', () => {
     },
   })
 
-  sandboxTest.skipIf(isDebug)(
-    'sandbox requires traffic access token',
-    async ({ sandbox }) => {
-      // Verify the sandbox was created successfully and has a traffic access token
-      assert(sandbox.trafficAccessToken)
+  sandboxTest('sandbox requires traffic access token', async ({ sandbox }) => {
+    // Verify the sandbox was created successfully and has a traffic access token
+    assert(sandbox.trafficAccessToken)
 
-      // Start a simple HTTP server in the sandbox
-      const port = 8080
-      sandbox.commands.run(`python3 -m http.server ${port}`, {
-        background: true,
-      })
+    // Start a simple HTTP server in the sandbox
+    const port = 8080
+    sandbox.commands.run(`python3 -m http.server ${port}`, {
+      background: true,
+    })
 
-      // Wait for server to start
-      await new Promise((resolve) => setTimeout(resolve, 3000))
+    // Wait for server to start
+    await new Promise((resolve) => setTimeout(resolve, 3000))
 
-      // Get the public URL for the sandbox
-      const sandboxUrl = `https://${sandbox.getHost(port)}`
+    // Get the public URL for the sandbox
+    const sandboxUrl = `${sandboxProtocol}://${sandbox.getHost(port)}`
 
-      // Test 1: Request without traffic access token should fail with 403
-      const response1 = await fetch(sandboxUrl)
-      assert.equal(response1.status, 403)
+    // Test 1: Request without traffic access token should fail with 403
+    const response1 = await fetch(sandboxUrl)
+    assert.equal(response1.status, 403)
 
-      // Test 2: Request with valid traffic access token should succeed
-      const response2 = await fetch(sandboxUrl, {
-        headers: {
-          'agentbox-traffic-access-token': sandbox.trafficAccessToken,
-        },
-      })
-      assert.equal(response2.status, 200)
-    }
-  )
+    // Test 2: Request with valid traffic access token should succeed
+    const response2 = await fetch(sandboxUrl, {
+      headers: {
+        'agentbox-traffic-access-token': sandbox.trafficAccessToken,
+      },
+    })
+    assert.equal(response2.status, 200)
+  })
 })
 
 describe('allowPublicTraffic=true', () => {
@@ -172,26 +175,23 @@ describe('allowPublicTraffic=true', () => {
     },
   })
 
-  sandboxTest.skipIf(isDebug)(
-    'sandbox works without token',
-    async ({ sandbox }) => {
-      // Start a simple HTTP server in the sandbox
-      const port = 8080
-      sandbox.commands.run(`python3 -m http.server ${port}`, {
-        background: true,
-      })
+  sandboxTest('sandbox works without token', async ({ sandbox }) => {
+    // Start a simple HTTP server in the sandbox
+    const port = 8080
+    sandbox.commands.run(`python3 -m http.server ${port}`, {
+      background: true,
+    })
 
-      // Wait for server to start
-      await new Promise((resolve) => setTimeout(resolve, 3000))
+    // Wait for server to start
+    await new Promise((resolve) => setTimeout(resolve, 3000))
 
-      // Get the public URL for the sandbox
-      const sandboxUrl = `https://${sandbox.getHost(port)}`
+    // Get the public URL for the sandbox
+    const sandboxUrl = `${sandboxProtocol}://${sandbox.getHost(port)}`
 
-      // Request without traffic access token should succeed (public access enabled)
-      const response = await fetch(sandboxUrl)
-      assert.equal(response.status, 200)
-    }
-  )
+    // Request without traffic access token should succeed (public access enabled)
+    const response = await fetch(sandboxUrl)
+    assert.equal(response.status, 200)
+  })
 })
 
 describe('firewall transform injects headers', () => {

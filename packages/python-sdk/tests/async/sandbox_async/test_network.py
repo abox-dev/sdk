@@ -1,11 +1,20 @@
 import asyncio
 import json
+import os
+from urllib.parse import urlsplit
 
 import httpx
 import pytest
 
 from agentbox import SandboxNetworkOpts
 from agentbox.sandbox.commands.command_handle import CommandExitException
+
+
+def sandbox_protocol(debug: bool) -> str:
+    sandbox_url = os.getenv("AGENTBOX_SANDBOX_URL")
+    return (
+        urlsplit(sandbox_url).scheme if sandbox_url else ("http" if debug else "https")
+    )
 
 
 async def wait_for_status(
@@ -119,8 +128,7 @@ async def test_allow_takes_precedence_over_deny(async_sandbox_factory):
     assert result2.stdout.strip() == "302"
 
 
-@pytest.mark.skip_debug()
-async def test_allow_public_traffic_false(async_sandbox_factory):
+async def test_allow_public_traffic_false(async_sandbox_factory, debug):
     """Test that sandbox with allow_public_traffic=False requires traffic access token."""
     async_sandbox = await async_sandbox_factory(
         secure=True, network=SandboxNetworkOpts(allow_public_traffic=False)
@@ -139,7 +147,7 @@ async def test_allow_public_traffic_false(async_sandbox_factory):
     await asyncio.sleep(3)
 
     # Get the public URL for the sandbox
-    sandbox_url = f"https://{async_sandbox.get_host(port)}"
+    sandbox_url = f"{sandbox_protocol(debug)}://{async_sandbox.get_host(port)}"
 
     async with httpx.AsyncClient() as client:
         # Test 1: Request without traffic access token should fail with 403
@@ -152,8 +160,7 @@ async def test_allow_public_traffic_false(async_sandbox_factory):
         assert response.status_code == 200
 
 
-@pytest.mark.skip_debug()
-async def test_allow_public_traffic_true(async_sandbox_factory):
+async def test_allow_public_traffic_true(async_sandbox_factory, debug):
     """Test that sandbox with allow_public_traffic=True works without token."""
     async_sandbox = await async_sandbox_factory(
         network=SandboxNetworkOpts(allow_public_traffic=True)
@@ -169,7 +176,7 @@ async def test_allow_public_traffic_true(async_sandbox_factory):
     await asyncio.sleep(3)
 
     # Get the public URL for the sandbox
-    sandbox_url = f"https://{async_sandbox.get_host(port)}"
+    sandbox_url = f"{sandbox_protocol(debug)}://{async_sandbox.get_host(port)}"
 
     async with httpx.AsyncClient() as client:
         # Request without traffic access token should succeed (public access enabled)
