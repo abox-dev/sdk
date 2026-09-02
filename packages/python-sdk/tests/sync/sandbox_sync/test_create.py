@@ -1,18 +1,17 @@
 from time import sleep
 from typing import Any, cast
-from uuid import uuid4
 
 import httpx
 import pytest
 
-from agentbox import Sandbox, SandboxException, SandboxState
+from agentbox import Sandbox, SandboxQuery, SandboxState
 from agentbox.api.client.models import (
     NewSandbox,
     SandboxAutoResumeConfig,
 )
 from agentbox.api.client.types import UNSET
 from agentbox.exceptions import InvalidArgumentException
-from agentbox.sandbox.sandbox_api import SandboxQuery, build_iam_config
+from agentbox.sandbox.sandbox_api import build_iam_config
 
 
 @pytest.mark.skip_debug()
@@ -37,34 +36,6 @@ def test_metadata(sandbox_factory):
             break
     else:
         assert False, "Sandbox not found"
-
-
-@pytest.mark.skip_debug()
-def test_mcp_gateway_start_failure_kills_created_sandbox(template):
-    metadata = {"mcp_gateway_cleanup_test_id": str(uuid4())}
-    query = SandboxQuery(state=[SandboxState.RUNNING], metadata=metadata)
-    remaining_sandboxes = []
-
-    try:
-        # The base template has no mcp-gateway binary, so gateway startup
-        # reliably fails after the sandbox has been allocated.
-        with pytest.raises(SandboxException, match="Failed to start MCP gateway"):
-            Sandbox.create(
-                template,
-                timeout=60,
-                metadata=metadata,
-                mcp=cast(Any, {"invalid_server": {}}),
-            )
-
-        remaining_sandboxes = Sandbox.list(query=query).next_items()
-        assert remaining_sandboxes == []
-    finally:
-        try:
-            remaining_sandboxes = Sandbox.list(query=query).next_items()
-        except Exception:
-            pass
-        for sandbox in remaining_sandboxes:
-            Sandbox.kill(sandbox.sandbox_id)
 
 
 def test_create_payload_serializes_auto_resume_enabled():

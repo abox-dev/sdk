@@ -170,11 +170,6 @@ components:
       additionalProperties:
         type: string
         description: Environment variables for the sandbox
-    Mcp:
-      type: object
-      description: MCP configuration for the sandbox
-      additionalProperties: {}
-      nullable: true
     SandboxNetworkConfig:
       type: object
       properties:
@@ -538,8 +533,6 @@ components:
           $ref: '#/components/schemas/SandboxMetadata'
         envVars:
           $ref: '#/components/schemas/EnvVars'
-        mcp:
-          $ref: '#/components/schemas/Mcp'
         iam:
           $ref: '#/components/schemas/SandboxIam'
     SandboxIam:

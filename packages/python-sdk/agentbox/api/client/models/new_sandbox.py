@@ -1,5 +1,5 @@
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, TypeVar, Union, cast
+from typing import TYPE_CHECKING, Any, TypeVar, Union
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -7,7 +7,6 @@ from attrs import field as _attrs_field
 from ..types import UNSET, Unset
 
 if TYPE_CHECKING:
-    from ..models.mcp_type_0 import McpType0
     from ..models.sandbox_auto_resume_config import SandboxAutoResumeConfig
     from ..models.sandbox_iam import SandboxIam
     from ..models.sandbox_network_config import SandboxNetworkConfig
@@ -35,7 +34,6 @@ class NewSandbox:
         network (Union[Unset, SandboxNetworkConfig]):
         metadata (Union[Unset, Any]):
         env_vars (Union[Unset, Any]):
-        mcp (Union['McpType0', None, Unset]): MCP configuration for the sandbox
         iam (Union[Unset, SandboxIam]): Sandbox workload identity configuration. A non-empty, valid tokens map enables
             workload identity for the sandbox.
     """
@@ -50,13 +48,10 @@ class NewSandbox:
     network: Union[Unset, "SandboxNetworkConfig"] = UNSET
     metadata: Union[Unset, Any] = UNSET
     env_vars: Union[Unset, Any] = UNSET
-    mcp: Union["McpType0", None, Unset] = UNSET
     iam: Union[Unset, "SandboxIam"] = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        from ..models.mcp_type_0 import McpType0
-
         template_id = self.template_id
 
         timeout = self.timeout
@@ -80,14 +75,6 @@ class NewSandbox:
         metadata = self.metadata
 
         env_vars = self.env_vars
-
-        mcp: Union[None, Unset, dict[str, Any]]
-        if isinstance(self.mcp, Unset):
-            mcp = UNSET
-        elif isinstance(self.mcp, McpType0):
-            mcp = self.mcp.to_dict()
-        else:
-            mcp = self.mcp
 
         iam: Union[Unset, dict[str, Any]] = UNSET
         if not isinstance(self.iam, Unset):
@@ -118,8 +105,6 @@ class NewSandbox:
             field_dict["metadata"] = metadata
         if env_vars is not UNSET:
             field_dict["envVars"] = env_vars
-        if mcp is not UNSET:
-            field_dict["mcp"] = mcp
         if iam is not UNSET:
             field_dict["iam"] = iam
 
@@ -127,7 +112,6 @@ class NewSandbox:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
-        from ..models.mcp_type_0 import McpType0
         from ..models.sandbox_auto_resume_config import SandboxAutoResumeConfig
         from ..models.sandbox_iam import SandboxIam
         from ..models.sandbox_network_config import SandboxNetworkConfig
@@ -163,23 +147,6 @@ class NewSandbox:
 
         env_vars = d.pop("envVars", UNSET)
 
-        def _parse_mcp(data: object) -> Union["McpType0", None, Unset]:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            try:
-                if not isinstance(data, dict):
-                    raise TypeError()
-                componentsschemas_mcp_type_0 = McpType0.from_dict(data)
-
-                return componentsschemas_mcp_type_0
-            except:  # noqa: E722
-                pass
-            return cast(Union["McpType0", None, Unset], data)
-
-        mcp = _parse_mcp(d.pop("mcp", UNSET))
-
         _iam = d.pop("iam", UNSET)
         iam: Union[Unset, SandboxIam]
         if isinstance(_iam, Unset):
@@ -198,7 +165,6 @@ class NewSandbox:
             network=network,
             metadata=metadata,
             env_vars=env_vars,
-            mcp=mcp,
             iam=iam,
         )
 

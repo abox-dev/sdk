@@ -15,7 +15,6 @@
 - [BuildStatusReason](type-aliases/BuildStatusReason.md)
 - [CopyItem](type-aliases/CopyItem.md)
 - [GetBuildStatusOptions](type-aliases/GetBuildStatusOptions.md)
-- [McpServerName](type-aliases/McpServerName.md)
 - [TemplateBuildStatus](type-aliases/TemplateBuildStatus.md)
 - [TemplateBuildStatusResponse](type-aliases/TemplateBuildStatusResponse.md)
 - [TemplateClass](type-aliases/TemplateClass.md)

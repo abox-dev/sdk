@@ -8,7 +8,6 @@
 ## Interfaces
 
 - [CreateSnapshotOpts](interfaces/CreateSnapshotOpts.md)
-- [McpServer](interfaces/McpServer.md)
 - [SandboxApiOpts](interfaces/SandboxApiOpts.md)
 - [SandboxForkOpts](interfaces/SandboxForkOpts.md)
 - [SandboxIamOpts](interfaces/SandboxIamOpts.md)

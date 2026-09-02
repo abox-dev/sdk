@@ -41,7 +41,6 @@ sandbox = Sandbox.create()
 - [**delete_snapshot**](#agentbox_code_interpreter.code_interpreter_sync.Sandbox.delete_snapshot) – Delete a snapshot.
 - [**fork**](#agentbox_code_interpreter.code_interpreter_sync.Sandbox.fork) – Fork the sandbox.
 - [**get_info**](#agentbox_code_interpreter.code_interpreter_sync.Sandbox.get_info) – Get sandbox information like sandbox ID, template, metadata, started at/end at date.
-- [**get_mcp_token**](#agentbox_code_interpreter.code_interpreter_sync.Sandbox.get_mcp_token) – Get the MCP token for the sandbox.
 - [**get_metrics**](#agentbox_code_interpreter.code_interpreter_sync.Sandbox.get_metrics) – Get the metrics of the current sandbox.
 - [**is_running**](#agentbox_code_interpreter.code_interpreter_sync.Sandbox.is_running) – Check if the sandbox is running.
 - [**kill**](#agentbox_code_interpreter.code_interpreter_sync.Sandbox.kill) – Kill the sandbox specified by sandbox ID.
@@ -104,7 +103,6 @@ create(
     envs=None,
     secure=True,
     allow_internet_access=True,
-    mcp=None,
     network=None,
     iam=None,
     lifecycle=None,
@@ -123,7 +121,6 @@ By default, the sandbox is created from the default `base` sandbox template.
 :param envs: Custom environment variables for the sandbox
 :param secure: Envd is secured with access token and cannot be used without it, defaults to `True`.
 :param allow_internet_access: Allow sandbox to access the internet, defaults to `True`. If set to `False`, it works the same as setting network `deny_out` to `[0.0.0.0/0]`.
-:param mcp: MCP server to enable in the sandbox
 :param network: Sandbox network configuration. ``allow_out``/``deny_out`` may also be a callable receiving a :class:`SandboxNetworkSelectorContext` (``ctx.all_traffic``, ``ctx.rules``) and returning a list of strings. Per-host transform rules are nested under ``network.rules``; a rule's ``transform`` may be a callable receiving a :class:`SandboxNetworkTransformContext` of placeholder strings (``ctx.iam.tokens[name]``).
 :param iam: Sandbox workload identity configuration. Each token contains ``audience`` and ``token_type``. Registered tokens are exposed to ``network.rules`` ``transform`` callables as ``ctx.iam.tokens[name]`` placeholders, which the egress proxy resolves per request
 :param lifecycle: Sandbox lifecycle configuration — ``on_timeout``: ``"kill"`` or ``"pause"`` (omitted from the request when unset, leaving the API's default, currently ``"kill"``, in effect), or an object ``{"action": "pause"|"kill", "keep_memory": bool}`` where ``keep_memory`` set to ``False`` makes a timeout auto-pause filesystem-only (cold-boots on resume; cannot be combined with ``auto_resume``); an omitted ``keep_memory`` leaves the snapshot kind to the API; ``auto_resume``: leave unset to let the API pick the behavior, set ``False`` to opt out explicitly, or ``True`` (only when ``on_timeout`` action is ``"pause"``). Example: ``{"on_timeout": {"action": "pause", "keep_memory": False}}``
@@ -231,16 +228,6 @@ get_info(**opts)
 Get sandbox information like sandbox ID, template, metadata, started at/end at date.
 
 :return: Sandbox info
-
-#### `agentbox_code_interpreter.code_interpreter_sync.Sandbox.get_mcp_token`
-
-```python
-get_mcp_token()
-```
-
-Get the MCP token for the sandbox.
-
-:return: MCP token for the sandbox, or None if MCP is not enabled.
 
 #### `agentbox_code_interpreter.code_interpreter_sync.Sandbox.get_metrics`
 

@@ -29,9 +29,6 @@ from .sandbox.filesystem.filesystem import EntryInfo, FileType, WriteInfo
 from .sandbox.filesystem.watch_handle import FilesystemEvent, FilesystemEventType
 from .sandbox.network import ALL_TRAFFIC
 from .sandbox.sandbox_api import (
-    GitHubMcpServer,
-    GitHubMcpServerConfig,
-    McpServer,
     SandboxIamOpts,
     SandboxIamToken,
     SandboxIamTokenType,

@@ -42,7 +42,6 @@ failure_map: dict[str, Optional[int]] = {
     "apt_install": 1,
     "git_clone": 1,
     "set_start_cmd": 1,
-    "add_mcp_server": None,
     "beta_dev_container_prebuild": 1,
     "beta_set_dev_container_start": 1,
 }
@@ -403,15 +402,6 @@ async def test_traces_on_start_cmd(async_build):
     )
     await _expect_to_throw_and_check_trace(
         lambda: async_build(template, name="set_start_cmd"), "set_start_cmd"
-    )
-
-
-@pytest.mark.skip_debug()
-async def test_traces_on_add_mcp_server():
-    # needs mcp-gateway as base template, without it no mcp servers can be added
-    await _expect_to_throw_and_check_trace(
-        lambda: AsyncTemplate().from_base_image().skip_cache().add_mcp_server("exa"),
-        "add_mcp_server",
     )
 
 

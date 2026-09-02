@@ -9,4 +9,4 @@ make sync-specs MONO_DIR=/path/to/mono
 make generate
 ```
 
-`make generate` is deterministic and uses only these checked-in files. It performs no network fetches. `mcp-server.json` and the `buf-*.gen.yaml` files are maintained in this repository.
+`make generate` is deterministic and uses only these checked-in files. It performs no network fetches. The `buf-*.gen.yaml` files are maintained in this repository.

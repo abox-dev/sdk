@@ -280,34 +280,6 @@ information about the sandbox
 
 ***
 
-### getMcpToken()
-
-> **getMcpToken**(): `Promise`\<`string` \| `undefined`\>
-
-Get the MCP token for the sandbox.
-
-#### Returns
-
-`Promise`\<`string` \| `undefined`\>
-
-MCP token for the sandbox, or undefined if MCP is not enabled.
-
-***
-
-### getMcpUrl()
-
-> **getMcpUrl**(): `string`
-
-Get the MCP URL for the sandbox.
-
-#### Returns
-
-`string`
-
-MCP URL for the sandbox.
-
-***
-
 ### getMetrics()
 
 > **getMetrics**(`opts?`): `Promise`\<[`SandboxMetrics`](../interfaces/SandboxMetrics.md)[]\>

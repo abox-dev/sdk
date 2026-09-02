@@ -115,7 +115,6 @@ def test_client_sandbox_is_a_subclass(api_server):
     assert isinstance(client.Sandbox.create(), client.Sandbox)
     # Class-level defaults are inherited.
     assert client.Sandbox.default_template == Sandbox.default_template
-    assert client.Sandbox.default_mcp_template == Sandbox.default_mcp_template
     assert client.Sandbox.default_sandbox_timeout == Sandbox.default_sandbox_timeout
 
 

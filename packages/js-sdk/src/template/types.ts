@@ -1,7 +1,6 @@
 import { ReadyCmd } from './readycmd'
 import type { PathLike } from 'node:fs'
 import type { LogEntry } from './logger'
-import type { McpServer } from '../sandbox/mcp'
 import { ConnectionOpts } from '../connectionConfig'
 
 /**
@@ -197,11 +196,6 @@ export type CopyItem = {
   resolveSymlinks?: boolean
   gzip?: boolean
 }
-
-/**
- * MCP server names that can be installed.
- */
-export type McpServerName = keyof McpServer
 
 /**
  * Initial state of a template builder.
@@ -648,20 +642,6 @@ export interface TemplateBuilder {
     packages: string | string[],
     options?: { noInstallRecommends?: boolean; fixMissing?: boolean }
   ): TemplateBuilder
-
-  /**
-   * Install MCP servers using mcp-gateway.
-   * Note: Requires a base image with mcp-gateway pre-installed (e.g., mcp-gateway).
-   * @param servers MCP server name(s)
-   *
-   * @throws {Error} If the base template is not mcp-gateway
-   * @example
-   * ```ts
-   * template.addMcpServer('exa')
-   * template.addMcpServer(['brave', 'firecrawl', 'duckduckgo'])
-   * ```
-   */
-  addMcpServer(servers: McpServerName | McpServerName[]): TemplateBuilder
 
   /**
    * Clone a Git repository.
