@@ -26,13 +26,13 @@ async def test_jupyter_url_points_to_sandbox_host_by_default(cls, monkeypatch):
 
 
 @pytest.mark.parametrize("cls", [Sandbox, AsyncSandbox])
-async def test_jupyter_url_honors_sandbox_url_option(cls):
+async def test_jupyter_url_routes_through_sandbox_url_proxy(cls):
     sandbox = make_sandbox(cls, sandbox_url="https://proxy.example.com")
-    assert sandbox._jupyter_url == "https://proxy.example.com"
+    assert sandbox._jupyter_url == "https://49999-test-sandbox-id.proxy.example.com"
 
 
 @pytest.mark.parametrize("cls", [Sandbox, AsyncSandbox])
-async def test_jupyter_url_honors_sandbox_url_env_var(cls, monkeypatch):
+async def test_jupyter_url_routes_through_sandbox_url_env_var_proxy(cls, monkeypatch):
     monkeypatch.setenv("AGENTBOX_SANDBOX_URL", "https://env.example.com")
     sandbox = make_sandbox(cls)
-    assert sandbox._jupyter_url == "https://env.example.com"
+    assert sandbox._jupyter_url == "https://49999-test-sandbox-id.env.example.com"

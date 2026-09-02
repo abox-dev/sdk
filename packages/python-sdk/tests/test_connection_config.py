@@ -1,3 +1,5 @@
+import pytest
+
 from agentbox import ConnectionConfig
 
 
@@ -72,6 +74,38 @@ def test_sandbox_url_debug_uses_localhost():
     )
 
 
+def test_sandbox_url_routing_preserves_sandbox_guest_port_and_proxy_port():
+    config = ConnectionConfig(debug=False, sandbox_url="http://localhost:3002")
+
+    assert (
+        config.get_host("sandbox-id", "agentbox.app", 8080)
+        == "8080-sandbox-id.localhost:3002"
+    )
+    assert (
+        config.get_sandbox_direct_url("sandbox-id", "agentbox.app")
+        == "http://49983-sandbox-id.localhost:3002"
+    )
+    assert (
+        config.get_sandbox_url("sandbox-id", "agentbox.app") == "http://localhost:3002"
+    )
+
+
+def test_sandbox_url_routing_preserves_configured_protocol():
+    config = ConnectionConfig(debug=False, sandbox_url="https://proxy.localhost")
+
+    assert (
+        config.get_sandbox_direct_url("sandbox-id", "agentbox.app")
+        == "https://49983-sandbox-id.proxy.localhost"
+    )
+
+
+def test_sandbox_url_routing_rejects_invalid_url():
+    config = ConnectionConfig(debug=False, sandbox_url="localhost:3002")
+
+    with pytest.raises(ValueError, match="Invalid sandbox URL"):
+        config.get_host("sandbox-id", "agentbox.app", 8080)
+
+
 def test_get_host_keeps_per_sandbox_host_for_supported_domain():
     config = ConnectionConfig(domain="agentbox.app")
 
@@ -90,12 +124,12 @@ def test_sandbox_direct_url_keeps_per_sandbox_host_for_supported_domain():
     )
 
 
-def test_sandbox_direct_url_uses_explicit_url_first():
+def test_sandbox_direct_url_uses_explicit_url_as_routing_base():
     config = ConnectionConfig(sandbox_url="https://sandbox.example.com")
 
     assert (
         config.get_sandbox_direct_url("sandbox-id", "agentbox.app")
-        == "https://sandbox.example.com"
+        == "https://49983-sandbox-id.sandbox.example.com"
     )
 
 

@@ -38,13 +38,17 @@ test('jupyterUrl points directly to the sandbox host by default', () => {
   expect(sandbox.jupyterUrl).toBe('https://49999-test-sandbox-id.example.dev')
 })
 
-test('jupyterUrl honors the sandboxUrl option', () => {
+test('jupyterUrl routes through the sandboxUrl proxy', () => {
   const sandbox = createSandbox({ sandboxUrl: 'https://proxy.example.com' })
-  expect(sandbox.jupyterUrl).toBe('https://proxy.example.com')
+  expect(sandbox.jupyterUrl).toBe(
+    'https://49999-test-sandbox-id.proxy.example.com'
+  )
 })
 
-test('jupyterUrl honors the AGENTBOX_SANDBOX_URL environment variable', () => {
+test('jupyterUrl routes through the AGENTBOX_SANDBOX_URL proxy', () => {
   process.env.AGENTBOX_SANDBOX_URL = 'https://env.example.com'
   const sandbox = createSandbox()
-  expect(sandbox.jupyterUrl).toBe('https://env.example.com')
+  expect(sandbox.jupyterUrl).toBe(
+    'https://49999-test-sandbox-id.env.example.com'
+  )
 })

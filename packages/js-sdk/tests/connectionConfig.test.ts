@@ -150,6 +150,59 @@ test('sandbox_url stays localhost in debug mode', () => {
   )
 })
 
+test('sandbox URL routing preserves sandbox, guest port, and proxy port', () => {
+  const config = new ConnectionConfig({
+    debug: false,
+    sandboxUrl: 'http://localhost:3002',
+  })
+
+  assert.equal(
+    config.getHost('sbx-test', 8080, 'agentbox.app'),
+    '8080-sbx-test.localhost:3002'
+  )
+  assert.equal(
+    config.getSandboxDirectUrl('sbx-test', {
+      sandboxDomain: 'agentbox.app',
+      envdPort: 49983,
+    }),
+    'http://49983-sbx-test.localhost:3002'
+  )
+  assert.equal(
+    config.getSandboxUrl('sbx-test', {
+      sandboxDomain: 'agentbox.app',
+      envdPort: 49983,
+    }),
+    'http://localhost:3002'
+  )
+})
+
+test('sandbox URL routing preserves the configured protocol', () => {
+  const config = new ConnectionConfig({
+    debug: false,
+    sandboxUrl: 'https://proxy.localhost',
+  })
+
+  assert.equal(
+    config.getSandboxDirectUrl('sbx-test', {
+      sandboxDomain: 'agentbox.app',
+      envdPort: 49983,
+    }),
+    'https://49983-sbx-test.proxy.localhost'
+  )
+})
+
+test('sandbox URL routing rejects an invalid URL', () => {
+  const config = new ConnectionConfig({
+    debug: false,
+    sandboxUrl: 'localhost:3002',
+  })
+
+  assert.throws(
+    () => config.getHost('sbx-test', 8080, 'agentbox.app'),
+    /Invalid sandbox URL/
+  )
+})
+
 test('debug false in args overrides AGENTBOX_DEBUG env var', () => {
   process.env.AGENTBOX_DEBUG = 'true'
 

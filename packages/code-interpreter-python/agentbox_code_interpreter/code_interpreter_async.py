@@ -61,12 +61,11 @@ class AsyncSandbox(BaseAsyncSandbox):
 
     @property
     def _jupyter_url(self) -> str:
-        # Honors the `sandbox_url` option and the `AGENTBOX_SANDBOX_URL` environment
-        # variable, same as the base SDK does for envd requests.
-        sandbox_url = cast(Optional[str], self.connection_config._sandbox_url)
-        if sandbox_url:
-            return sandbox_url
-        return f"{'http' if self.connection_config.debug else 'https'}://{self.get_host(JUPYTER_PORT)}"
+        return self.connection_config.get_sandbox_direct_url(
+            self.sandbox_id,
+            self.sandbox_domain,
+            JUPYTER_PORT,
+        )
 
     @property
     def _client(self) -> AsyncClient:

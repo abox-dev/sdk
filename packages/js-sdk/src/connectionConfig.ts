@@ -1,6 +1,7 @@
 import { Logger } from './logs'
 import { getEnvVar, version } from './api/metadata'
 import { runtime } from './utils'
+import { InvalidArgumentError } from './errors'
 
 const supportedDomains = ['agentbox-runtime.ru']
 
@@ -490,7 +491,8 @@ export class ConnectionConfig {
     opts: { sandboxDomain: string; envdPort: number }
   ) {
     if (this.sandboxUrl) {
-      return this.sandboxUrl
+      const proxyUrl = this.parseSandboxUrl()
+      return `${proxyUrl.protocol}//${this.getHost(sandboxId, opts.envdPort, opts.sandboxDomain)}`
     }
 
     if (this.debug) {
@@ -501,11 +503,37 @@ export class ConnectionConfig {
   }
 
   getHost(sandboxId: string, port: number, sandboxDomain: string) {
+    if (this.sandboxUrl) {
+      const proxyUrl = this.parseSandboxUrl()
+      const proxyPort = proxyUrl.port ? `:${proxyUrl.port}` : ''
+      return `${port}-${sandboxId}.${proxyUrl.hostname}${proxyPort}`
+    }
+
     if (this.debug) {
       return `localhost:${port}`
     }
 
     return `${port}-${sandboxId}.${sandboxDomain ?? this.domain}`
+  }
+
+  private parseSandboxUrl(): URL {
+    const value = this.sandboxUrl
+    if (!value) {
+      throw new InvalidArgumentError('Sandbox URL is not configured')
+    }
+
+    let parsed: URL
+    try {
+      parsed = new URL(value)
+    } catch {
+      throw new InvalidArgumentError(`Invalid sandbox URL: ${value}`)
+    }
+
+    if (!['http:', 'https:'].includes(parsed.protocol) || !parsed.hostname) {
+      throw new InvalidArgumentError(`Invalid sandbox URL: ${value}`)
+    }
+
+    return parsed
   }
 }
 

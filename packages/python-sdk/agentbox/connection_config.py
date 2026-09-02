@@ -1,5 +1,6 @@
 import logging
 import os
+from urllib.parse import SplitResult, urlsplit
 
 from typing import cast, Mapping, Optional, Dict, TypedDict, Union
 
@@ -269,14 +270,19 @@ class ConnectionConfig:
 
         return f"https://{self.get_host(sandbox_id, sandbox_domain, self.envd_port)}"
 
-    def get_sandbox_direct_url(self, sandbox_id: str, sandbox_domain: str) -> str:
+    def get_sandbox_direct_url(
+        self, sandbox_id: str, sandbox_domain: str, port: Optional[int] = None
+    ) -> str:
+        port = port if port is not None else self.envd_port
+
         if self._sandbox_url:
-            return self._sandbox_url  # type: ignore[return-value]
+            proxy_url = self._parse_sandbox_url()
+            return f"{proxy_url.scheme}://{self.get_host(sandbox_id, sandbox_domain, port)}"
 
         if self.debug:
-            return f"http://{self.get_host(sandbox_id, sandbox_domain, self.envd_port)}"
+            return f"http://{self.get_host(sandbox_id, sandbox_domain, port)}"
 
-        return f"https://{self.get_host(sandbox_id, sandbox_domain, self.envd_port)}"
+        return f"https://{self.get_host(sandbox_id, sandbox_domain, port)}"
 
     def get_host(self, sandbox_id: str, sandbox_domain: str, port: int) -> str:
         """
@@ -289,10 +295,26 @@ class ConnectionConfig:
 
         :return: Host address to connect to
         """
+        if self._sandbox_url:
+            proxy_url = self._parse_sandbox_url()
+            proxy_port = f":{proxy_url.port}" if proxy_url.port else ""
+            return f"{port}-{sandbox_id}.{proxy_url.hostname}{proxy_port}"
+
         if self.debug:
             return f"localhost:{port}"
 
         return f"{port}-{sandbox_id}.{sandbox_domain}"
+
+    def _parse_sandbox_url(self) -> SplitResult:
+        value = self._sandbox_url
+        if value is None:
+            raise ValueError("Sandbox URL is not configured")
+
+        parsed = urlsplit(value)
+        if parsed.scheme not in {"http", "https"} or not parsed.hostname:
+            raise ValueError(f"Invalid sandbox URL: {value}")
+
+        return parsed
 
     def get_api_params(
         self,
