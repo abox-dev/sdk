@@ -1,6 +1,6 @@
-import { afterEach, beforeEach, expect, test } from 'vitest'
+import { afterEach, beforeEach, expect, expectTypeOf, test } from 'vitest'
 
-import { Sandbox } from '../src'
+import { Sandbox, type RunCodeLanguage } from '../src'
 
 // Constructing a sandbox instance makes no network requests, so URL
 // resolution can be tested without a live sandbox.
@@ -51,4 +51,15 @@ test('jupyterUrl routes through the AGENTBOX_SANDBOX_URL proxy', () => {
   expect(sandbox.jupyterUrl).toBe(
     'https://49999-test-sandbox-id.env.example.com'
   )
+})
+
+test('uses the template provisioned by the AgentBox runtime by default', () => {
+  const sandboxClass = Sandbox as unknown as { defaultTemplate: string }
+  expect(sandboxClass.defaultTemplate).toBe('code-interpreter')
+})
+
+test('publishes only languages supported by the AgentBox runtime', () => {
+  expectTypeOf<RunCodeLanguage>().toEqualTypeOf<
+    'python' | 'javascript' | 'typescript' | 'js' | 'ts'
+  >()
 })

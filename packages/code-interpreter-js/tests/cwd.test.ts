@@ -26,24 +26,3 @@ sandboxTest.skipIf(isDebug)('cwd typescript', async ({ sandbox }) => {
   })
   expect(result.text).toEqual('/home/user')
 })
-
-sandboxTest.skipIf(isDebug)('cwd r', async ({ sandbox }) => {
-  const result = await sandbox.runCode('getwd()', {
-    language: 'r',
-  })
-  expect(result.results[0]?.text.trim()).toEqual('[1] "/home/user"')
-})
-
-sandboxTest.skipIf(isDebug)('cwd java', async ({ sandbox }) => {
-  const result = await sandbox.runCode('System.getProperty("user.dir")', {
-    language: 'java',
-  })
-  expect(result.results[0]?.text.trim()).toEqual('/home/user')
-})
-
-sandboxTest.skipIf(isDebug)('cwd bash', async ({ sandbox }) => {
-  const result = await sandbox.runCode('pwd', {
-    language: 'bash',
-  })
-  expect(result.logs.stdout.join().trim()).toEqual('/home/user')
-})

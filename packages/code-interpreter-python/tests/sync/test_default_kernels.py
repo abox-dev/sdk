@@ -8,18 +8,6 @@ def test_js_kernel(sandbox: Sandbox):
     assert execution.logs.stdout == ["Hello, World!\n"]
 
 
-@pytest.mark.skip_debug()
-def test_r_kernel(sandbox: Sandbox):
-    execution = sandbox.run_code('print("Hello, World!")', language="r")
-    assert execution.logs.stdout == ['[1] "Hello, World!"\n']
-
-
-@pytest.mark.skip_debug()
-def test_java_kernel(sandbox: Sandbox):
-    execution = sandbox.run_code('System.out.println("Hello, World!")', language="java")
-    assert execution.logs.stdout[0] == "Hello, World!"
-
-
 def test_js_esm_imports(sandbox: Sandbox):
     execution = sandbox.run_code(
         """

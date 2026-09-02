@@ -177,7 +177,7 @@ class AsyncSandbox(BaseAsyncSandbox):
     async def run_code(
         self,
         code: str,
-        language: Optional[str] = None,
+        language: Optional[RunCodeLanguage] = None,
         context: Optional[Context] = None,
         on_stdout: Optional[OutputHandlerWithAsync[OutputMessage]] = None,
         on_stderr: Optional[OutputHandlerWithAsync[OutputMessage]] = None,

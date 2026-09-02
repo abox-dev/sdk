@@ -38,7 +38,6 @@ export type Context = {
   cwd: string
 }
 
-/* eslint-disable @typescript-eslint/ban-types */
 /**
  * Supported language for code execution.
  */
@@ -46,11 +45,8 @@ export type RunCodeLanguage =
   | 'python'
   | 'javascript'
   | 'typescript'
-  | 'r'
-  | 'java'
-  | 'bash'
-  | (string & {})
-/* eslint-enable @typescript-eslint/ban-types */
+  | 'js'
+  | 'ts'
 
 /**
  * Options for running code.
@@ -139,7 +135,7 @@ export interface CreateCodeContextOpts {
  */
 export class Sandbox extends BaseSandbox {
   protected static override readonly defaultTemplate: string =
-    'code-interpreter-v1'
+    'code-interpreter'
 
   protected get jupyterUrl(): string {
     return this.connectionConfig.getSandboxDirectUrl(this.sandboxId, {
@@ -196,7 +192,7 @@ export class Sandbox extends BaseSandbox {
   async runCode(
     code: string,
     opts?: RunCodeOpts & {
-      language?: string
+      language?: RunCodeLanguage
       context?: Context
     }
   ): Promise<Execution> {
