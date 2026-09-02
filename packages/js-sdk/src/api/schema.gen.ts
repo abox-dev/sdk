@@ -1741,10 +1741,6 @@ export interface components {
             /** @description The maximum value of the requested metric in the given interval */
             value: number;
         };
-        /** @description MCP configuration for the sandbox */
-        Mcp: {
-            [key: string]: unknown;
-        } | null;
         /**
          * Format: int32
          * @description Memory for the sandbox in MiB
@@ -1766,7 +1762,6 @@ export interface components {
             autoResume?: components["schemas"]["SandboxAutoResumeConfig"];
             envVars?: components["schemas"]["EnvVars"];
             iam?: components["schemas"]["SandboxIam"];
-            mcp?: components["schemas"]["Mcp"];
             metadata?: components["schemas"]["SandboxMetadata"];
             network?: components["schemas"]["SandboxNetworkConfig"];
             /** @description Secure all system communication with sandbox */

@@ -104,12 +104,6 @@ Schema: `NewSandbox`
 
   Environment variables for the sandbox
 
-- **`mcp`** · `Mcp | null` · optional
-
-  MCP configuration for the sandbox
-
-- **`mcp.*`** · `any` · additional property
-
 - **`iam`** · `SandboxIam` · optional
 
   Sandbox workload identity configuration. A non-empty, valid tokens map enables workload identity for the sandbox.

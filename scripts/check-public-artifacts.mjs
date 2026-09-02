@@ -16,6 +16,7 @@ const forbidden = [
   /\be2b\.(?:dev|app|com)\b/,
   /\b(?:E2B|e2b)_(?:API|DOMAIN|SANDBOX|PROJECT|DEBUG)/,
   /\b(?:class|interface|type|export|import)\s+(?:E2B|Desktop|Volume|Secret)\b/,
+  /\b(?:mcp-gateway|addMcpServer|getMcpUrl|McpServer|add_mcp_server|get_mcp_url|get_mcp_token)\b/,
 ]
 const textExtensions = new Set([
   '.cjs',

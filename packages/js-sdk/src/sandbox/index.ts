@@ -11,7 +11,6 @@ import { EnvdApiClient, handleEnvdApiError } from '../envd/api'
 import { createEnvdFetch, createEnvdRpcFetch } from '../envd/http2'
 import { createRpcLogger } from '../logs'
 import { Commands, Pty } from './commands'
-import { CommandExitError } from './commands/commandHandle'
 import { Filesystem } from './filesystem'
 import {
   SandboxOpts,
@@ -30,9 +29,8 @@ import {
 } from './sandboxApi'
 import { getSignature } from './signature'
 import { compareVersions } from 'compare-versions'
-import { InvalidArgumentError, SandboxError, TemplateError } from '../errors'
+import { InvalidArgumentError, TemplateError } from '../errors'
 import { ENVD_DEBUG_FALLBACK, ENVD_DEFAULT_USER } from '../envd/versions'
-import { shellQuote } from '../utils'
 
 /**
  * Options for sandbox upload/download URL generation.
@@ -73,7 +71,6 @@ export interface SandboxUrlOpts {
  */
 export class Sandbox extends SandboxApi {
   protected static readonly defaultTemplate: string = 'base'
-  protected static readonly defaultMcpTemplate: string = 'mcp-gateway'
   protected static readonly defaultSandboxTimeoutMs = DEFAULT_SANDBOX_TIMEOUT_MS
 
   /**
@@ -104,14 +101,11 @@ export class Sandbox extends SandboxApi {
   readonly trafficAccessToken?: string
 
   protected readonly envdPort = 49983
-  protected readonly mcpPort = 50005
-
   protected readonly connectionConfig: ConnectionConfig
   protected readonly envdAccessToken?: string
   private readonly envdApiUrl: string
   private readonly envdDirectUrl: string
   private readonly envdApi: EnvdApiClient
-  private mcpToken?: string
 
   /**
    * Use {@link Sandbox.create} to create a new Sandbox instead.
@@ -290,11 +284,7 @@ export class Sandbox extends SandboxApi {
             sandboxOpts: opts,
           }
         : {
-            template:
-              templateOrOpts?.template ??
-              (templateOrOpts?.mcp
-                ? this.defaultMcpTemplate
-                : this.defaultTemplate),
+            template: templateOrOpts?.template ?? this.defaultTemplate,
             sandboxOpts: templateOrOpts,
           }
 
@@ -315,27 +305,6 @@ export class Sandbox extends SandboxApi {
     )
 
     const sandbox = new this({ ...sandboxInfo, ...config }) as InstanceType<S>
-
-    if (sandboxOpts?.mcp) {
-      sandbox.mcpToken = crypto.randomUUID()
-      try {
-        await sandbox.commands.run(
-          `mcp-gateway --config ${shellQuote(JSON.stringify(sandboxOpts.mcp))}`,
-          {
-            user: 'root',
-            envs: {
-              GATEWAY_ACCESS_TOKEN: sandbox.mcpToken ?? '',
-            },
-          }
-        )
-      } catch (error) {
-        await sandbox.kill().catch(() => undefined)
-        if (error instanceof CommandExitError) {
-          throw new SandboxError(`Failed to start MCP gateway: ${error.stderr}`)
-        }
-        throw error
-      }
-    }
 
     return sandbox
   }
@@ -697,31 +666,6 @@ export class Sandbox extends SandboxApi {
       ...this.resolveApiOpts(opts),
       sandboxId: this.sandboxId,
     })
-  }
-
-  /**
-   *
-   * Get the MCP URL for the sandbox.
-   *
-   * @returns MCP URL for the sandbox.
-   */
-  getMcpUrl(): string {
-    return `https://${this.getHost(this.mcpPort)}/mcp`
-  }
-
-  /**
-   * Get the MCP token for the sandbox.
-   *
-   * @returns MCP token for the sandbox, or undefined if MCP is not enabled.
-   */
-  async getMcpToken(): Promise<string | undefined> {
-    if (!this.mcpToken) {
-      this.mcpToken = await this.files.read('/etc/mcp-gateway/.token', {
-        user: 'root',
-      })
-    }
-
-    return this.mcpToken
   }
 
   /**

@@ -40,7 +40,6 @@ const failureMap: Record<string, number | undefined> = {
   aptInstall: 1,
   gitClone: 1,
   setStartCmd: 1,
-  addMcpServer: undefined,
   betaDevContainerPrebuild: 1,
   betaSetDevContainerStart: 1,
 }
@@ -406,13 +405,6 @@ buildTemplateTest('traces on setStartCmd', async ({ buildTemplate }) => {
   await expectToThrowAndCheckTrace(async () => {
     await buildTemplate(template, { name: 'setStartCmd' })
   }, 'setStartCmd')
-})
-
-buildTemplateTest('traces on addMcpServer', async () => {
-  // needs mcp-gateway as base template, without it no mcp servers can be added
-  await expectToThrowAndCheckTrace(async () => {
-    Template().fromBaseImage().skipCache().addMcpServer('exa')
-  }, 'addMcpServer')
 })
 
 buildTemplateTest(

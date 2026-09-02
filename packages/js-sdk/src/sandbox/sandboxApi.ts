@@ -16,31 +16,6 @@ import {
 } from '../errors'
 import { Paginator } from '../paginator'
 import { timeoutToSeconds } from '../utils'
-import type { McpServer as BaseMcpServer } from './mcp'
-
-/**
- * Extended MCP server configuration that includes base servers
- * and allows dynamic GitHub-based MCP servers with custom run and install commands.
- */
-export type McpServer = BaseMcpServer | GitHubMcpServer
-
-export type GitHubMcpServer = {
-  [key: `github/${string}`]: {
-    /**
-     * Command to run the MCP server. Must start a stdio-compatible server.
-     */
-    runCmd: string
-    /**
-     * Command to install dependencies for the MCP server. Working directory is the root of the github repository.
-     */
-    installCmd?: string
-    /**
-     * Environment variables to set in the MCP process.
-     */
-    envs?: Record<string, string>
-  }
-}
-
 /**
  * Transform applied to egress requests matching a {@link SandboxNetworkRule}.
  */
@@ -454,7 +429,7 @@ export interface SandboxOpts extends ConnectionOpts {
   /**
    * Sandbox template name or ID.
    *
-   * @default 'base' (or 'mcp-gateway' when `mcp` option is set)
+   * @default 'base'
    */
   template?: string
 
@@ -496,12 +471,6 @@ export interface SandboxOpts extends ConnectionOpts {
    * @default true
    */
   allowInternetAccess?: boolean
-
-  /**
-   * MCP server to enable in the sandbox
-   * @default undefined
-   */
-  mcp?: McpServer
 
   /**
    * Sandbox network configuration
@@ -1431,7 +1400,6 @@ export class SandboxApi extends ClientFactory {
     const body: components['schemas']['NewSandbox'] = {
       templateID: template,
       metadata: opts?.metadata,
-      mcp: opts?.mcp as Record<string, unknown> | undefined,
       envVars: opts?.envs,
       timeout: timeoutToSeconds(timeoutMs),
       secure: opts?.secure ?? true,

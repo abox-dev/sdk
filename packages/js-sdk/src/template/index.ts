@@ -32,7 +32,6 @@ import {
   GetBuildStatusOptions,
   Instruction,
   InstructionType,
-  McpServerName,
   RegistryConfig,
   TemplateBuilder,
   TemplateBuildStatusResponse,
@@ -776,20 +775,6 @@ export class TemplateBase
     )
   }
 
-  addMcpServer(servers: McpServerName | McpServerName[]): TemplateBuilder {
-    if (this.baseTemplate !== 'mcp-gateway') {
-      throw new BuildError(
-        'MCP servers can only be added to mcp-gateway template',
-        getCallerFrame()
-      )
-    }
-
-    const serverList = Array.isArray(servers) ? servers : [servers]
-    return this.runCmd(`mcp-gateway pull ${serverList.join(' ')}`, {
-      user: 'root',
-    })
-  }
-
   gitClone(
     url: string,
     path?: PathLike,
@@ -1219,7 +1204,6 @@ export type {
   BuildStatusReason,
   CopyItem,
   GetBuildStatusOptions,
-  McpServerName,
   TemplateBuilder,
   TemplateBuildStatus,
   TemplateBuildStatusResponse,

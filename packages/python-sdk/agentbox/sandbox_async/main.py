@@ -1,9 +1,5 @@
-import asyncio
 import datetime
-import json
 import logging
-import shlex
-import uuid
 from typing import Dict, List, Optional, Union, overload
 
 import httpx
@@ -15,15 +11,9 @@ from agentbox.api.client_async import get_envd_api
 from agentbox.connection_config import ApiParams, ConnectionConfig
 from agentbox.envd.api import ENVD_API_HEALTH_ROUTE, ahandle_envd_api_exception
 from agentbox.envd.versions import ENVD_DEBUG_FALLBACK
-from agentbox.exceptions import (
-    SandboxException,
-    TemplateException,
-    format_request_timeout_error,
-)
-from agentbox.sandbox.commands.command_handle import CommandExitException
+from agentbox.exceptions import TemplateException, format_request_timeout_error
 from agentbox.sandbox.main import SandboxOpts
 from agentbox.sandbox.sandbox_api import (
-    McpServer,
     SandboxIamOpts,
     SandboxLifecycle,
     SandboxMetrics,
@@ -161,7 +151,6 @@ class AsyncSandbox(SandboxApi):
         envs: Optional[Dict[str, str]] = None,
         secure: bool = True,
         allow_internet_access: bool = True,
-        mcp: Optional[McpServer] = None,
         network: Optional[SandboxNetworkOpts] = None,
         iam: Optional[SandboxIamOpts] = None,
         lifecycle: Optional[SandboxLifecycle] = None,
@@ -179,7 +168,6 @@ class AsyncSandbox(SandboxApi):
         :param envs: Custom environment variables for the sandbox
         :param secure: Envd is secured with access token and cannot be used without it, defaults to `True`.
         :param allow_internet_access: Allow sandbox to access the internet, defaults to `True`. If set to `False`, it works the same as setting network `deny_out` to `[0.0.0.0/0]`.
-        :param mcp: MCP server to enable in the sandbox
         :param network: Sandbox network configuration. ``allow_out``/``deny_out`` may also be a callable receiving a :class:`SandboxNetworkSelectorContext` (``ctx.all_traffic``, ``ctx.rules``) and returning a list of strings. Per-host transform rules are nested under ``network.rules``; a rule's ``transform`` may be a callable receiving a :class:`SandboxNetworkTransformContext` of placeholder strings (``ctx.iam.tokens[name]``).
         :param iam: Sandbox workload identity configuration. Each token contains ``audience`` and ``token_type``. Registered tokens are exposed to ``network.rules`` ``transform`` callables as ``ctx.iam.tokens[name]`` placeholders, which the egress proxy resolves per request
         :param lifecycle: Sandbox lifecycle configuration — ``on_timeout``: ``"kill"`` or ``"pause"`` (omitted from the request when unset, leaving the API's default, currently ``"kill"``, in effect), or an object ``{"action": "pause"|"kill", "keep_memory": bool}`` where ``keep_memory`` set to ``False`` makes a timeout auto-pause filesystem-only (cold-boots on resume; cannot be combined with ``auto_resume``); an omitted ``keep_memory`` leaves the snapshot kind to the API; ``auto_resume``: leave unset to let the API pick the behavior, set ``False`` to opt out explicitly, or ``True`` (only when ``on_timeout`` action is ``"pause"``). Example: ``{"on_timeout": {"action": "pause", "keep_memory": False}}``
@@ -189,9 +177,7 @@ class AsyncSandbox(SandboxApi):
 
         Use this method instead of using the constructor to create a new sandbox.
         """
-        if not template and mcp is not None:
-            template = cls.default_mcp_template
-        elif not template:
+        if not template:
             template = cls.default_template
 
         sandbox = await cls._create(
@@ -201,36 +187,12 @@ class AsyncSandbox(SandboxApi):
             envs=envs,
             secure=secure,
             allow_internet_access=allow_internet_access,
-            mcp=mcp,
             network=network,
             iam=iam,
             lifecycle=lifecycle,
             logger=logger,
             **opts,
         )
-
-        if mcp is not None:
-            token = str(uuid.uuid4())
-            sandbox._mcp_token = token
-
-            try:
-                await sandbox.commands.run(
-                    f"mcp-gateway --config {shlex.quote(json.dumps(mcp))}",
-                    user="root",
-                    envs={"GATEWAY_ACCESS_TOKEN": token},
-                )
-            except BaseException as e:
-                try:
-                    await sandbox.kill()
-                except asyncio.CancelledError:
-                    raise
-                except Exception:
-                    pass
-                if isinstance(e, CommandExitException):
-                    raise SandboxException(
-                        f"Failed to start MCP gateway: {e.stderr}"
-                    ) from e
-                raise
 
         return sandbox
 
@@ -936,18 +898,6 @@ class AsyncSandbox(SandboxApi):
             **opts,
         )
 
-    async def get_mcp_token(self) -> Optional[str]:
-        """
-        Get the MCP token for the sandbox.
-
-        :return: MCP token for the sandbox, or None if MCP is not enabled.
-        """
-        if not self._mcp_token:
-            self._mcp_token = await self.files.read(
-                "/etc/mcp-gateway/.token", user="root"
-            )
-        return self._mcp_token
-
     @classmethod
     async def _cls_connect_sandbox(
         cls,
@@ -1064,7 +1014,6 @@ class AsyncSandbox(SandboxApi):
         envs: Optional[Dict[str, str]],
         secure: bool,
         allow_internet_access: bool,
-        mcp: Optional[McpServer] = None,
         network: Optional[SandboxNetworkOpts] = None,
         iam: Optional[SandboxIamOpts] = None,
         lifecycle: Optional[SandboxLifecycle] = None,
@@ -1089,7 +1038,6 @@ class AsyncSandbox(SandboxApi):
                 env_vars=envs,
                 secure=secure,
                 allow_internet_access=allow_internet_access,
-                mcp=mcp,
                 network=network,
                 iam=iam,
                 lifecycle=lifecycle,

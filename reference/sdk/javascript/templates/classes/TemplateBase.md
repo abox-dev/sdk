@@ -38,42 +38,6 @@ Exposed as [Template](../variables/Template.md), which can be called as a factor
 
 ## Methods
 
-### addMcpServer()
-
-> **addMcpServer**(`servers`): [`TemplateBuilder`](../interfaces/TemplateBuilder.md)
-
-Install MCP servers using mcp-gateway.
-Note: Requires a base image with mcp-gateway pre-installed (e.g., mcp-gateway).
-
-#### Parameters
-
-##### servers
-
-keyof McpServer \| keyof McpServer[]
-
-MCP server name(s)
-
-#### Returns
-
-[`TemplateBuilder`](../interfaces/TemplateBuilder.md)
-
-#### Throws
-
-If the base template is not mcp-gateway
-
-#### Example
-
-```ts
-template.addMcpServer('exa')
-template.addMcpServer(['brave', 'firecrawl', 'duckduckgo'])
-```
-
-#### Implementation of
-
-[`TemplateBuilder`](../interfaces/TemplateBuilder.md).[`addMcpServer`](../interfaces/TemplateBuilder.md#addmcpserver)
-
-***
-
 ### aptInstall()
 
 > **aptInstall**(`packages`, `options?`): [`TemplateBuilder`](../interfaces/TemplateBuilder.md)

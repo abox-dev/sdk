@@ -2,7 +2,6 @@ export { AgentBox, Sandbox } from '../../packages/js-sdk/src/index'
 export type {
   AgentBoxClientOpts,
   CreateSnapshotOpts,
-  McpServer,
   SandboxApiOpts,
   SandboxConnectOpts,
   SandboxForkOpts,

@@ -5,7 +5,6 @@ export type {
   BuildStatusReason,
   CopyItem,
   GetBuildStatusOptions,
-  McpServerName,
   TemplateBuilder,
   TemplateBuildStatus,
   TemplateBuildStatusResponse,

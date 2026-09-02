@@ -1,6 +1,6 @@
 import datetime
 import logging
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Dict, List, Optional, Union
 
 from packaging.version import Version
 from typing_extensions import Unpack
@@ -45,7 +45,6 @@ from agentbox.exceptions import (
 from agentbox.sandbox.main import SandboxBase
 from agentbox.sandbox.sandbox_api import (
     build_network_update_body,
-    McpServer,
     SandboxIamOpts,
     SandboxInfo,
     SandboxLifecycle,
@@ -206,7 +205,6 @@ class SandboxApi(SandboxBase):
         metadata: Optional[Dict[str, str]],
         env_vars: Optional[Dict[str, str]],
         secure: bool,
-        mcp: Optional[McpServer] = None,
         network: Optional[SandboxNetworkOpts] = None,
         iam: Optional[SandboxIamOpts] = None,
         lifecycle: Optional[SandboxLifecycle] = None,
@@ -230,7 +228,6 @@ class SandboxApi(SandboxBase):
             metadata=metadata or {},
             timeout=timeout,
             env_vars=env_vars or {},
-            mcp=cast(Any, mcp) or UNSET,
             secure=secure,
             allow_internet_access=allow_internet_access,
             network=SandboxNetworkConfig(**network_body) if network_body else UNSET,

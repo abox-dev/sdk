@@ -25,12 +25,9 @@ class SandboxOpts(TypedDict):
 
 
 class SandboxBase(ClientFactory):
-    mcp_port = 50005
-
     default_sandbox_timeout = 300
 
     default_template = "base"
-    default_mcp_template = "mcp-gateway"
 
     def __init__(
         self,
@@ -53,20 +50,11 @@ class SandboxBase(ClientFactory):
         self.__envd_direct_url = self.connection_config.get_sandbox_direct_url(
             self.sandbox_id, self.sandbox_domain
         )
-        self.__mcp_token: Optional[str] = None
 
     @property
     def _envd_access_token(self) -> Optional[str]:
         """Private property to access the envd token"""
         return self.__envd_access_token
-
-    @property
-    def _mcp_token(self) -> Optional[str]:
-        return self.__mcp_token
-
-    @_mcp_token.setter
-    def _mcp_token(self, token: str) -> None:
-        self.__mcp_token = token
 
     @property
     def connection_config(self) -> ConnectionConfig:
@@ -222,11 +210,3 @@ class SandboxBase(ClientFactory):
         return self.connection_config.get_host(
             self.sandbox_id, self.sandbox_domain, port
         )
-
-    def get_mcp_url(self) -> str:
-        """
-        Get the MCP URL for the sandbox.
-
-        :returns MCP URL for the sandbox.
-        """
-        return f"https://{self.get_host(self.mcp_port)}/mcp"

@@ -529,8 +529,7 @@ def main() -> None:
 
     create_sandbox = (REFERENCE / "openapi/markdown/createSandbox.md").read_text()
     assert "Schema: `NewSandbox`" in create_sandbox
-    assert "- **`mcp.*`** · `any` · additional property" in create_sandbox
-    assert "- **`mcp.*`** · `object` · additional property" not in create_sandbox
+    assert "**`mcp`**" not in create_sandbox
     for field in (
         "autoResume.enabled",
         "network.allowPublicTraffic",

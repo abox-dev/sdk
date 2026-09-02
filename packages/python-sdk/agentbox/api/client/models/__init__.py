@@ -24,7 +24,6 @@ from .logs_direction import LogsDirection
 from .logs_source import LogsSource
 from .machine_info import MachineInfo
 from .max_team_metric import MaxTeamMetric
-from .mcp_type_0 import McpType0
 from .new_sandbox import NewSandbox
 from .new_team_api_key import NewTeamAPIKey
 from .node import Node
@@ -111,7 +110,6 @@ __all__ = (
     "LogsSource",
     "MachineInfo",
     "MaxTeamMetric",
-    "McpType0",
     "NewSandbox",
     "NewTeamAPIKey",
     "Node",

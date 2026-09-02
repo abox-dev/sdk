@@ -61,41 +61,12 @@ from agentbox.api.client.models import (
 from agentbox.api.client.types import UNSET, Unset
 from agentbox.connection_config import ApiParams
 from agentbox.exceptions import InvalidArgumentException
-from agentbox.sandbox.mcp import McpServer as BaseMcpServer
 from agentbox.sandbox.iam import (
     IamTokenPlaceholders,
     validate_iam_token_name,
 )
 from agentbox.sandbox.network import ALL_TRAFFIC
 from agentbox.paginator import PaginatorBase
-
-
-class GitHubMcpServerConfig(TypedDict):
-    """
-    Configuration for a GitHub-based MCP server.
-    """
-
-    run_cmd: str
-    """
-    Command to run the MCP server. Must start a stdio-compatible server.
-    """
-    install_cmd: NotRequired[str]
-    """
-    Command to install dependencies for the MCP server. Working directory is the root of the github repository.
-    """
-    envs: NotRequired[Dict[str, str]]
-    """
-    Environment variables to set in the MCP process.
-    """
-
-
-# Extended MCP server configuration that includes base servers
-# and allows dynamic GitHub-based MCP servers with custom run and install commands.
-# For GitHub servers, use keys in the format "github/owner/repo"
-GitHubMcpServer = Dict[str, Union[GitHubMcpServerConfig, Any]]
-
-# Union type that combines base MCP servers with GitHub-based servers
-McpServer = Union[BaseMcpServer, GitHubMcpServer]
 
 
 class SandboxNetworkTransform(TypedDict):

@@ -135,20 +135,6 @@ Logger to use for logging messages. It can accept any object that implements `Lo
 
 ***
 
-### mcp?
-
-> `optional` **mcp?**: `McpServer`
-
-MCP server to enable in the sandbox
-
-#### Default
-
-```ts
-undefined
-```
-
-***
-
 ### metadata?
 
 > `optional` **metadata?**: `Record`\<`string`, `string`\>
@@ -256,7 +242,9 @@ Sandbox template name or ID.
 
 #### Default
 
-'base' (or 'mcp-gateway' when `mcp` option is set)
+```ts
+'base'
+```
 
 ***
 

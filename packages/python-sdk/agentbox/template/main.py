@@ -486,34 +486,6 @@ class TemplateBuilder:
             user="root",
         )
 
-    def add_mcp_server(self, servers: Union[str, List[str]]) -> "TemplateBuilder":
-        """
-        Install MCP servers using mcp-gateway.
-
-        Note: Requires a base image with mcp-gateway pre-installed (e.g., mcp-gateway).
-
-        :param servers: MCP server name(s)
-
-        :return: `TemplateBuilder` class
-
-        Example
-        ```python
-        template.add_mcp_server('exa')
-        template.add_mcp_server(['brave', 'firecrawl', 'duckduckgo'])
-        ```
-        """
-        if self._template._base_template != "mcp-gateway":
-            caller_frame = get_caller_frame()
-            stack_trace = make_traceback(caller_frame)
-            raise BuildException(
-                "MCP servers can only be added to mcp-gateway template"
-            ).with_traceback(stack_trace)
-
-        if isinstance(servers, str):
-            servers = [servers]
-
-        return self.run_cmd(f"mcp-gateway pull {' '.join(servers)}", user="root")
-
     def git_clone(
         self,
         url: str,

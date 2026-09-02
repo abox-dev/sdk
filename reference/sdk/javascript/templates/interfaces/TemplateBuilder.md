@@ -7,38 +7,6 @@ Provides methods for customizing the template environment.
 
 ## Methods
 
-### addMcpServer()
-
-> **addMcpServer**(`servers`): `TemplateBuilder`
-
-Install MCP servers using mcp-gateway.
-Note: Requires a base image with mcp-gateway pre-installed (e.g., mcp-gateway).
-
-#### Parameters
-
-##### servers
-
-keyof McpServer \| keyof McpServer[]
-
-MCP server name(s)
-
-#### Returns
-
-`TemplateBuilder`
-
-#### Throws
-
-If the base template is not mcp-gateway
-
-#### Example
-
-```ts
-template.addMcpServer('exa')
-template.addMcpServer(['brave', 'firecrawl', 'duckduckgo'])
-```
-
-***
-
 ### aptInstall()
 
 > **aptInstall**(`packages`, `options?`): `TemplateBuilder`

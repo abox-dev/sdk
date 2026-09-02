@@ -17,7 +17,7 @@ generate-envd:
 
 	ruff format .
 
-generate: generate-api generate-envd generate-mcp
+generate: generate-api generate-envd
 
 typecheck:
 	ty check
@@ -28,18 +28,6 @@ lint:
 
 format:
 	ruff format .
-
-generate-mcp:
-	datamodel-codegen \
-			--input ../../spec/mcp-server.json \
-			--input-file-type jsonschema \
-			--output agentbox/sandbox/mcp.py \
-			--output-model-type typing.TypedDict \
-			--target-python-version 3.10 \
-			--class-name McpServer \
-			--use-field-description \
-			--disable-timestamp \
-			--extra-fields forbid
 
 .PHONY: test
 test:
