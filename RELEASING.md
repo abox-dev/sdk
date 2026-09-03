@@ -5,10 +5,12 @@ releasing the AgentBox SDK packages. The SDK repository owns package-level and
 end-to-end SDK tests. The mono repository owns backend HTTP/Connect regression
 tests and does not duplicate SDK test implementations.
 
-All five public packages use one version:
+All six public packages use one version:
 
 - npm: `@abox-dev/sdk`, `@abox-dev/code-interpreter`, `@abox-dev/cli`;
 - PyPI: `abox-sdk`, `abox-code-interpreter`.
+- Go: `github.com/abox-dev/sdk/packages/go-sdk` (including
+  `codeinterpreter`).
 
 ## 1. Prepare the change
 
@@ -38,9 +40,9 @@ uv lock --project packages/code-interpreter-python
 node scripts/check-release-versions.mjs vX.Y.Z
 ```
 
-`release:version` updates the five workspace manifests and both Python
-`pyproject.toml` files. Regenerate both Python lock files rather than editing
-them by hand. Do not release the JavaScript and Python packages at different
+`release:version` updates the five workspace manifests, both Python
+`pyproject.toml` files, and `packages/go-sdk/version.go`. Regenerate both Python lock files
+rather than editing them by hand. Do not release any SDK packages at different
 versions.
 
 ## 3. Verify source and release artifacts
@@ -55,6 +57,7 @@ pnpm format:check
 pnpm lint
 pnpm typecheck
 pnpm test
+make go-check
 make generate
 git diff --exit-code
 ./scripts/build-release.sh
@@ -77,9 +80,9 @@ published:
 ./scripts/test-release-runtime.sh
 ```
 
-The suite covers JavaScript, Python sync/async, Code Interpreter, CLI,
-private traffic, and a temporary template build. It owns and removes its test
-resources. A release must not be tagged if this suite fails.
+The suite covers JavaScript, Python sync/async, Go core and Code Interpreter,
+CLI, private traffic, and a temporary template build. It owns and removes its
+test resources. A release must not be tagged if this suite fails.
 
 ## 5. Merge and tag
 
@@ -91,17 +94,22 @@ commit:
 git switch main
 git pull --ff-only origin main
 node scripts/check-release-versions.mjs vX.Y.Z
+git tag -a packages/go-sdk/vX.Y.Z -m "AgentBox Go SDK vX.Y.Z"
 git tag -a vX.Y.Z -m "AgentBox SDK vX.Y.Z"
-git push origin vX.Y.Z
+git push --atomic origin packages/go-sdk/vX.Y.Z vX.Y.Z
 ```
 
-Do not move or reuse a published tag. If a release needs a correction, publish
-a new patch version.
+Do not move or reuse either published tag. If a release needs a correction,
+publish a new patch version.
 
 The tag workflow builds the artifacts once, verifies them, publishes npm via
 Trusted Publishing, publishes both PyPI projects via their GitHub environments,
-and creates a GitHub Release with checksums. An existing registry file is
-accepted only when its digest matches the newly built artifact.
+creates a GitHub Release with checksums, and asks the public Go proxy to index
+the tagged Go submodule. The `packages/go-sdk/vX.Y.Z` and `vX.Y.Z` tags must
+point to the same commit. Go has no separate registry account or archive: the
+immutable Git tag and Go checksum database are its published artifact. An
+existing registry file is accepted only when its digest matches the newly built
+artifact.
 
 ## 6. Verify the published packages
 
@@ -111,6 +119,14 @@ packages into clean environments and repeat the KVM suite:
 ```bash
 ./scripts/test-published-runtime.sh X.Y.Z
 ```
+
+Also verify a clean Go consumer with
+`GOPROXY=https://proxy.golang.org go get github.com/abox-dev/sdk/packages/go-sdk@vX.Y.Z`.
+
+Supported Go CI versions are 1.24.x, 1.25.x, 1.26.x, and 1.27.x. Builds and
+hermetic tests run on every row; race and coverage run on 1.27.x, while
+cross-builds run on 1.24.x and 1.27.x. Follow the Go-version maintenance
+checklist in `AGENTS.md`/`CLAUDE.md` whenever a new patch or minor is released.
 
 Verify the GitHub Release assets with its `SHA256SUMS`. Document public API
 changes in the AgentBox documentation repository. No SDK-version update is

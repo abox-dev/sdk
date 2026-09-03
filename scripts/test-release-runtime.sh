@@ -30,3 +30,12 @@ uv pip install --python "$test_dir/python/bin/python" \
   "$release_dir"/pypi-code-interpreter/*.whl >/dev/null
 "$test_dir/python/bin/python" "$root_dir/tests/runtime/core-python.py"
 "$test_dir/python/bin/python" "$root_dir/tests/runtime/code_interpreter_python.py"
+
+mkdir -p "$test_dir/go"
+cp "$root_dir/tests/runtime/go/main.go" "$test_dir/go/main.go"
+cd "$test_dir/go"
+go mod init example.com/agentbox-runtime-smoke >/dev/null
+go mod edit -replace github.com/abox-dev/sdk/packages/go-sdk="$root_dir/packages/go-sdk"
+go mod edit -require github.com/abox-dev/sdk/packages/go-sdk@v0.0.0
+go mod tidy
+go run -tags runtime .
