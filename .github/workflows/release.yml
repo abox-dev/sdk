@@ -26,10 +26,23 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.24.13'
+          cache: true
+          cache-dependency-path: packages/go-sdk/go.sum
       - run: pnpm install --frozen-lockfile
       - run: uv sync --project packages/python-sdk --frozen
       - run: uv sync --project packages/code-interpreter-python --frozen
       - run: node scripts/check-release-versions.mjs "${GITHUB_REF_NAME}"
+      - name: Verify matching Go module tag
+        run: |
+          go_tag="packages/go-sdk/${GITHUB_REF_NAME}"
+          go_commit=$(git ls-remote origin "refs/tags/${go_tag}^{}" | cut -f1)
+          test "$go_commit" = "$GITHUB_SHA"
+      - run: go test ./...
+        working-directory: packages/go-sdk
+      - run: make go-consumer-check
       - run: ./scripts/build-release.sh
       - run: node scripts/check-public-artifacts.mjs release
       - run: ./scripts/test-release-artifacts.sh
@@ -122,3 +135,17 @@ jobs:
             release/npm/*.tgz
             release/pypi/*
             release/pypi-code-interpreter/*
+
+  go-proxy-smoke:
+    needs: github-release
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.24.13'
+      - run: |
+          mkdir consumer
+          cd consumer
+          go mod init example.com/agentbox-release-smoke
+          GOPROXY=https://proxy.golang.org go get "github.com/abox-dev/sdk/packages/go-sdk@${GITHUB_REF_NAME}"
+          go test github.com/abox-dev/sdk/packages/go-sdk github.com/abox-dev/sdk/packages/go-sdk/codeinterpreter

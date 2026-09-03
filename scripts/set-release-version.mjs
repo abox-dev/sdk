@@ -33,6 +33,12 @@ for (const relative of pythonManifests) {
   if (!current) throw new Error(`Cannot find version in ${relative}`)
   currentVersions.add(current)
 }
+const goVersionFile = path.join(root, 'packages/go-sdk/version.go')
+const goVersionContent = fs.readFileSync(goVersionFile, 'utf8')
+const goVersion = goVersionContent.match(/^const Version = "([^"]+)"/m)?.[1]
+if (!goVersion)
+  throw new Error('Cannot find Version in packages/go-sdk/version.go')
+currentVersions.add(goVersion)
 if (currentVersions.size !== 1) {
   throw new Error(
     `Package versions are already inconsistent: ${[...currentVersions].join(', ')}`
@@ -53,5 +59,12 @@ for (const relative of pythonManifests) {
     content.replace(/^version\s*=\s*"[^"]+"/m, `version = "${version}"`)
   )
 }
+fs.writeFileSync(
+  goVersionFile,
+  goVersionContent.replace(
+    /^const Version = "[^"]+"/m,
+    `const Version = "${version}"`
+  )
+)
 
 process.stdout.write(`Updated all AgentBox SDK packages to ${version}\n`)

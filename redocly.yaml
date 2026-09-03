@@ -40,6 +40,17 @@ apis:
       filter-out:
         property: x-not-implemented
         value: [true]
+  go-sdk:
+    root: spec/openapi.yml
+    decorators:
+      filter-in:
+        property: tags
+        value: [sandboxes, snapshots, templates, tags]
+        matchStrategy: any
+        applyTo: Operation
+      filter-out:
+        property: x-not-implemented
+        value: [true]
   envd:
     root: spec/envd/envd.yaml
     decorators:

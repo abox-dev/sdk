@@ -42,3 +42,12 @@ uv pip show --python "$test_dir/python/bin/python" \
 "$test_dir/python/bin/python" "$root_dir/tests/runtime/core-python.py"
 "$test_dir/python/bin/python" \
   "$root_dir/tests/runtime/code_interpreter_python.py"
+
+mkdir -p "$test_dir/go"
+cp "$root_dir/tests/runtime/go/main.go" "$test_dir/go/main.go"
+cd "$test_dir/go"
+go mod init example.com/agentbox-runtime-smoke >/dev/null
+GOPROXY=https://proxy.golang.org go get \
+  "github.com/abox-dev/sdk/packages/go-sdk@v$version" \
+  "github.com/abox-dev/sdk/packages/go-sdk/codeinterpreter@v$version" >/dev/null
+go run -tags runtime .

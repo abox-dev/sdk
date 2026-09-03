@@ -6,15 +6,17 @@
 
 # AgentBox SDK
 
-Official JavaScript, Python, and CLI clients for running isolated AgentBox sandboxes and code interpreters.
+Official Go, JavaScript, Python, and CLI clients for running isolated AgentBox sandboxes and code interpreters.
 
-| Package                     | Install                                  | Import                       |
-| --------------------------- | ---------------------------------------- | ---------------------------- |
-| JavaScript SDK              | `npm install @abox-dev/sdk`              | `@abox-dev/sdk`              |
-| Python SDK                  | `pip install abox-sdk`                   | `agentbox`                   |
-| JavaScript Code Interpreter | `npm install @abox-dev/code-interpreter` | `@abox-dev/code-interpreter` |
-| Python Code Interpreter     | `pip install abox-code-interpreter`      | `agentbox_code_interpreter`  |
-| CLI                         | `npm install --global @abox-dev/cli`     | `agentbox`                   |
+| Package                     | Install                                                          | Import                                    |
+| --------------------------- |------------------------------------------------------------------|-------------------------------------------|
+| JavaScript SDK              | `npm install @abox-dev/sdk`                                      | `@abox-dev/sdk`                           |
+| Python SDK                  | `pip install abox-sdk`                                           | `agentbox`                                |
+| Go SDK                      | `go get github.com/abox-dev/sdk/packages/go-sdk`                 | `github.com/abox-dev/sdk/packages/go-sdk` |
+| JavaScript Code Interpreter | `npm install @abox-dev/code-interpreter`                         | `@abox-dev/code-interpreter`              |
+| Python Code Interpreter     | `pip install abox-code-interpreter`                              | `agentbox_code_interpreter`               |
+| Go Code Interpreter         | `go get github.com/abox-dev/sdk/packages/go-sdk/codeinterpreter` | `github.com/abox-dev/sdk/packages/go-sdk/codeinterpreter` |
+| CLI                         | `npm install --global @abox-dev/cli`                             | `agentbox`                                |
 
 ## Quick start
 
@@ -48,9 +50,29 @@ with Sandbox.create() as sandbox:
     print(result.stdout)
 ```
 
+Go:
+
+```go
+client, err := agentbox.NewClient()
+if err != nil {
+    log.Fatal(err)
+}
+sandbox, err := client.Sandboxes.Create(context.Background(), nil)
+if err != nil {
+    log.Fatal(err)
+}
+defer sandbox.Kill(context.Background())
+
+result, err := sandbox.Commands.Run(context.Background(), "echo", &agentbox.CommandOptions{Args: []string{"Hello from AgentBox"}})
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Print(string(result.Stdout))
+```
+
 ## Configuration
 
-The SDKs use `AGENTBOX_API_KEY` and optionally `AGENTBOX_PROJECT_ID`, `AGENTBOX_DOMAIN`, `AGENTBOX_API_URL`, and `AGENTBOX_SANDBOX_URL`. The production defaults are `agentbox-runtime.ru`, `api.agentbox-runtime.ru`, and `sandbox.agentbox-runtime.ru`.
+The SDKs use `AGENTBOX_API_KEY` and optionally `AGENTBOX_PROJECT_ID`, `AGENTBOX_DOMAIN`, `AGENTBOX_API_URL`, and `AGENTBOX_SANDBOX_URL`. The production defaults are `agentbox-runtime.ru`, `api.agentbox-runtime.ru`, and `sandbox.agentbox-runtime.ru`. Go requires Go 1.24 or newer.
 
 The CLI stores local configuration in `~/.agentbox/config.json`; environment variables take precedence. See [CLI configuration](https://docs.agentbox.ru/en/cli/configuration/).
 

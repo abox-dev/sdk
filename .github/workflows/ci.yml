@@ -32,6 +32,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.27.x'
+          cache: true
+          cache-dependency-path: packages/go-sdk/go.sum
       - run: pnpm install --frozen-lockfile
       - run: uv sync --project packages/python-sdk --frozen
       - run: uv sync --project packages/code-interpreter-python --frozen
@@ -39,6 +44,56 @@ jobs:
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
+      - run: go mod tidy && git diff --exit-code -- go.mod go.sum
+        working-directory: packages/go-sdk
+      - run: make check-agent-instructions go-format-check go-vet go-coverage go-consumer-check
+
+  go-test:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        go: ['1.24.x', '1.25.x', '1.26.x', '1.27.x']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v6
+        with:
+          go-version: ${{ matrix.go }}
+          cache: true
+          cache-dependency-path: packages/go-sdk/go.sum
+      - run: go build ./...
+        working-directory: packages/go-sdk
+      - run: go test ./...
+        working-directory: packages/go-sdk
+
+  go-race:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.27.x'
+          cache: true
+          cache-dependency-path: packages/go-sdk/go.sum
+      - run: go test -race ./...
+        working-directory: packages/go-sdk
+
+  go-cross-build:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        go: ['1.24.x', '1.27.x']
+        goos: [linux, darwin, windows]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v6
+        with:
+          go-version: ${{ matrix.go }}
+          cache: true
+          cache-dependency-path: packages/go-sdk/go.sum
+      - run: GOOS=${{ matrix.goos }} GOARCH=amd64 CGO_ENABLED=0 go build ./...
+        working-directory: packages/go-sdk
 
   deterministic-codegen:
     runs-on: ubuntu-24.04
@@ -51,6 +106,11 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.24.x'
+          cache: true
+          cache-dependency-path: packages/go-sdk/go.sum
       - run: pnpm install --frozen-lockfile
       - run: make generate
       - run: git diff --exit-code

@@ -1,9 +1,10 @@
-FROM golang:1.23
+FROM golang:1.24.13 AS go-tools
 
 # Install Golang deps
 RUN go install github.com/bufbuild/buf/cmd/buf@v1.50.1 && \
-    go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.1 && \
-    go install connectrpc.com/connect/cmd/protoc-gen-connect-go@v1.18.1
+    go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.12 && \
+    go install connectrpc.com/connect/cmd/protoc-gen-connect-go@v1.19.1 && \
+    go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@v2.7.2
 
 
 FROM python:3.10
@@ -12,10 +13,11 @@ FROM python:3.10
 WORKDIR /workspace
 
 # Copy installed Go deps from previous build step
-COPY --from=0 /go /go
+COPY --from=go-tools /go /go
+COPY --from=go-tools /usr/local/go /usr/local/go
 
 # Add Go binary to PATH
-ENV PATH="/go/bin:${PATH}"
+ENV PATH="/usr/local/go/bin:/go/bin:${PATH}"
 
 # The pinned E2B fork is a build-only upstream tool carrying the explode fix.
 # It is never included in AgentBox wheels or sdists. See UPSTREAM.md.

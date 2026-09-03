@@ -19,6 +19,14 @@ for (const manifest of manifests) {
     throw new Error(`${manifest}: expected ${expected}, got ${value}`)
 }
 
+const goVersion = fs
+  .readFileSync('packages/go-sdk/version.go', 'utf8')
+  .match(/^const Version = "([^"]+)"/m)?.[1]
+if (goVersion !== expected)
+  throw new Error(
+    `packages/go-sdk/version.go: expected ${expected}, got ${goVersion}`
+  )
+
 for (const manifest of [
   'packages/python-sdk/pyproject.toml',
   'packages/code-interpreter-python/pyproject.toml',
@@ -62,4 +70,8 @@ for (const directory of [
   if (!fs.existsSync(path.join(directory, 'NOTICE'))) {
     throw new Error(`${directory}/NOTICE is missing`)
   }
+}
+
+if (!fs.existsSync('packages/go-sdk/LICENSE')) {
+  throw new Error('packages/go-sdk/LICENSE is missing')
 }
