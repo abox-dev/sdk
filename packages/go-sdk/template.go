@@ -341,7 +341,11 @@ func (builder *TemplateBuilder) Run(commands ...string) *TemplateBuilder {
 }
 
 // RunAs adds shell commands executed as user.
+// An empty user inherits the current build user, as Run does.
 func (builder *TemplateBuilder) RunAs(user string, commands ...string) *TemplateBuilder {
+	if user == "" {
+		return builder.Run(commands...)
+	}
 	return builder.add("RUN", strings.Join(commands, " && "), user)
 }
 

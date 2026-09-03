@@ -1,6 +1,6 @@
 [project]
 name = "abox-sdk"
-version = "0.1.3"
+version = "0.1.4"
 description = "AgentBox SDK for secure cloud sandboxes"
 authors = [{ name = "RetailDriver LLC" }]
 license = "MIT"

@@ -1,4 +1,4 @@
 package agentbox
 
 // Version is the AgentBox SDK release version.
-const Version = "0.1.3"
+const Version = "0.1.4"
