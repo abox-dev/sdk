@@ -67,4 +67,21 @@ fs.writeFileSync(
   )
 )
 
+const goReadmeFile = path.join(root, 'packages/go-sdk/README.md')
+const goReadmeContent = fs.readFileSync(goReadmeFile, 'utf8')
+const goReferenceVersion = new RegExp(
+  `(https://pkg\\.go\\.dev/github\\.com/abox-dev/sdk/packages/go-sdk(?:/codeinterpreter)?@)v${goVersion.replaceAll('.', '\\.')}`,
+  'g'
+)
+const goReadmeUpdated = goReadmeContent.replace(
+  goReferenceVersion,
+  `$1v${version}`
+)
+if (goReadmeUpdated === goReadmeContent && version !== goVersion) {
+  throw new Error(
+    'Cannot update versioned pkg.go.dev links in packages/go-sdk/README.md'
+  )
+}
+fs.writeFileSync(goReadmeFile, goReadmeUpdated)
+
 process.stdout.write(`Updated all AgentBox SDK packages to ${version}\n`)

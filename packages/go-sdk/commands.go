@@ -43,6 +43,7 @@ type CommandExitError struct {
 	Message string
 }
 
+// Error describes the non-zero command exit code.
 func (e *CommandExitError) Error() string {
 	if e.Message != "" {
 		return fmt.Sprintf("agentbox: command exited with code %d: %s", e.Result.ExitCode, e.Message)

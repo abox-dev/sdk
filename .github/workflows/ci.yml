@@ -46,7 +46,7 @@ jobs:
       - run: pnpm test
       - run: go mod tidy && git diff --exit-code -- go.mod go.sum
         working-directory: packages/go-sdk
-      - run: make check-agent-instructions go-format-check go-vet go-coverage go-consumer-check
+      - run: make check-agent-instructions go-format-check go-doc-check go-vet go-coverage go-consumer-check
 
   go-test:
     runs-on: ubuntu-24.04

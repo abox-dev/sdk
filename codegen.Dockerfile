@@ -4,7 +4,8 @@ FROM golang:1.24.13 AS go-tools
 RUN go install github.com/bufbuild/buf/cmd/buf@v1.50.1 && \
     go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.12 && \
     go install connectrpc.com/connect/cmd/protoc-gen-connect-go@v1.19.1 && \
-    go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@v2.7.2
+    go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@v2.7.2 && \
+    go install github.com/princjef/gomarkdoc/cmd/gomarkdoc@v1.1.0
 
 
 FROM python:3.10

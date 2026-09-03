@@ -18,7 +18,9 @@ import (
 )
 
 const (
-	DefaultTemplate         = "code-interpreter"
+	// DefaultTemplate is the template used when Create receives no template.
+	DefaultTemplate = "code-interpreter"
+	// JupyterPort is the internal Code Interpreter service port.
 	JupyterPort             = 49999
 	defaultExecutionTimeout = time.Minute
 )
@@ -26,6 +28,7 @@ const (
 // Client wraps the core client with Code Interpreter creation helpers.
 type Client struct{ Core *agentbox.Client }
 
+// NewClient creates a Code Interpreter client using the core client options.
 func NewClient(options ...agentbox.ClientOption) (*Client, error) {
 	client, err := agentbox.NewClient(options...)
 	if err != nil {
@@ -37,6 +40,7 @@ func NewClient(options ...agentbox.ClientOption) (*Client, error) {
 // Sandbox is a core sandbox with notebook-kernel APIs.
 type Sandbox struct{ *agentbox.Sandbox }
 
+// Create creates a Code Interpreter sandbox.
 func (client *Client) Create(ctx context.Context, options *agentbox.CreateSandboxOptions) (*Sandbox, error) {
 	if options == nil {
 		options = &agentbox.CreateSandboxOptions{}
@@ -53,6 +57,8 @@ func (client *Client) Create(ctx context.Context, options *agentbox.CreateSandbo
 	}
 	return &Sandbox{Sandbox: sandbox}, nil
 }
+
+// Connect attaches to an existing Code Interpreter sandbox.
 func (client *Client) Connect(ctx context.Context, id string, options *agentbox.ConnectSandboxOptions) (*Sandbox, error) {
 	sandbox, err := client.Core.Sandboxes.Connect(ctx, id, options)
 	if err != nil {
@@ -65,8 +71,11 @@ func (client *Client) Connect(ctx context.Context, id string, options *agentbox.
 type Language string
 
 const (
-	Python     Language = "python"
+	// Python selects a Python kernel.
+	Python Language = "python"
+	// JavaScript selects a JavaScript kernel.
 	JavaScript Language = "javascript"
+	// TypeScript selects a TypeScript kernel.
 	TypeScript Language = "typescript"
 )
 
@@ -76,6 +85,8 @@ type Context struct {
 	Language string `json:"language"`
 	Cwd      string `json:"cwd"`
 }
+
+// CreateContextOptions configures a persistent kernel context.
 type CreateContextOptions struct {
 	Language       Language      `json:"language,omitempty"`
 	Cwd            string        `json:"cwd,omitempty"`
@@ -170,6 +181,7 @@ func (sandbox *Sandbox) RunCode(ctx context.Context, code string, options *RunCo
 	return execution, nil
 }
 
+// CreateContext creates a persistent kernel context.
 func (sandbox *Sandbox) CreateContext(ctx context.Context, options *CreateContextOptions) (*Context, error) {
 	if options == nil {
 		options = &CreateContextOptions{}
@@ -180,6 +192,8 @@ func (sandbox *Sandbox) CreateContext(ctx context.Context, options *CreateContex
 	}
 	return &result, nil
 }
+
+// ListContexts returns all persistent kernel contexts in the sandbox.
 func (sandbox *Sandbox) ListContexts(ctx context.Context) ([]Context, error) {
 	var result []Context
 	if err := sandbox.contextRequest(ctx, http.MethodGet, "/contexts", nil, 0, &result); err != nil {
@@ -187,12 +201,16 @@ func (sandbox *Sandbox) ListContexts(ctx context.Context) ([]Context, error) {
 	}
 	return result, nil
 }
+
+// RemoveContext removes a persistent kernel context.
 func (sandbox *Sandbox) RemoveContext(ctx context.Context, contextID string) error {
 	if strings.TrimSpace(contextID) == "" {
 		return &agentbox.InvalidArgumentError{Message: "context ID cannot be empty"}
 	}
 	return sandbox.contextRequest(ctx, http.MethodDelete, "/contexts/"+url.PathEscape(contextID), nil, 0, nil)
 }
+
+// RestartContext restarts a persistent kernel context.
 func (sandbox *Sandbox) RestartContext(ctx context.Context, contextID string) error {
 	if strings.TrimSpace(contextID) == "" {
 		return &agentbox.InvalidArgumentError{Message: "context ID cannot be empty"}

@@ -10,8 +10,10 @@ import (
 type SandboxState string
 
 const (
+	// SandboxRunning indicates that a sandbox accepts requests.
 	SandboxRunning SandboxState = "running"
-	SandboxPaused  SandboxState = "paused"
+	// SandboxPaused indicates that a sandbox is suspended.
+	SandboxPaused SandboxState = "paused"
 )
 
 // SandboxMetadata contains user-defined sandbox metadata.
@@ -121,10 +123,14 @@ type SandboxLogEntry struct {
 type TemplateBuildStatus string
 
 const (
-	BuildWaiting  TemplateBuildStatus = "waiting"
+	// BuildWaiting indicates that a template build is queued.
+	BuildWaiting TemplateBuildStatus = "waiting"
+	// BuildBuilding indicates that a template build is in progress.
 	BuildBuilding TemplateBuildStatus = "building"
-	BuildReady    TemplateBuildStatus = "ready"
-	BuildFailed   TemplateBuildStatus = "error"
+	// BuildReady indicates that a template build completed successfully.
+	BuildReady TemplateBuildStatus = "ready"
+	// BuildFailed indicates that a template build failed.
+	BuildFailed TemplateBuildStatus = "error"
 )
 
 // BuildLogEntry is one structured template build log record.

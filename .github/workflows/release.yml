@@ -149,3 +149,24 @@ jobs:
           go mod init example.com/agentbox-release-smoke
           GOPROXY=https://proxy.golang.org go get "github.com/abox-dev/sdk/packages/go-sdk@${GITHUB_REF_NAME}"
           go test github.com/abox-dev/sdk/packages/go-sdk github.com/abox-dev/sdk/packages/go-sdk/codeinterpreter
+      - name: Wait for pkg.go.dev reference pages
+        env:
+          VERSION: ${{ github.ref_name }}
+        run: |
+          for package in \
+            "github.com/abox-dev/sdk/packages/go-sdk" \
+            "github.com/abox-dev/sdk/packages/go-sdk/codeinterpreter"
+          do
+            url="https://pkg.go.dev/${package}@${VERSION}"
+            available=false
+            for attempt in $(seq 1 30)
+            do
+              if curl --fail --silent --show-error --location --output /dev/null "$url"
+              then
+                available=true
+                break
+              fi
+              sleep 20
+            done
+            test "$available" = true
+          done

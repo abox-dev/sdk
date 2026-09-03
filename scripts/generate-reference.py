@@ -1120,6 +1120,31 @@ def run_sdk_generators() -> None:
         check=True,
     )
 
+    for package, output in (
+        (ROOT / "packages/go-sdk", OUT / "sdk/go/core.md"),
+        (
+            ROOT / "packages/go-sdk/codeinterpreter",
+            OUT / "sdk/go/code-interpreter.md",
+        ),
+    ):
+        output.parent.mkdir(parents=True, exist_ok=True)
+        subprocess.run(
+            [
+                "gomarkdoc",
+                "--format",
+                "plain",
+                "--output",
+                str(output),
+                ".",
+            ],
+            cwd=package,
+            check=True,
+        )
+        output.write_text(
+            "\n".join(line.rstrip() for line in output.read_text().splitlines())
+            + "\n"
+        )
+
 
 def package_versions() -> dict:
     packages = {
@@ -1139,6 +1164,11 @@ def package_versions() -> dict:
         versions[name] = re.search(
             r'^version = "([^"]+)"', path.read_text(), re.M
         ).group(1)
+    versions["github.com/abox-dev/sdk/packages/go-sdk"] = re.search(
+        r'^const Version = "([^"]+)"',
+        (ROOT / "packages/go-sdk/version.go").read_text(),
+        re.M,
+    ).group(1)
     return versions
 
 

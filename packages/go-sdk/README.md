@@ -44,6 +44,9 @@ func main() {
 Code Interpreter is available from
 `github.com/abox-dev/sdk/packages/go-sdk/codeinterpreter`.
 
+API reference for this release: [core SDK on pkg.go.dev](https://pkg.go.dev/github.com/abox-dev/sdk/packages/go-sdk@v0.1.2) and
+[Code Interpreter on pkg.go.dev](https://pkg.go.dev/github.com/abox-dev/sdk/packages/go-sdk/codeinterpreter@v0.1.2).
+
 Documentation: [core SDK](https://docs.agentbox.ru/en/sdk/),
 [sandboxes](https://docs.agentbox.ru/en/sdk/sandboxes/),
 [templates](https://docs.agentbox.ru/en/sdk/templates/), and

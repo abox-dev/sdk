@@ -89,54 +89,72 @@ func (builder *TemplateBuilder) fromImage(image string) *TemplateBuilder {
 func (builder *TemplateBuilder) FromImage(image string) *TemplateBuilder {
 	return builder.fromImage(image)
 }
+
+// FromDebian selects an official Debian image, defaulting to stable.
 func (builder *TemplateBuilder) FromDebian(variant string) *TemplateBuilder {
 	if variant == "" {
 		variant = "stable"
 	}
 	return builder.fromImage("debian:" + variant)
 }
+
+// FromUbuntu selects an official Ubuntu image, defaulting to latest.
 func (builder *TemplateBuilder) FromUbuntu(variant string) *TemplateBuilder {
 	if variant == "" {
 		variant = "latest"
 	}
 	return builder.fromImage("ubuntu:" + variant)
 }
+
+// FromFedora selects an official Fedora image, defaulting to version 44.
 func (builder *TemplateBuilder) FromFedora(variant string) *TemplateBuilder {
 	if variant == "" {
 		variant = "44"
 	}
 	return builder.fromImage("fedora:" + variant)
 }
+
+// FromAlpine selects an official Alpine image, defaulting to version 3.24.
 func (builder *TemplateBuilder) FromAlpine(variant string) *TemplateBuilder {
 	if variant == "" {
 		variant = "3.24"
 	}
 	return builder.fromImage("alpine:" + variant)
 }
+
+// FromArch selects an official Arch Linux image.
 func (builder *TemplateBuilder) FromArch(variant string) *TemplateBuilder {
 	if variant == "" {
 		variant = "latest"
 	}
 	return builder.fromImage("archlinux:" + variant)
 }
+
+// FromPython selects an official Python image.
 func (builder *TemplateBuilder) FromPython(version string) *TemplateBuilder {
 	if version == "" {
 		version = "3"
 	}
 	return builder.fromImage("python:" + version)
 }
+
+// FromNode selects an official Node.js image, defaulting to the LTS variant.
 func (builder *TemplateBuilder) FromNode(variant string) *TemplateBuilder {
 	if variant == "" {
 		variant = "lts"
 	}
 	return builder.fromImage("node:" + variant)
 }
+
+// FromBun selects an official Bun image.
 func (builder *TemplateBuilder) FromBun(variant string) *TemplateBuilder {
 	if variant == "" {
 		variant = "latest"
 	}
 	return builder.fromImage("oven/bun:" + variant)
 }
+
+// FromBase selects the default AgentBox base image.
 func (builder *TemplateBuilder) FromBase() *TemplateBuilder {
 	return builder.fromImage(defaultBaseImage)
 }
@@ -317,16 +335,25 @@ func (builder *TemplateBuilder) Copy(source, destination string, options *CopyOp
 	return builder
 }
 
+// Run adds shell commands executed as the current build user.
 func (builder *TemplateBuilder) Run(commands ...string) *TemplateBuilder {
 	return builder.add("RUN", strings.Join(commands, " && "))
 }
+
+// RunAs adds shell commands executed as user.
 func (builder *TemplateBuilder) RunAs(user string, commands ...string) *TemplateBuilder {
 	return builder.add("RUN", strings.Join(commands, " && "), user)
 }
+
+// Workdir sets the working directory for subsequent template steps.
 func (builder *TemplateBuilder) Workdir(path string) *TemplateBuilder {
 	return builder.add("WORKDIR", path)
 }
+
+// User sets the user for subsequent template steps.
 func (builder *TemplateBuilder) User(user string) *TemplateBuilder { return builder.add("USER", user) }
+
+// Env sets environment variables for subsequent template steps.
 func (builder *TemplateBuilder) Env(values map[string]string) *TemplateBuilder {
 	args := make([]string, 0, len(values)*2)
 	keys := slices.Sorted(maps.Keys(values))
@@ -335,6 +362,8 @@ func (builder *TemplateBuilder) Env(values map[string]string) *TemplateBuilder {
 	}
 	return builder.add("ENV", args...)
 }
+
+// Remove recursively removes paths from the template filesystem.
 func (builder *TemplateBuilder) Remove(paths ...string) *TemplateBuilder {
 	quoted := make([]string, len(paths))
 	for index, path := range paths {
@@ -342,9 +371,13 @@ func (builder *TemplateBuilder) Remove(paths ...string) *TemplateBuilder {
 	}
 	return builder.Run("rm -rf " + strings.Join(quoted, " "))
 }
+
+// Rename moves a path in the template filesystem.
 func (builder *TemplateBuilder) Rename(source, destination string) *TemplateBuilder {
 	return builder.Run("mv " + shellQuote(source) + " " + shellQuote(destination))
 }
+
+// MakeDir creates directories and their missing parents.
 func (builder *TemplateBuilder) MakeDir(paths ...string) *TemplateBuilder {
 	quoted := make([]string, len(paths))
 	for index, path := range paths {
@@ -352,15 +385,21 @@ func (builder *TemplateBuilder) MakeDir(paths ...string) *TemplateBuilder {
 	}
 	return builder.Run("mkdir -p " + strings.Join(quoted, " "))
 }
+
+// Symlink creates a symbolic link.
 func (builder *TemplateBuilder) Symlink(source, destination string) *TemplateBuilder {
 	return builder.Run("ln -s " + shellQuote(source) + " " + shellQuote(destination))
 }
+
+// PipInstall installs Python packages as root.
 func (builder *TemplateBuilder) PipInstall(packages ...string) *TemplateBuilder {
 	if len(packages) == 0 {
 		packages = []string{"."}
 	}
 	return builder.RunAs("root", "pip install "+strings.Join(packages, " "))
 }
+
+// NPMInstall installs npm packages with the requested scope.
 func (builder *TemplateBuilder) NPMInstall(options PackageInstallOptions, packages ...string) *TemplateBuilder {
 	flags := ""
 	if options.Global {
@@ -375,6 +414,8 @@ func (builder *TemplateBuilder) NPMInstall(options PackageInstallOptions, packag
 	}
 	return builder.RunAs(user, strings.TrimSpace("npm install"+flags+" "+strings.Join(packages, " ")))
 }
+
+// BunInstall installs Bun packages with the requested scope.
 func (builder *TemplateBuilder) BunInstall(options PackageInstallOptions, packages ...string) *TemplateBuilder {
 	flags := ""
 	if options.Global {
@@ -389,6 +430,8 @@ func (builder *TemplateBuilder) BunInstall(options PackageInstallOptions, packag
 	}
 	return builder.RunAs(user, strings.TrimSpace("bun install"+flags+" "+strings.Join(packages, " ")))
 }
+
+// AptInstall installs Debian packages as root.
 func (builder *TemplateBuilder) AptInstall(options AptInstallOptions, packages ...string) *TemplateBuilder {
 	flags := ""
 	if options.NoInstallRecommends {
@@ -399,6 +442,8 @@ func (builder *TemplateBuilder) AptInstall(options AptInstallOptions, packages .
 	}
 	return builder.RunAs("root", "apt-get update", "DEBIAN_FRONTEND=noninteractive DEBCONF_NOWARNINGS=yes apt-get install -y"+flags+" "+strings.Join(packages, " "))
 }
+
+// GitClone clones a Git repository into the template filesystem.
 func (builder *TemplateBuilder) GitClone(repository string, options *GitCloneOptions) *TemplateBuilder {
 	args := []string{"git clone", shellQuote(repository)}
 	user := ""
@@ -422,21 +467,33 @@ func (builder *TemplateBuilder) SkipCache() *TemplateBuilder {
 	builder.forceNext = true
 	return builder
 }
+
+// Start configures the sandbox start command and readiness command.
 func (builder *TemplateBuilder) Start(command, readyCommand string) *TemplateBuilder {
 	builder.startCmd, builder.readyCmd = command, readyCommand
 	return builder
 }
+
+// Ready replaces the readiness command for the template.
 func (builder *TemplateBuilder) Ready(command string) *TemplateBuilder {
 	builder.readyCmd = command
 	return builder
 }
+
+// WaitForPort returns a readiness command that waits for a listening port.
 func WaitForPort(port int) string {
 	return fmt.Sprintf(`[ -n "$(ss -Htuln sport = :%d)" ]`, port)
 }
+
+// WaitForURL returns a readiness command that waits for an HTTP status.
 func WaitForURL(value string, status int) string {
 	return fmt.Sprintf(`curl -s -o /dev/null -w "%%{http_code}" %s | grep -q "%d"`, shellQuote(value), status)
 }
-func WaitForFile(path string) string       { return "test -e " + shellQuote(path) }
+
+// WaitForFile returns a readiness command that waits for a filesystem path.
+func WaitForFile(path string) string { return "test -e " + shellQuote(path) }
+
+// WaitForProcess returns a readiness command that waits for a named process.
 func WaitForProcess(process string) string { return "pgrep " + shellQuote(process) + " >/dev/null" }
 
 // WaitForTimeout waits a fixed duration before marking a service ready.
@@ -510,6 +567,8 @@ func (builder *TemplateBuilder) request(steps []api.TemplateStep) api.TemplateBu
 
 // TemplateService manages AgentBox templates.
 type TemplateService struct{ client *Client }
+
+// TemplateBuildOptions configures resources, tags, caching, and build polling.
 type TemplateBuildOptions struct {
 	Tags               []string
 	CPUCount, MemoryMB int
@@ -517,11 +576,15 @@ type TemplateBuildOptions struct {
 	PollInterval       time.Duration
 	OnLog              func(BuildLogEntry)
 }
+
+// TemplateBuildRef identifies a started template build.
 type TemplateBuildRef struct {
 	Name                string
 	Tags                []string
 	TemplateID, BuildID string
 }
+
+// TemplateListOptions configures template pagination and team filtering.
 type TemplateListOptions struct {
 	TeamID, NextToken string
 	Limit             int
@@ -532,12 +595,16 @@ type TemplateInfoOptions struct {
 	NextToken string
 	Limit     int
 }
+
+// TemplateLogOptions configures template log pagination and filtering.
 type TemplateLogOptions struct {
 	Cursor                   string
 	Timestamp                int64
 	Limit                    int
 	Direction, Level, Source string
 }
+
+// TemplateTag associates a template tag with a build.
 type TemplateTag struct {
 	Tag, BuildID string
 	CreatedAt    time.Time
@@ -635,6 +702,7 @@ func (service *TemplateService) Build(ctx context.Context, builder *TemplateBuil
 	}
 }
 
+// BuildStatus returns the current build state and logs after logsOffset.
 func (service *TemplateService) BuildStatus(ctx context.Context, templateID, buildID string, logsOffset int) (*TemplateBuildInfo, error) {
 	offset := int32(logsOffset)
 	requestCtx, cancel := withRequestTimeout(ctx, service.client.config.requestTimeout)
@@ -649,6 +717,8 @@ func (service *TemplateService) BuildStatus(ctx context.Context, templateID, bui
 	result, err := convertModel[TemplateBuildInfo](*response.JSON200)
 	return &result, err
 }
+
+// Exists reports whether a template alias exists or is reserved.
 func (service *TemplateService) Exists(ctx context.Context, alias string) (bool, error) {
 	requestCtx, cancel := withRequestTimeout(ctx, service.client.config.requestTimeout)
 	defer cancel()
@@ -667,6 +737,8 @@ func (service *TemplateService) Exists(ctx context.Context, alias string) (bool,
 	}
 	return true, nil
 }
+
+// AssignTags assigns tags to a template target and returns the selected build ID.
 func (service *TemplateService) AssignTags(ctx context.Context, target string, tags []string) (string, error) {
 	requestCtx, cancel := withRequestTimeout(ctx, service.client.config.requestTimeout)
 	defer cancel()
@@ -679,6 +751,8 @@ func (service *TemplateService) AssignTags(ctx context.Context, target string, t
 	}
 	return response.JSON201.BuildID.String(), nil
 }
+
+// RemoveTags removes tags from a named template.
 func (service *TemplateService) RemoveTags(ctx context.Context, name string, tags []string) error {
 	requestCtx, cancel := withRequestTimeout(ctx, service.client.config.requestTimeout)
 	defer cancel()
@@ -691,6 +765,8 @@ func (service *TemplateService) RemoveTags(ctx context.Context, name string, tag
 	}
 	return nil
 }
+
+// Tags lists tags assigned to a template.
 func (service *TemplateService) Tags(ctx context.Context, templateID string) ([]TemplateTag, error) {
 	requestCtx, cancel := withRequestTimeout(ctx, service.client.config.requestTimeout)
 	defer cancel()
