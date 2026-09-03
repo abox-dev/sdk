@@ -24,7 +24,11 @@ func main() {
 	if string(result.Stdout) != "go-runtime-smoke" {
 		panic(fmt.Sprintf("unexpected stdout %q", result.Stdout))
 	}
-	must(sandbox.Kill(ctx))
+	killed, err := sandbox.Kill(ctx)
+	must(err)
+	if !killed {
+		panic("core sandbox was not killed")
+	}
 
 	interpreter, err := codeinterpreter.NewClient()
 	must(err)
@@ -35,7 +39,11 @@ func main() {
 	if !strings.Contains(execution.Text(), "42") {
 		panic(fmt.Sprintf("unexpected execution %#v", execution))
 	}
-	must(codeSandbox.Kill(ctx))
+	killed, err = codeSandbox.Kill(ctx)
+	must(err)
+	if !killed {
+		panic("code interpreter sandbox was not killed")
+	}
 }
 
 func must(err error) {
