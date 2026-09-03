@@ -182,11 +182,11 @@
   },
   "monoRevision": "559cf23aa80d22eeb1bd2769d4ab6646b8e40fcb",
   "packages": {
-    "@abox-dev/cli": "0.1.1",
-    "@abox-dev/code-interpreter": "0.1.1",
-    "@abox-dev/sdk": "0.1.1",
-    "abox-code-interpreter": "0.1.1",
-    "abox-sdk": "0.1.1"
+    "@abox-dev/cli": "0.1.2",
+    "@abox-dev/code-interpreter": "0.1.2",
+    "@abox-dev/sdk": "0.1.2",
+    "abox-code-interpreter": "0.1.2",
+    "abox-sdk": "0.1.2"
   },
   "schemaVersion": 1
 }
