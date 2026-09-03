@@ -261,7 +261,7 @@ Create a client, start a sandbox, and run a command:
 
 <a name="Version"></a>Version is the AgentBox SDK release version.
 
-	const Version = "0.1.3"
+	const Version = "0.1.4"
 
 <a name="IAMTokenPlaceholder"></a>
 ## func IAMTokenPlaceholder
@@ -1927,7 +1927,7 @@ Run adds shell commands executed as the current build user.
 
 	func (builder *TemplateBuilder) RunAs(user string, commands ...string) *TemplateBuilder
 
-RunAs adds shell commands executed as user.
+RunAs adds shell commands executed as user. An empty user inherits the current build user, as Run does.
 
 <a name="TemplateBuilder.SkipCache"></a>
 ### func \(\*TemplateBuilder\) SkipCache

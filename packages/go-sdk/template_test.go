@@ -2,16 +2,83 @@ package agentbox
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 	"time"
 )
+
+func TestTemplateRunUserArguments(t *testing.T) {
+	tests := []struct {
+		name  string
+		apply func(*TemplateBuilder) *TemplateBuilder
+		args  []string
+	}{
+		{"run-as-current", func(b *TemplateBuilder) *TemplateBuilder { return b.RunAs("", "echo one", "echo two") }, []string{"echo one && echo two"}},
+		{"run-as-explicit", func(b *TemplateBuilder) *TemplateBuilder { return b.RunAs("root", "id -un") }, []string{"id -un", "root"}},
+		{"npm-default", func(b *TemplateBuilder) *TemplateBuilder { return b.NPMInstall(PackageInstallOptions{}, "lodash") }, []string{"npm install lodash"}},
+		{"npm-dev", func(b *TemplateBuilder) *TemplateBuilder {
+			return b.NPMInstall(PackageInstallOptions{Dev: true}, "typescript")
+		}, []string{"npm install --save-dev typescript"}},
+		{"npm-global", func(b *TemplateBuilder) *TemplateBuilder {
+			return b.NPMInstall(PackageInstallOptions{Global: true}, "tsx")
+		}, []string{"npm install -g tsx", "root"}},
+		{"bun-default", func(b *TemplateBuilder) *TemplateBuilder { return b.BunInstall(PackageInstallOptions{}, "lodash") }, []string{"bun install lodash"}},
+		{"bun-dev", func(b *TemplateBuilder) *TemplateBuilder {
+			return b.BunInstall(PackageInstallOptions{Dev: true}, "typescript")
+		}, []string{"bun install --dev typescript"}},
+		{"bun-global", func(b *TemplateBuilder) *TemplateBuilder {
+			return b.BunInstall(PackageInstallOptions{Global: true}, "tsx")
+		}, []string{"bun install -g tsx", "root"}},
+		{"git-default", func(b *TemplateBuilder) *TemplateBuilder { return b.GitClone("https://example.test/repo.git", nil) }, []string{"git clone 'https://example.test/repo.git'"}},
+		{"git-options", func(b *TemplateBuilder) *TemplateBuilder {
+			return b.GitClone("https://example.test/repo.git", &GitCloneOptions{Path: "repo", Depth: 1})
+		}, []string{"git clone 'https://example.test/repo.git' --depth 1 'repo'"}},
+		{"git-explicit", func(b *TemplateBuilder) *TemplateBuilder {
+			return b.GitClone("https://example.test/repo.git", &GitCloneOptions{User: "root"})
+		}, []string{"git clone 'https://example.test/repo.git'", "root"}},
+	}
+	for _, currentUser := range []string{"", "app"} {
+		for _, test := range tests {
+			t.Run(currentUser+"/"+test.name, func(t *testing.T) {
+				builder := NewTemplate("").FromBase()
+				if currentUser != "" {
+					builder.User(currentUser)
+				}
+				data, err := test.apply(builder).JSON()
+				if err != nil {
+					t.Fatal(err)
+				}
+				var request struct {
+					Steps []struct {
+						Type string   `json:"type"`
+						Args []string `json:"args"`
+					} `json:"steps"`
+				}
+				if err := json.Unmarshal(data, &request); err != nil {
+					t.Fatal(err)
+				}
+				if len(request.Steps) == 0 {
+					t.Fatal("missing build steps")
+				}
+				step := request.Steps[len(request.Steps)-1]
+				if step.Type != "RUN" || !slices.Equal(step.Args, test.args) {
+					t.Fatalf("RUN arguments = %#v, want %#v (type %q)", step.Args, test.args, step.Type)
+				}
+				if currentUser != "" && (request.Steps[0].Type != "USER" || !slices.Equal(request.Steps[0].Args, []string{currentUser})) {
+					t.Fatal("configured build user was not preserved")
+				}
+			})
+		}
+	}
+}
 
 func TestTemplateBuilder(t *testing.T) {
 	contextPath := t.TempDir()

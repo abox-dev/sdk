@@ -1,6 +1,6 @@
 {
   "name": "@abox-dev/code-interpreter",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "packageManager": "pnpm@10.34.5",
   "description": "AgentBox Code Interpreter - Stateful code execution",
   "homepage": "https://docs.agentbox.ru/en/sdk/code-interpreter/",
