@@ -1,7 +1,7 @@
 {
   "name": "@abox-dev/code-interpreter-python",
   "private": true,
-  "version": "0.1.2",
+  "version": "0.1.3",
   "scripts": {
     "test": "uv run pytest -n 2 --verbose -x tests/test_sandbox_url.py",
     "test:integration": "uv run pytest -n 2 --verbose -x",

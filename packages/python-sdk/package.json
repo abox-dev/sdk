@@ -1,7 +1,7 @@
 {
   "name": "@abox-dev/python-sdk",
   "private": true,
-  "version": "0.1.2",
+  "version": "0.1.3",
   "scripts": {
     "test": "uv run pytest -n 4 --verbose -x tests/test_*.py tests/shared",
     "test:integration": "uv run pytest -n 4 --verbose -x tests/sync tests/async",
