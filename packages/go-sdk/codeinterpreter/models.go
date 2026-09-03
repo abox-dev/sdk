@@ -14,6 +14,7 @@ type OutputMessage struct {
 	Error     bool
 }
 
+// String returns the output line.
 func (message OutputMessage) String() string { return message.Line }
 
 // ExecutionError is a kernel error and traceback.
@@ -23,12 +24,16 @@ type ExecutionError struct {
 	Traceback string `json:"traceback"`
 }
 
+// Error formats the kernel error name and value.
 func (e ExecutionError) Error() string { return fmt.Sprintf("%s: %s", e.Name, e.Value) }
 
+// Logs contains collected standard output and standard error lines.
 type Logs struct {
 	Stdout []string `json:"stdout"`
 	Stderr []string `json:"stderr"`
 }
+
+// Execution contains the complete result of one code execution.
 type Execution struct {
 	Results        []Result        `json:"results"`
 	Logs           Logs            `json:"logs"`
@@ -36,6 +41,7 @@ type Execution struct {
 	ExecutionCount int             `json:"execution_count,omitempty"`
 }
 
+// Text returns the text representation of the main result, if present.
 func (execution Execution) Text() string {
 	for _, result := range execution.Results {
 		if result.IsMainResult {
@@ -47,6 +53,8 @@ func (execution Execution) Text() string {
 
 // RawData preserves every MIME representation returned by the kernel.
 type RawData map[string]json.RawMessage
+
+// Result contains the decoded and raw MIME representations of one result.
 type Result struct {
 	Text, HTML, Markdown, SVG, PNG, JPEG, PDF, LaTeX, JSON, JavaScript string
 	Data                                                               map[string]any
@@ -56,6 +64,7 @@ type Result struct {
 	IsMainResult                                                       bool
 }
 
+// Formats returns the available raw MIME keys in sorted order.
 func (result Result) Formats() []string {
 	formats := make([]string, 0, len(result.Raw))
 	for key := range result.Raw {
@@ -65,30 +74,48 @@ func (result Result) Formats() []string {
 	return formats
 }
 
+// ChartType identifies a supported chart representation.
 type ChartType string
 
 const (
-	ChartLine          ChartType = "line"
-	ChartScatter       ChartType = "scatter"
-	ChartBar           ChartType = "bar"
-	ChartPie           ChartType = "pie"
+	// ChartLine identifies a line chart.
+	ChartLine ChartType = "line"
+	// ChartScatter identifies a scatter chart.
+	ChartScatter ChartType = "scatter"
+	// ChartBar identifies a bar chart.
+	ChartBar ChartType = "bar"
+	// ChartPie identifies a pie chart.
+	ChartPie ChartType = "pie"
+	// ChartBoxAndWhisker identifies a box-and-whisker chart.
 	ChartBoxAndWhisker ChartType = "box_and_whisker"
-	ChartSuper         ChartType = "superchart"
-	ChartUnknown       ChartType = "unknown"
+	// ChartSuper identifies a composite chart.
+	ChartSuper ChartType = "superchart"
+	// ChartUnknown identifies a chart type unknown to this SDK version.
+	ChartUnknown ChartType = "unknown"
 )
 
+// ScaleType identifies a chart axis scale.
 type ScaleType string
 
 const (
-	ScaleLinear      ScaleType = "linear"
-	ScaleDatetime    ScaleType = "datetime"
+	// ScaleLinear identifies a linear scale.
+	ScaleLinear ScaleType = "linear"
+	// ScaleDatetime identifies a date and time scale.
+	ScaleDatetime ScaleType = "datetime"
+	// ScaleCategorical identifies a categorical scale.
 	ScaleCategorical ScaleType = "categorical"
-	ScaleLog         ScaleType = "log"
-	ScaleSymlog      ScaleType = "symlog"
-	ScaleLogit       ScaleType = "logit"
-	ScaleFunction    ScaleType = "function"
+	// ScaleLog identifies a logarithmic scale.
+	ScaleLog ScaleType = "log"
+	// ScaleSymlog identifies a symmetric logarithmic scale.
+	ScaleSymlog ScaleType = "symlog"
+	// ScaleLogit identifies a logit scale.
+	ScaleLogit ScaleType = "logit"
+	// ScaleFunction identifies a custom function scale.
+	ScaleFunction ScaleType = "function"
+	// ScaleFunctionLog identifies a logarithmic custom function scale.
 	ScaleFunctionLog ScaleType = "functionlog"
-	ScaleAsinh       ScaleType = "asinh"
+	// ScaleAsinh identifies an inverse hyperbolic sine scale.
+	ScaleAsinh ScaleType = "asinh"
 )
 
 // Chart retains typed common chart properties and unknown fields in Extra.
@@ -105,6 +132,7 @@ type Chart struct {
 	Extra    map[string]json.RawMessage `json:"-"`
 }
 
+// UnmarshalJSON decodes known chart fields and preserves unknown fields in Extra.
 func (chart *Chart) UnmarshalJSON(data []byte) error {
 	type wire Chart
 	var value wire

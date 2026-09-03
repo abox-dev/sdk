@@ -41,9 +41,9 @@ node scripts/check-release-versions.mjs vX.Y.Z
 ```
 
 `release:version` updates the five workspace manifests, both Python
-`pyproject.toml` files, and `packages/go-sdk/version.go`. Regenerate both Python lock files
-rather than editing them by hand. Do not release any SDK packages at different
-versions.
+`pyproject.toml` files, `packages/go-sdk/version.go`, and the versioned
+pkg.go.dev links in the Go README. Regenerate both Python lock files rather than
+editing them by hand. Do not release any SDK packages at different versions.
 
 ## 3. Verify source and release artifacts
 
@@ -109,7 +109,8 @@ the tagged Go submodule. The `packages/go-sdk/vX.Y.Z` and `vX.Y.Z` tags must
 point to the same commit. Go has no separate registry account or archive: the
 immutable Git tag and Go checksum database are its published artifact. An
 existing registry file is accepted only when its digest matches the newly built
-artifact.
+artifact. The release workflow also waits for the versioned core and Code
+Interpreter pages to become available on pkg.go.dev.
 
 ## 6. Verify the published packages
 
@@ -122,6 +123,10 @@ packages into clean environments and repeat the KVM suite:
 
 Also verify a clean Go consumer with
 `GOPROXY=https://proxy.golang.org go get github.com/abox-dev/sdk/packages/go-sdk@vX.Y.Z`.
+Confirm both versioned reference pages:
+
+- `https://pkg.go.dev/github.com/abox-dev/sdk/packages/go-sdk@vX.Y.Z`;
+- `https://pkg.go.dev/github.com/abox-dev/sdk/packages/go-sdk/codeinterpreter@vX.Y.Z`.
 
 Supported Go CI versions are 1.24.x, 1.25.x, 1.26.x, and 1.27.x. Builds and
 hermetic tests run on every row; race and coverage run on 1.27.x, while

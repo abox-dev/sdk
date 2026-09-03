@@ -44,6 +44,8 @@
     "sdk/cli/auth.md": "0b2c75262b0c0670c7bc0f0f3cbed65fbe4a16d6fe4437789a5685b8bf2174a1",
     "sdk/cli/sandbox.md": "16b64c5a4e932eca2452e400e0faf154eba1d3c7373513aa7cd9744e02908313",
     "sdk/cli/template.md": "f270b22b9ee10a9b954a14f24e04c5449b4d5823bb28002ffde3ed682594cfc5",
+    "sdk/go/code-interpreter.md": "9c56333b8181878d656baa27a4b56b768a0cb01c9d764f7ac8d52d32d8faa70c",
+    "sdk/go/core.md": "72592421dccf87837b71ddf1e52d812474311f0cc498dc0756af186ce114a84e",
     "sdk/javascript/code-interpreter/README.md": "a787206eb86f81fc306b373ce20bc6c91464b0ab3c3ec7650eccbb6be5f676c5",
     "sdk/javascript/code-interpreter/classes/Sandbox.md": "19d9f1f1e8847606a54d93c5a6e5d4c89f936a745866e8d6a2aa06758b605e60",
     "sdk/javascript/code-interpreter/enumerations/ChartType.md": "cf1ba00cd3258cc88814b7215e101b0d775ceb15dd833636d58ae538d8107ec1",
@@ -186,7 +188,8 @@
     "@abox-dev/code-interpreter": "0.1.2",
     "@abox-dev/sdk": "0.1.2",
     "abox-code-interpreter": "0.1.2",
-    "abox-sdk": "0.1.2"
+    "abox-sdk": "0.1.2",
+    "github.com/abox-dev/sdk/packages/go-sdk": "0.1.2"
   },
   "schemaVersion": 1
 }

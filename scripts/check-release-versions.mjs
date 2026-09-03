@@ -27,6 +27,17 @@ if (goVersion !== expected)
     `packages/go-sdk/version.go: expected ${expected}, got ${goVersion}`
   )
 
+const goReadme = fs.readFileSync('packages/go-sdk/README.md', 'utf8')
+for (const packagePath of [
+  'github.com/abox-dev/sdk/packages/go-sdk',
+  'github.com/abox-dev/sdk/packages/go-sdk/codeinterpreter',
+]) {
+  const reference = `https://pkg.go.dev/${packagePath}@v${expected}`
+  if (!goReadme.includes(reference)) {
+    throw new Error(`packages/go-sdk/README.md: missing ${reference}`)
+  }
+}
+
 for (const manifest of [
   'packages/python-sdk/pyproject.toml',
   'packages/code-interpreter-python/pyproject.toml',

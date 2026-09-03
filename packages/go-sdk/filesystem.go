@@ -28,9 +28,12 @@ import (
 type FileType string
 
 const (
-	FileTypeFile      FileType = "file"
+	// FileTypeFile identifies a regular file.
+	FileTypeFile FileType = "file"
+	// FileTypeDirectory identifies a directory.
 	FileTypeDirectory FileType = "dir"
-	FileTypeSymlink   FileType = "symlink"
+	// FileTypeSymlink identifies a symbolic link.
+	FileTypeSymlink FileType = "symlink"
 )
 
 // EntryInfo describes a sandbox filesystem entry.
