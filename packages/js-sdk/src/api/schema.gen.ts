@@ -42,6 +42,7 @@ export interface paths {
                 400: components["responses"]["400"];
                 401: components["responses"]["401"];
                 500: components["responses"]["500"];
+                503: components["responses"]["503"];
             };
         };
         delete?: never;
@@ -1797,10 +1798,16 @@ export interface components {
             /** @description Identifier of the node */
             id: string;
             machineInfo: components["schemas"]["MachineInfo"];
-            metrics: components["schemas"]["NodeMetrics"];
             /**
              * Format: uint32
-             * @description Number of sandboxes running on the node
+             * @description Runtime maintenance contract version reported by ServiceInfo
+             */
+            maintenanceVersion: number;
+            metrics: components["schemas"]["NodeMetrics"];
+            roles: components["schemas"]["NodeRole"][];
+            /**
+             * Format: uint32
+             * @description Number of sandboxes running on the node; for template builders this is not an outstanding build count.
              */
             sandboxCount: number;
             /**
@@ -1837,10 +1844,16 @@ export interface components {
             /** @description Identifier of the node */
             id: string;
             machineInfo: components["schemas"]["MachineInfo"];
-            metrics: components["schemas"]["NodeMetrics"];
             /**
              * Format: uint32
-             * @description Number of sandboxes running on the node
+             * @description Runtime maintenance contract version reported by ServiceInfo
+             */
+            maintenanceVersion: number;
+            metrics: components["schemas"]["NodeMetrics"];
+            roles: components["schemas"]["NodeRole"][];
+            /**
+             * Format: uint32
+             * @description Number of sandboxes running on the node; for template builders this is not an outstanding build count.
              */
             sandboxCount: number;
             /** @description Service instance identifier of the node */
@@ -1909,6 +1922,8 @@ export interface components {
              */
             memoryUsedBytes: number;
         };
+        /** @enum {string} */
+        NodeRole: "worker" | "template-builder";
         /**
          * @description Status of the node.
          *     - draining: the node is bound to be shut down. It will not accept new sandboxes and will stop once all existing sandboxes are done.
@@ -2559,6 +2574,15 @@ export interface components {
         };
         /** @description Server error */
         500: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description Service temporarily unavailable */
+        503: {
             headers: {
                 [name: string]: unknown;
             };

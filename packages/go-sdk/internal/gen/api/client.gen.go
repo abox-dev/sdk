@@ -949,6 +949,9 @@ type N409 = Error
 // N500 defines model for 500.
 type N500 = Error
 
+// N503 defines model for 503.
+type N503 = Error
+
 // GetSandboxesMetricsParams defines parameters for GetSandboxesMetrics.
 type GetSandboxesMetricsParams struct {
 	// SandboxIds Comma-separated list of sandbox IDs to get metrics for
@@ -3654,6 +3657,7 @@ type PostSandboxesResponse struct {
 	JSON400      *N400
 	JSON401      *N401
 	JSON500      *N500
+	JSON503      *N503
 }
 
 // Status returns HTTPResponse.Status
@@ -4969,6 +4973,13 @@ func ParsePostSandboxesResponse(rsp *http.Response) (*PostSandboxesResponse, err
 			return nil, err
 		}
 		response.JSON500 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 503:
+		var dest N503
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON503 = &dest
 
 	}
 

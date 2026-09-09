@@ -205,3 +205,21 @@ Schema: `Error`
 - **`message`** · `string` · required
 
   Error
+
+### 503
+
+Service temporarily unavailable
+
+Content-Type: `application/json`
+
+Schema: `Error`
+
+- **`code`** · `integer` · required
+
+  Error code
+
+  Format: `int32`
+
+- **`message`** · `string` · required
+
+  Error

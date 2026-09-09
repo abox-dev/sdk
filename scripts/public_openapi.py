@@ -5,9 +5,9 @@ from __future__ import annotations
 from typing import Any
 
 REMOVED_SCHEMAS = {
-    "CreatedAccessToken",
+    "CatalogEntry",
+    "Mcp",
     "NewVolume",
-    "NewAccessToken",
     "SandboxVolumeMount",
     "TemplateLegacy",
     "Volume",
@@ -15,7 +15,7 @@ REMOVED_SCHEMAS = {
     "VolumeToken",
 }
 
-CLIENT_REMOVED_PROPERTIES = {"volumeMounts"}
+CLIENT_REMOVED_PROPERTIES = {"mcp", "volumeMounts"}
 REFERENCE_REMOVED_PROPERTIES = CLIENT_REMOVED_PROPERTIES | {
     "envdAccessToken",
     "trafficAccessToken",

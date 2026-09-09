@@ -29,6 +29,7 @@ from .new_team_api_key import NewTeamAPIKey
 from .node import Node
 from .node_detail import NodeDetail
 from .node_metrics import NodeMetrics
+from .node_role import NodeRole
 from .node_status import NodeStatus
 from .node_status_change import NodeStatusChange
 from .resumed_sandbox import ResumedSandbox
@@ -115,6 +116,7 @@ __all__ = (
     "Node",
     "NodeDetail",
     "NodeMetrics",
+    "NodeRole",
     "NodeStatus",
     "NodeStatusChange",
     "ResumedSandbox",

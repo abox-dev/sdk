@@ -6,6 +6,7 @@ from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 from dateutil.parser import isoparse
 
+from ..models.node_role import NodeRole
 from ..models.node_status import NodeStatus
 
 if TYPE_CHECKING:
@@ -20,6 +21,8 @@ T = TypeVar("T", bound="Node")
 class Node:
     """
     Attributes:
+        roles (list[NodeRole]):
+        maintenance_version (int): Runtime maintenance contract version reported by ServiceInfo
         version (str): Version of the orchestrator
         commit (str): Commit of the orchestrator
         id (str): Identifier of the node
@@ -31,13 +34,16 @@ class Node:
             sandboxes are done.
             - standby: the node is not actively used, but it can return to ready and continue serving traffic.
         status_changed_at (datetime.datetime): Time when the node status was last changed
-        sandbox_count (int): Number of sandboxes running on the node
+        sandbox_count (int): Number of sandboxes running on the node; for template builders this is not an outstanding
+            build count.
         metrics (NodeMetrics): Node metrics
         create_successes (int): Number of sandbox create successes
         create_fails (int): Number of sandbox create fails
         sandbox_starting_count (int): Number of starting Sandboxes
     """
 
+    roles: list[NodeRole]
+    maintenance_version: int
     version: str
     commit: str
     id: str
@@ -54,6 +60,13 @@ class Node:
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
+        roles = []
+        for roles_item_data in self.roles:
+            roles_item = roles_item_data.value
+            roles.append(roles_item)
+
+        maintenance_version = self.maintenance_version
+
         version = self.version
 
         commit = self.commit
@@ -84,6 +97,8 @@ class Node:
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
+                "roles": roles,
+                "maintenanceVersion": maintenance_version,
                 "version": version,
                 "commit": commit,
                 "id": id,
@@ -108,6 +123,15 @@ class Node:
         from ..models.node_metrics import NodeMetrics
 
         d = dict(src_dict)
+        roles = []
+        _roles = d.pop("roles")
+        for roles_item_data in _roles:
+            roles_item = NodeRole(roles_item_data)
+
+            roles.append(roles_item)
+
+        maintenance_version = d.pop("maintenanceVersion")
+
         version = d.pop("version")
 
         commit = d.pop("commit")
@@ -135,6 +159,8 @@ class Node:
         sandbox_starting_count = d.pop("sandboxStartingCount")
 
         node = cls(
+            roles=roles,
+            maintenance_version=maintenance_version,
             version=version,
             commit=commit,
             id=id,

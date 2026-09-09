@@ -189,6 +189,13 @@ components:
           schema:
             $ref: "#/components/schemas/Error"
 
+    "503":
+      description: Service temporarily unavailable
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
   schemas:
     Team:
       required:
@@ -295,6 +302,12 @@ components:
       additionalProperties:
         type: string
         description: Environment variables for the sandbox
+
+    Mcp:
+      type: object
+      description: MCP configuration for the sandbox
+      additionalProperties: {}
+      nullable: true
 
     SandboxNetworkConfig:
       type: object
@@ -785,6 +798,8 @@ components:
           $ref: "#/components/schemas/SandboxMetadata"
         envVars:
           $ref: "#/components/schemas/EnvVars"
+        mcp:
+          $ref: "#/components/schemas/Mcp"
         iam:
           $ref: "#/components/schemas/SandboxIam"
         volumeMounts:
@@ -1318,6 +1333,17 @@ components:
           type: boolean
           description: Whether the step should be forced to run regardless of the cache
 
+    CatalogEntry:
+      type: object
+      required: [alias, description]
+      properties:
+        alias:
+          type: string
+          description: Bare global catalog name owned by the configured project.
+        description:
+          type: string
+          maxLength: 4096
+
     TemplateBuildRequestV3:
       properties:
         name:
@@ -1725,8 +1751,15 @@ components:
           type: string
           description: CPU architecture of the node
 
+    NodeRole:
+      type: string
+      enum: [worker, template-builder]
+      x-enum-varnames: [NodeRoleWorker, NodeRoleTemplateBuilder]
+
     Node:
       required:
+        - roles
+        - maintenanceVersion
         - id
         - serviceInstanceID
         - clusterID
@@ -1741,6 +1774,14 @@ components:
         - commit
         - machineInfo
       properties:
+        roles:
+          type: array
+          items:
+            $ref: "#/components/schemas/NodeRole"
+        maintenanceVersion:
+          type: integer
+          format: uint32
+          description: Runtime maintenance contract version reported by ServiceInfo
         version:
           type: string
           description: Version of the orchestrator
@@ -1767,7 +1808,7 @@ components:
         sandboxCount:
           type: integer
           format: uint32
-          description: Number of sandboxes running on the node
+          description: Number of sandboxes running on the node; for template builders this is not an outstanding build count.
         metrics:
           $ref: "#/components/schemas/NodeMetrics"
         createSuccesses:
@@ -1785,6 +1826,8 @@ components:
 
     NodeDetail:
       required:
+        - roles
+        - maintenanceVersion
         - id
         - serviceInstanceID
         - clusterID
@@ -1798,6 +1841,14 @@ components:
         - metrics
         - machineInfo
       properties:
+        roles:
+          type: array
+          items:
+            $ref: "#/components/schemas/NodeRole"
+        maintenanceVersion:
+          type: integer
+          format: uint32
+          description: Runtime maintenance contract version reported by ServiceInfo
         clusterID:
           type: string
           description: Identifier of the cluster
@@ -1824,7 +1875,7 @@ components:
         sandboxCount:
           type: integer
           format: uint32
-          description: Number of sandboxes running on the node
+          description: Number of sandboxes running on the node; for template builders this is not an outstanding build count.
         metrics:
           $ref: "#/components/schemas/NodeMetrics"
         createSuccesses:
@@ -1835,39 +1886,6 @@ components:
           type: integer
           format: uint64
           description: Number of sandbox create fails
-
-    CreatedAccessToken:
-      required:
-        - id
-        - name
-        - token
-        - mask
-        - createdAt
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: Identifier of the access token
-        name:
-          type: string
-          description: Name of the access token
-        token:
-          type: string
-          description: The fully created access token
-        mask:
-          $ref: "#/components/schemas/IdentifierMaskingDetails"
-        createdAt:
-          type: string
-          format: date-time
-          description: Timestamp of access token creation
-
-    NewAccessToken:
-      required:
-        - name
-      properties:
-        name:
-          type: string
-          description: Name of the access token
 
     TeamAPIKey:
       required:
@@ -2103,12 +2121,20 @@ paths:
   /health:
     get:
       summary: Health check
-      description: Health check
+      description: API readiness, independent of runtime worker availability
       responses:
-        "204":
-          description: The service is healthy
-        "401":
-          $ref: "#/components/responses/401"
+        "200":
+          description: The API is initialized and ready to accept requests
+          content:
+            text/plain:
+              schema:
+                type: string
+        "503":
+          description: The API is not ready or is draining
+          content:
+            text/plain:
+              schema:
+                type: string
 
   /teams:
     get:
@@ -2290,6 +2316,8 @@ paths:
           $ref: "#/components/responses/400"
         "500":
           $ref: "#/components/responses/500"
+        "503":
+          $ref: "#/components/responses/503"
 
   /v2/sandboxes:
     get:
@@ -3537,10 +3565,43 @@ paths:
         "500":
           $ref: "#/components/responses/500"
 
+  /admin/templates/{templateID}/catalog:
+    post:
+      summary: Expose a template in the global catalog
+      description: Sets public visibility, global alias and storefront description. Requires a ready default; does not assign tags. Disabled without TEMPLATE_CATALOG_TEAM_ID and TEMPLATE_CATALOG_ALIASES.
+      tags: [admin]
+      security:
+        - AdminApiKeyAuth: []
+      parameters:
+        - $ref: "#/components/parameters/templateID"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CatalogEntry"
+      responses:
+        "204":
+          description: Catalog entry configured
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        "409":
+          $ref: "#/components/responses/409"
+        "503":
+          $ref: "#/components/responses/503"
+        "500":
+          $ref: "#/components/responses/500"
+
   /nodes:
     get:
       summary: List nodes
-      description: List all nodes
+      description: List workers and template builders, including draining and unhealthy runtimes. Records are unique by clusterID and id.
       tags: [admin]
       security:
         - AdminApiKeyAuth: []
@@ -3569,7 +3630,7 @@ paths:
   /nodes/{nodeID}:
     get:
       summary: Node info
-      description: Get node info
+      description: Read current ServiceInfo from a known worker or template builder. An unreachable runtime returns 503.
       tags: [admin]
       security:
         - AdminApiKeyAuth: []
@@ -3583,6 +3644,8 @@ paths:
             type: string
             format: uuid
       responses:
+        "503":
+          $ref: "#/components/responses/503"
         "200":
           description: Successfully returned the node
           content:
@@ -3597,7 +3660,7 @@ paths:
           $ref: "#/components/responses/500"
     post:
       summary: Change node status
-      description: Change status of a node
+      description: Change worker or template builder status; acknowledged only after the runtime persists the maintenance decision.
       tags: [admin]
       security:
         - AdminApiKeyAuth: []
@@ -3609,6 +3672,10 @@ paths:
             schema:
               $ref: "#/components/schemas/NodeStatusChange"
       responses:
+        "503":
+          $ref: "#/components/responses/503"
+        "400":
+          $ref: "#/components/responses/400"
         "204":
           description: The node status was changed successfully
         "409":
@@ -3742,34 +3809,6 @@ paths:
           $ref: "#/components/responses/401"
         "404":
           $ref: "#/components/responses/404"
-        "500":
-          $ref: "#/components/responses/500"
-
-  /access-tokens:
-    post:
-      summary: Create access token
-      description: Create a new access token. Deprecated; use an AgentBox project API key instead.
-      deprecated: true
-      tags: [access-tokens]
-      security:
-        - AuthProviderBearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/NewAccessToken"
-      responses:
-        "201":
-          description: Access token created successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CreatedAccessToken"
-        "401":
-          $ref: "#/components/responses/401"
-        "410":
-          $ref: "#/components/responses/410"
         "500":
           $ref: "#/components/responses/500"
 
