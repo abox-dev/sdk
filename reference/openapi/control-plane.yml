@@ -98,6 +98,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+    '503':
+      description: Service temporarily unavailable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   schemas:
     TeamUser:
       required:
@@ -1310,6 +1316,8 @@ paths:
           $ref: '#/components/responses/400'
         '500':
           $ref: '#/components/responses/500'
+        '503':
+          $ref: '#/components/responses/503'
       operationId: createSandbox
       security:
       - ApiKeyAuth: []
