@@ -30,7 +30,7 @@ import {
   SandboxHealthCheck,
 } from '../../envd/rpc'
 import { ENVD_COMMANDS_STDIN, ENVD_ENVD_CLOSE } from '../../envd/versions'
-import { SandboxError } from '../../errors'
+import { CommandNotFoundError, SandboxError } from '../../errors'
 import { CommandHandle, CommandResult } from './commandHandle'
 export { Pty } from './pty'
 
@@ -228,7 +228,9 @@ export class Commands {
         }
       )
     } catch (err) {
-      throw await handleRpcErrorWithHealthCheck(err, this.checkHealth)
+      throw await handleRpcErrorWithHealthCheck(err, this.checkHealth, {
+        [Code.NotFound]: (message) => new CommandNotFoundError(message),
+      })
     }
   }
 
@@ -265,7 +267,9 @@ export class Commands {
         }
       )
     } catch (err) {
-      throw await handleRpcErrorWithHealthCheck(err, this.checkHealth)
+      throw await handleRpcErrorWithHealthCheck(err, this.checkHealth, {
+        [Code.NotFound]: (message) => new CommandNotFoundError(message),
+      })
     }
   }
 

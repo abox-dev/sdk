@@ -2,7 +2,12 @@
  * Execute a command in a running sandbox.
  */
 
-import { Sandbox, CommandExitError, SandboxNotFoundError } from '@abox-dev/sdk'
+import {
+  Sandbox,
+  CommandExitError,
+  CommandNotFoundError,
+  SandboxNotFoundError,
+} from '@abox-dev/sdk'
 import * as commander from 'commander'
 
 import { ensureAPIKey } from '../../api'
@@ -182,7 +187,10 @@ async function sendStdin(sandbox: Sandbox, pid: number): Promise<void> {
       try {
         await sandbox.commands.sendStdin(pid, chunk)
       } catch (err) {
-        if (err instanceof SandboxNotFoundError) {
+        if (
+          err instanceof CommandNotFoundError ||
+          err instanceof SandboxNotFoundError
+        ) {
           processExited = true
           console.error(
             'agentbox: Remote command exited before stdin could be delivered.'
@@ -203,7 +211,10 @@ async function sendStdin(sandbox: Sandbox, pid: number): Promise<void> {
   try {
     await sandbox.commands.closeStdin(pid)
   } catch (err) {
-    if (err instanceof SandboxNotFoundError) {
+    if (
+      err instanceof CommandNotFoundError ||
+      err instanceof SandboxNotFoundError
+    ) {
       // Process already exited — EOF is moot.
       return
     }

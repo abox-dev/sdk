@@ -32,6 +32,7 @@ vi.mock('@abox-dev/sdk', () => {
   }
 
   class SandboxNotFoundError extends Error {}
+  class CommandNotFoundError extends Error {}
 
   return {
     Sandbox: {
@@ -39,6 +40,7 @@ vi.mock('@abox-dev/sdk', () => {
     },
     CommandExitError,
     SandboxNotFoundError,
+    CommandNotFoundError,
   }
 })
 

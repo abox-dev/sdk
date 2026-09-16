@@ -79,6 +79,16 @@ export class SandboxNotFoundError extends SandboxError {
 }
 
 /**
+ * Thrown when a command process has already exited or its PID does not exist.
+ */
+export class CommandNotFoundError extends SandboxError {
+  constructor(message: string) {
+    super(message)
+    this.name = 'CommandNotFoundError'
+  }
+}
+
+/**
  * Thrown when authentication fails.
  */
 export class AuthenticationError extends Error {
