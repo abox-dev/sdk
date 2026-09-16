@@ -191,6 +191,31 @@ test('sandbox URL routing preserves the configured protocol', () => {
   )
 })
 
+test('shared sandbox URL derives direct hosts from the runtime domain', () => {
+  const config = new ConnectionConfig({
+    sandboxUrl: 'https://sandbox.agentbox-runtime.ru',
+  })
+
+  assert.equal(
+    config.getSandboxUrl('sbx-test', {
+      sandboxDomain: 'agentbox-runtime.ru',
+      envdPort: 49983,
+    }),
+    'https://sandbox.agentbox-runtime.ru'
+  )
+  assert.equal(
+    config.getHost('sbx-test', 8080, 'agentbox-runtime.ru'),
+    '8080-sbx-test.agentbox-runtime.ru'
+  )
+  assert.equal(
+    config.getSandboxDirectUrl('sbx-test', {
+      sandboxDomain: 'agentbox-runtime.ru',
+      envdPort: 49983,
+    }),
+    'https://49983-sbx-test.agentbox-runtime.ru'
+  )
+})
+
 test('sandbox URL routing rejects an invalid URL', () => {
   const config = new ConnectionConfig({
     debug: false,
