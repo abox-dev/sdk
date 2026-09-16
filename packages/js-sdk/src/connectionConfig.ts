@@ -506,7 +506,11 @@ export class ConnectionConfig {
     if (this.sandboxUrl) {
       const proxyUrl = this.parseSandboxUrl()
       const proxyPort = proxyUrl.port ? `:${proxyUrl.port}` : ''
-      return `${port}-${sandboxId}.${proxyUrl.hostname}${proxyPort}`
+      const host =
+        proxyUrl.hostname === `sandbox.${sandboxDomain}`
+          ? sandboxDomain
+          : proxyUrl.hostname
+      return `${port}-${sandboxId}.${host}${proxyPort}`
     }
 
     if (this.debug) {
