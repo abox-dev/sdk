@@ -10,6 +10,7 @@ export {
   NotEnoughSpaceError,
   SandboxError,
   SandboxNotFoundError,
+  CommandNotFoundError,
   TemplateError,
   TimeoutError,
   RateLimitError,

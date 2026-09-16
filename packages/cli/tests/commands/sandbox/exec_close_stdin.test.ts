@@ -36,6 +36,7 @@ vi.mock('@abox-dev/sdk', () => {
   }
 
   class SandboxNotFoundError extends Error {}
+  class CommandNotFoundError extends Error {}
 
   return {
     Sandbox: {
@@ -43,6 +44,7 @@ vi.mock('@abox-dev/sdk', () => {
     },
     CommandExitError,
     SandboxNotFoundError,
+    CommandNotFoundError,
   }
 })
 
@@ -131,10 +133,10 @@ describe('sandbox exec closeStdin handling', () => {
     expect(exitSpy).toHaveBeenCalledWith(1)
   })
 
-  test('keeps SandboxNotFoundError from closeStdin non-fatal', async () => {
-    const { SandboxNotFoundError } = await import('@abox-dev/sdk')
+  test('keeps CommandNotFoundError from closeStdin non-fatal', async () => {
+    const { CommandNotFoundError } = await import('@abox-dev/sdk')
     mocks.closeStdin.mockRejectedValue(
-      new SandboxNotFoundError('already exited')
+      new CommandNotFoundError('already exited')
     )
 
     const exitSpy = vi
@@ -153,10 +155,10 @@ describe('sandbox exec closeStdin handling', () => {
     expect(exitSpy).toHaveBeenCalledWith(0)
   })
 
-  test('stops stdin streaming after SandboxNotFoundError from sendStdin', async () => {
-    const { SandboxNotFoundError } = await import('@abox-dev/sdk')
+  test('stops stdin streaming after CommandNotFoundError from sendStdin', async () => {
+    const { CommandNotFoundError } = await import('@abox-dev/sdk')
     mocks.sendStdin.mockRejectedValueOnce(
-      new SandboxNotFoundError('already exited')
+      new CommandNotFoundError('already exited')
     )
     mocks.streamStdinChunks.mockImplementation(
       async (
