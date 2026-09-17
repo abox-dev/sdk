@@ -4,6 +4,7 @@
 
 - [AuthenticationError](classes/AuthenticationError.md)
 - [BuildError](classes/BuildError.md)
+- [CommandNotFoundError](classes/CommandNotFoundError.md)
 - [FileNotFoundError](classes/FileNotFoundError.md)
 - [FileUploadError](classes/FileUploadError.md)
 - [InvalidArgumentError](classes/InvalidArgumentError.md)

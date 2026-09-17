@@ -298,7 +298,12 @@ class ConnectionConfig:
         if self._sandbox_url:
             proxy_url = self._parse_sandbox_url()
             proxy_port = f":{proxy_url.port}" if proxy_url.port else ""
-            return f"{port}-{sandbox_id}.{proxy_url.hostname}{proxy_port}"
+            host = (
+                sandbox_domain
+                if proxy_url.hostname == f"sandbox.{sandbox_domain}"
+                else proxy_url.hostname
+            )
+            return f"{port}-{sandbox_id}.{host}{proxy_port}"
 
         if self.debug:
             return f"localhost:{port}"

@@ -1,45 +1,32 @@
-[agentbox-sdk-monorepo](../README.md) / SandboxError
+[agentbox-sdk-monorepo](../README.md) / CommandNotFoundError
 
-# Class: SandboxError
+# Class: CommandNotFoundError
 
-Base class for all sandbox errors.
-
-Thrown when general sandbox errors occur.
+Thrown when a command process has already exited or its PID does not exist.
 
 ## Extends
 
-- `Error`
-
-## Extended by
-
-- [`CommandNotFoundError`](CommandNotFoundError.md)
-- [`FileNotFoundError`](FileNotFoundError.md)
-- [`InvalidArgumentError`](InvalidArgumentError.md)
-- [`NotEnoughSpaceError`](NotEnoughSpaceError.md)
-- [`RateLimitError`](RateLimitError.md)
-- [`SandboxNotFoundError`](SandboxNotFoundError.md)
-- [`TemplateError`](TemplateError.md)
-- [`TimeoutError`](TimeoutError.md)
+- [`SandboxError`](SandboxError.md)
 
 ## Constructors
 
 ### Constructor
 
-> **new SandboxError**(`message?`): `SandboxError`
+> **new CommandNotFoundError**(`message`): `CommandNotFoundError`
 
 #### Parameters
 
-##### message?
+##### message
 
 `string`
 
 #### Returns
 
-`SandboxError`
+`CommandNotFoundError`
 
 #### Overrides
 
-`Error.constructor`
+[`SandboxError`](SandboxError.md).[`constructor`](SandboxError.md#constructor)
 
 ## Properties
 
@@ -49,7 +36,7 @@ Thrown when general sandbox errors occur.
 
 #### Inherited from
 
-`Error.cause`
+[`SandboxError`](SandboxError.md).[`cause`](SandboxError.md#cause)
 
 ***
 
@@ -59,7 +46,7 @@ Thrown when general sandbox errors occur.
 
 #### Inherited from
 
-`Error.message`
+[`SandboxError`](SandboxError.md).[`message`](SandboxError.md#message)
 
 ***
 
@@ -69,7 +56,7 @@ Thrown when general sandbox errors occur.
 
 #### Inherited from
 
-`Error.name`
+[`SandboxError`](SandboxError.md).[`name`](SandboxError.md#name)
 
 ***
 
@@ -79,7 +66,7 @@ Thrown when general sandbox errors occur.
 
 #### Inherited from
 
-`Error.stack`
+[`SandboxError`](SandboxError.md).[`stack`](SandboxError.md#stack)
 
 ***
 
@@ -99,7 +86,7 @@ not capture any frames.
 
 #### Inherited from
 
-`Error.stackTraceLimit`
+[`SandboxError`](SandboxError.md).[`stackTraceLimit`](SandboxError.md#stacktracelimit)
 
 ## Methods
 
@@ -167,7 +154,7 @@ a();
 
 #### Inherited from
 
-`Error.captureStackTrace`
+[`SandboxError`](SandboxError.md).[`captureStackTrace`](SandboxError.md#capturestacktrace)
 
 ***
 
@@ -195,4 +182,4 @@ https://v8.dev/docs/stack-trace-api#customizing-stack-traces
 
 #### Inherited from
 
-`Error.prepareStackTrace`
+[`SandboxError`](SandboxError.md).[`prepareStackTrace`](SandboxError.md#preparestacktrace)
