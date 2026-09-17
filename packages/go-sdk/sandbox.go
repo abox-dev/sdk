@@ -664,7 +664,11 @@ func (sandbox *Sandbox) envdURL(port int, direct bool) string {
 	if sandbox.client.config.sandboxURL != "" {
 		parsed, _ := url.Parse(sandbox.client.config.sandboxURL)
 		if direct {
-			return parsed.Scheme + "://" + fmt.Sprintf("%d-%s.%s", port, sandbox.ID, parsed.Host)
+			host := parsed.Host
+			if parsed.Hostname() == "sandbox."+sandbox.Domain {
+				host = strings.TrimPrefix(host, "sandbox.")
+			}
+			return parsed.Scheme + "://" + fmt.Sprintf("%d-%s.%s", port, sandbox.ID, host)
 		}
 		return sandbox.client.config.sandboxURL
 	}

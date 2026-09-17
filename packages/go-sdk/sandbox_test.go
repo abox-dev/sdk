@@ -13,6 +13,44 @@ import (
 	api "github.com/abox-dev/sdk/packages/go-sdk/internal/gen/api"
 )
 
+func TestSandboxDirectURLWithConfiguredProxy(t *testing.T) {
+	tests := []struct {
+		name, proxyURL, domain, directURL string
+	}{
+		{
+			name: "shared production host", proxyURL: "https://sandbox.agentbox-runtime.ru",
+			domain: "agentbox-runtime.ru", directURL: "https://49983-sbx.agentbox-runtime.ru",
+		},
+		{
+			name: "shared production host with port", proxyURL: "https://sandbox.agentbox-runtime.ru:8443",
+			domain: "agentbox-runtime.ru", directURL: "https://49983-sbx.agentbox-runtime.ru:8443",
+		},
+		{
+			name: "custom proxy", proxyURL: "https://sandbox.example.com",
+			domain: "agentbox-runtime.ru", directURL: "https://49983-sbx.sandbox.example.com",
+		},
+		{
+			name: "local proxy", proxyURL: "http://localhost:3002",
+			domain: "agentbox-runtime.ru", directURL: "http://49983-sbx.localhost:3002",
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			client, err := NewClient(WithSandboxURL(test.proxyURL), WithDebug(false))
+			if err != nil {
+				t.Fatal(err)
+			}
+			sandbox := &Sandbox{ID: "sbx", Domain: test.domain, client: client}
+			if got := sandbox.envdURL(49983, false); got != test.proxyURL {
+				t.Fatalf("shared URL = %q, want %q", got, test.proxyURL)
+			}
+			if got := sandbox.envdURL(49983, true); got != test.directURL {
+				t.Fatalf("direct URL = %q, want %q", got, test.directURL)
+			}
+		})
+	}
+}
+
 func TestSandboxLifecycleAPI(t *testing.T) {
 	requests := make(chan *http.Request, 32)
 	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {

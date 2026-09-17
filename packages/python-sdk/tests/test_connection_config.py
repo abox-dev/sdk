@@ -99,6 +99,25 @@ def test_sandbox_url_routing_preserves_configured_protocol():
     )
 
 
+def test_shared_sandbox_url_uses_runtime_domain_for_direct_host():
+    config = ConnectionConfig(
+        debug=False, sandbox_url="https://sandbox.agentbox-runtime.ru"
+    )
+
+    assert (
+        config.get_sandbox_url("sandbox-id", "agentbox-runtime.ru")
+        == "https://sandbox.agentbox-runtime.ru"
+    )
+    assert (
+        config.get_host("sandbox-id", "agentbox-runtime.ru", 8080)
+        == "8080-sandbox-id.agentbox-runtime.ru"
+    )
+    assert (
+        config.get_sandbox_direct_url("sandbox-id", "agentbox-runtime.ru")
+        == "https://49983-sandbox-id.agentbox-runtime.ru"
+    )
+
+
 def test_sandbox_url_routing_rejects_invalid_url():
     config = ConnectionConfig(debug=False, sandbox_url="localhost:3002")
 

@@ -1,6 +1,7 @@
 export {
   AuthenticationError,
   BuildError,
+  CommandNotFoundError,
   FileNotFoundError,
   FileUploadError,
   InvalidArgumentError,
