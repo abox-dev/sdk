@@ -9,7 +9,7 @@ import (
 
 // PTYOptions configures an interactive terminal.
 type PTYOptions struct {
-	// User selects the process owner. Empty uses the template default (user on envd < 0.4.0).
+	// User selects the process owner. Empty uses the template default.
 	User  string
 	Args  []string
 	Env   map[string]string

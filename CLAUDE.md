@@ -1,6 +1,7 @@
 Use pnpm for JavaScript packages, uv for Python packages, and Go modules for Go packages.
 Use English exclusively in source code, comments, documentation, commit messages, and GitHub pull request titles and descriptions.
 Keep the JavaScript, Python sync/async, and Go SDKs behaviorally aligned, including their Code Interpreter APIs.
+Describe current SDK and envd behavior in public documentation and exported API comments. Avoid historical version qualifiers and migration narratives; retain exact versions in installation commands, reference links, and dependency pins.
 Use only Go syntax and runtime dependencies compatible with the `go` directive in `packages/go-sdk/go.mod`.
 Run format checks, lint, type checks, unit tests, deterministic generation, builds, package-install checks, the exported GoDoc gate, and the Go race and coverage checks before committing. Handwritten Go code must keep at least 90% statement coverage; generated packages are excluded from the threshold.
 The API and envd snapshots under spec/ are generated from mono/infra. Do not edit them manually. Update them with `make sync-specs MONO_DIR=/path/to/mono`, then run `make generate`.
