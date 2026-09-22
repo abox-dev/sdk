@@ -269,7 +269,7 @@ Create a client, start a sandbox, and run a command:
 
 <a name="Version"></a>Version is the AgentBox SDK release version.
 
-	const Version = "0.2.0"
+	const Version = "0.2.1"
 
 <a name="IAMTokenPlaceholder"></a>
 ## func IAMTokenPlaceholder
