@@ -60,7 +60,7 @@ type WriteFile struct {
 
 // FileOptions selects the user for a filesystem operation. User affects relative
 // path resolution and ownership of created objects, not OS permission isolation.
-// Empty User uses the template default, or user on envd older than 0.4.0.
+// Empty User uses the template default.
 type FileOptions struct {
 	User string
 }

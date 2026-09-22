@@ -1,6 +1,6 @@
 [project]
 name = "abox-code-interpreter"
-version = "0.2.0"
+version = "0.2.1"
 description = "AgentBox Code Interpreter - Stateful code execution"
 authors = [{ name = "RetailDriver LLC" }]
 license = "MIT"
