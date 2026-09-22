@@ -239,14 +239,14 @@ func TestFilesystem(t *testing.T) {
 	sandbox, closeServer := newEnvdTestSandbox(t)
 	defer closeServer()
 	ctx := context.Background()
-	if text, err := sandbox.Files.ReadText(ctx, "/file.txt", ""); err != nil || text != "hello" {
+	if text, err := sandbox.Files.ReadText(ctx, "/file.txt", nil); err != nil || text != "hello" {
 		t.Fatalf("read: %q %v", text, err)
 	}
-	if _, err := sandbox.Files.Read(ctx, "", ""); err == nil {
+	if _, err := sandbox.Files.Read(ctx, "", nil); err == nil {
 		t.Fatal("expected empty path validation")
 	}
 	var output strings.Builder
-	if count, err := sandbox.Files.ReadTo(ctx, "/file.txt", "", &output); err != nil || count != 5 {
+	if count, err := sandbox.Files.ReadTo(ctx, "/file.txt", &output, nil); err != nil || count != 5 {
 		t.Fatalf("read to: %d %v", count, err)
 	}
 	if entry, err := sandbox.Files.WriteText(ctx, "/file.txt", "hello", &WriteFileOptions{Metadata: map[string]string{"kind": "test"}}); err != nil || entry.Path != "/file.txt" {
@@ -255,31 +255,31 @@ func TestFilesystem(t *testing.T) {
 	if _, err := sandbox.Files.WriteBytes(ctx, "/file.txt", []byte("hello"), nil); err != nil {
 		t.Fatal(err)
 	}
-	if entries, err := sandbox.Files.WriteBatch(ctx, []WriteFile{{Path: "/file.txt", Data: strings.NewReader("hello")}}, ""); err != nil || len(entries) != 1 {
+	if entries, err := sandbox.Files.WriteBatch(ctx, []WriteFile{{Path: "/file.txt", Data: strings.NewReader("hello")}}, nil); err != nil || len(entries) != 1 {
 		t.Fatalf("batch: %v", err)
 	}
-	if entry, err := sandbox.Files.Stat(ctx, "/file.txt"); err != nil || entry.Metadata["kind"] != "test" {
+	if entry, err := sandbox.Files.Stat(ctx, "/file.txt", nil); err != nil || entry.Metadata["kind"] != "test" {
 		t.Fatalf("stat: %#v %v", entry, err)
 	}
-	if exists, err := sandbox.Files.Exists(ctx, "missing"); err != nil || exists {
+	if exists, err := sandbox.Files.Exists(ctx, "missing", nil); err != nil || exists {
 		t.Fatalf("exists: %v %v", exists, err)
 	}
-	if exists, err := sandbox.Files.Exists(ctx, "/file.txt"); err != nil || !exists {
+	if exists, err := sandbox.Files.Exists(ctx, "/file.txt", nil); err != nil || !exists {
 		t.Fatalf("existing file: %v %v", exists, err)
 	}
-	if entries, err := sandbox.Files.WriteBatch(ctx, []WriteFile{{Path: "", Data: nil}}, ""); err == nil || len(entries) != 0 {
+	if entries, err := sandbox.Files.WriteBatch(ctx, []WriteFile{{Path: "", Data: nil}}, nil); err == nil || len(entries) != 0 {
 		t.Fatal("expected batch failure")
 	}
-	if entries, err := sandbox.Files.List(ctx, "/", 1); err != nil || len(entries) != 1 {
+	if entries, err := sandbox.Files.List(ctx, "/", &ListFilesOptions{Depth: 1}); err != nil || len(entries) != 1 {
 		t.Fatalf("list: %v", err)
 	}
-	if _, err := sandbox.Files.MakeDir(ctx, "/dir"); err != nil {
+	if _, err := sandbox.Files.MakeDir(ctx, "/dir", nil); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := sandbox.Files.Rename(ctx, "/file.txt", "/new.txt"); err != nil {
+	if _, err := sandbox.Files.Rename(ctx, "/file.txt", "/new.txt", nil); err != nil {
 		t.Fatal(err)
 	}
-	if err := sandbox.Files.Remove(ctx, "/new.txt"); err != nil {
+	if err := sandbox.Files.Remove(ctx, "/new.txt", nil); err != nil {
 		t.Fatal(err)
 	}
 	watcher, err := sandbox.Files.Watch(ctx, "/", &WatchOptions{IncludeEntry: true})
@@ -296,7 +296,7 @@ func TestFilesystem(t *testing.T) {
 	if _, err := sandbox.Files.WriteText(ctx, "/x", "x", &WriteFileOptions{Metadata: map[string]string{"bad key": "x"}}); err == nil {
 		t.Fatal("expected metadata validation")
 	}
-	if _, err := sandbox.Files.ReadText(ctx, "missing-http", ""); err == nil {
+	if _, err := sandbox.Files.ReadText(ctx, "missing-http", nil); err == nil {
 		t.Fatal("expected HTTP file error")
 	} else {
 		var missing *FileNotFoundError
@@ -343,7 +343,7 @@ func TestEnvdVersionCompatibility(t *testing.T) {
 	sandbox, closeServer := newEnvdTestSandbox(t)
 	defer closeServer()
 	sandbox.EnvdVersion = "0.3.9"
-	if _, err := sandbox.Files.ReadText(t.Context(), "old-user", ""); err != nil {
+	if _, err := sandbox.Files.ReadText(t.Context(), "old-user", nil); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := sandbox.Files.WriteText(t.Context(), "/file.txt", "hello", &WriteFileOptions{Metadata: map[string]string{"kind": "test"}}); err == nil {
@@ -379,7 +379,7 @@ func TestUnaryEnvdRequestTimeout(t *testing.T) {
 	sandbox, closeServer := newEnvdTestSandbox(t)
 	defer closeServer()
 	sandbox.client.config.requestTimeout = 10 * time.Millisecond
-	_, err := sandbox.Files.Stat(t.Context(), "slow")
+	_, err := sandbox.Files.Stat(t.Context(), "slow", nil)
 	var timeout *TimeoutError
 	if !errors.As(err, &timeout) {
 		t.Fatalf("expected TimeoutError, got %T: %v", err, err)
@@ -567,7 +567,7 @@ func TestStreamingResponsesAreClosed(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	watcher, err := sandbox.Files.Watch(t.Context(), "/", nil)
+	watcher, err := sandbox.Files.Watch(t.Context(), "/", &WatchOptions{User: "root"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -586,7 +586,7 @@ func TestStreamingResponsesAreClosed(t *testing.T) {
 func TestWatchCloseDoesNotRequireDrainingEvents(t *testing.T) {
 	sandbox, closeServer := newEnvdTestSandbox(t)
 	defer closeServer()
-	watcher, err := sandbox.Files.Watch(t.Context(), "/flood", nil)
+	watcher, err := sandbox.Files.Watch(t.Context(), "/flood", &WatchOptions{User: "root"})
 	if err != nil {
 		t.Fatal(err)
 	}

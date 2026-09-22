@@ -20,4 +20,10 @@ func TestPublicPackagesCompile(t *testing.T) {
 	_ = agentbox.TemplateInfoOptions{Limit: 10}
 	_ = agentbox.ForkResult{}
 	_ = agentbox.SandboxRequestOptions{}
+	_ = agentbox.CommandOptions{User: "user"}
+	_ = agentbox.PTYOptions{User: "root"}
+	_ = agentbox.FileOptions{User: "user"}
+	_ = agentbox.ListFilesOptions{User: "user", Depth: 2}
+	_ = agentbox.WatchOptions{User: "user"}
+	_ = agentbox.FileURLOptions{User: "user"}
 }

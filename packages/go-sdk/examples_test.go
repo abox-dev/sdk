@@ -67,3 +67,30 @@ func ExampleCommandService_Start_streaming() {
 	_ = attached.CloseStdin(ctx)
 	_, _ = attached.Wait(ctx)
 }
+
+func ExampleFileService_Stat() {
+	ctx := context.Background()
+	client, err := agentbox.NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+	sandbox, err := client.Sandboxes.Create(ctx, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer sandbox.Kill(context.Background())
+	// The same user selects process identity and resolves filesystem paths.
+	result, err := sandbox.Commands.Run(ctx, "id", &agentbox.CommandOptions{
+		User: "root",
+		Args: []string{"-un"},
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Print(string(result.Stdout))
+	info, err := sandbox.Files.Stat(ctx, "~", &agentbox.FileOptions{User: "root"})
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Print(info.Path)
+}

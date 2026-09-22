@@ -44,8 +44,8 @@ func main() {
 Code Interpreter is available from
 `github.com/abox-dev/sdk/packages/go-sdk/codeinterpreter`.
 
-API reference for this release: [core SDK on pkg.go.dev](https://pkg.go.dev/github.com/abox-dev/sdk/packages/go-sdk@v0.1.8) and
-[Code Interpreter on pkg.go.dev](https://pkg.go.dev/github.com/abox-dev/sdk/packages/go-sdk/codeinterpreter@v0.1.8).
+API reference for this release: [core SDK on pkg.go.dev](https://pkg.go.dev/github.com/abox-dev/sdk/packages/go-sdk@v0.2.0) and
+[Code Interpreter on pkg.go.dev](https://pkg.go.dev/github.com/abox-dev/sdk/packages/go-sdk/codeinterpreter@v0.2.0).
 
 Documentation: [core SDK](https://docs.agentbox.ru/en/sdk/),
 [sandboxes](https://docs.agentbox.ru/en/sdk/sandboxes/),
@@ -53,6 +53,33 @@ Documentation: [core SDK](https://docs.agentbox.ru/en/sdk/),
 [Code Interpreter](https://docs.agentbox.ru/en/sdk/code-interpreter/).
 
 `Sandbox.Kill` returns `false, nil` when the sandbox no longer exists.
+
+## Execution user and filesystem options
+
+Set `User` in `CommandOptions`, `PTYOptions`, or filesystem options to select a
+sandbox user. Empty `User` uses the template default (or `user` on envd older
+than 0.4.0). The selection belongs to each operation and works with streaming.
+Existing-process operations retain the user selected at launch.
+
+```go
+result, err := sandbox.Commands.Run(ctx, "id", &agentbox.CommandOptions{
+    User: "root",
+    Args: []string{"-un"},
+})
+info, err := sandbox.Files.Stat(ctx, "~", &agentbox.FileOptions{User: "root"})
+entries, err := sandbox.Files.List(ctx, "~", &agentbox.ListFilesOptions{
+    User: "root",
+    Depth: 2,
+})
+```
+
+All filesystem methods accept options as their final argument; nil selects
+defaults. `FileOptions` covers reads and simple filesystem operations;
+`ListFilesOptions`, `WriteFileOptions`, `WatchOptions`, and `FileURLOptions`
+cover listing, uploads (including batches), watches, and signed URLs.
+Filesystem users affect path resolution and ownership of created objects, not
+OS permission isolation. See the [user-selection guide](../../docs/go-envd-user-selection.md)
+for semantics and the signature changes introduced in v0.2.0.
 
 ## Command output
 

@@ -9,6 +9,8 @@ import (
 
 // PTYOptions configures an interactive terminal.
 type PTYOptions struct {
+	// User selects the process owner. Empty uses the template default (user on envd < 0.4.0).
+	User  string
 	Args  []string
 	Env   map[string]string
 	Cwd   string
@@ -52,6 +54,10 @@ func (service *PTYService) Create(ctx context.Context, command string, options *
 		request.Msg.Tag = &options.Tag
 	}
 	service.commands.addHeaders(request.Header())
+	if err := service.commands.sandbox.addUserHeader(request.Header(), options.User); err != nil {
+		cancel()
+		return nil, err
+	}
 	stream, err := service.commands.outputClient(options.Streaming).Start(ctx, request)
 	if err != nil {
 		cancel()

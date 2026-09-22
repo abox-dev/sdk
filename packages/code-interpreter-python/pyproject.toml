@@ -1,6 +1,6 @@
 [project]
 name = "abox-code-interpreter"
-version = "0.1.8"
+version = "0.2.0"
 description = "AgentBox Code Interpreter - Stateful code execution"
 authors = [{ name = "RetailDriver LLC" }]
 license = "MIT"
@@ -10,7 +10,7 @@ requires-python = ">=3.10"
 dependencies = [
     "httpx>=0.20.0,<1.0.0",
     "attrs>=21.3.0",
-    "abox-sdk>=0.1.0,<0.2.0",
+    "abox-sdk>=0.2.0,<0.3.0",
 ]
 
 [project.urls]

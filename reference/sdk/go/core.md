@@ -87,25 +87,27 @@ Create a client, start a sandbox, and run a command:
 - [type FileNotFoundError](<#FileNotFoundError>)
   - [func \(e \*FileNotFoundError\) Error\(\) string](<#FileNotFoundError.Error>)
   - [func \(e \*FileNotFoundError\) Unwrap\(\) error](<#FileNotFoundError.Unwrap>)
+- [type FileOptions](<#FileOptions>)
 - [type FileService](<#FileService>)
-  - [func \(service \*FileService\) Exists\(ctx context.Context, path string\) \(bool, error\)](<#FileService.Exists>)
-  - [func \(service \*FileService\) List\(ctx context.Context, path string, depth uint32\) \(\[\]EntryInfo, error\)](<#FileService.List>)
-  - [func \(service \*FileService\) MakeDir\(ctx context.Context, path string\) \(\*EntryInfo, error\)](<#FileService.MakeDir>)
-  - [func \(service \*FileService\) Read\(ctx context.Context, path, user string\) \(io.ReadCloser, error\)](<#FileService.Read>)
-  - [func \(service \*FileService\) ReadBytes\(ctx context.Context, path, user string\) \(\[\]byte, error\)](<#FileService.ReadBytes>)
-  - [func \(service \*FileService\) ReadText\(ctx context.Context, path, user string\) \(string, error\)](<#FileService.ReadText>)
-  - [func \(service \*FileService\) ReadTo\(ctx context.Context, path, user string, writer io.Writer\) \(int64, error\)](<#FileService.ReadTo>)
-  - [func \(service \*FileService\) Remove\(ctx context.Context, path string\) error](<#FileService.Remove>)
-  - [func \(service \*FileService\) Rename\(ctx context.Context, source, destination string\) \(\*EntryInfo, error\)](<#FileService.Rename>)
-  - [func \(service \*FileService\) SignedReadURL\(path, user string, expiration time.Time\) \(string, error\)](<#FileService.SignedReadURL>)
-  - [func \(service \*FileService\) SignedWriteURL\(path, user string, expiration time.Time\) \(string, error\)](<#FileService.SignedWriteURL>)
-  - [func \(service \*FileService\) Stat\(ctx context.Context, path string\) \(\*EntryInfo, error\)](<#FileService.Stat>)
+  - [func \(service \*FileService\) Exists\(ctx context.Context, path string, options \*FileOptions\) \(bool, error\)](<#FileService.Exists>)
+  - [func \(service \*FileService\) List\(ctx context.Context, path string, options \*ListFilesOptions\) \(\[\]EntryInfo, error\)](<#FileService.List>)
+  - [func \(service \*FileService\) MakeDir\(ctx context.Context, path string, options \*FileOptions\) \(\*EntryInfo, error\)](<#FileService.MakeDir>)
+  - [func \(service \*FileService\) Read\(ctx context.Context, path string, options \*FileOptions\) \(io.ReadCloser, error\)](<#FileService.Read>)
+  - [func \(service \*FileService\) ReadBytes\(ctx context.Context, path string, options \*FileOptions\) \(\[\]byte, error\)](<#FileService.ReadBytes>)
+  - [func \(service \*FileService\) ReadText\(ctx context.Context, path string, options \*FileOptions\) \(string, error\)](<#FileService.ReadText>)
+  - [func \(service \*FileService\) ReadTo\(ctx context.Context, path string, writer io.Writer, options \*FileOptions\) \(int64, error\)](<#FileService.ReadTo>)
+  - [func \(service \*FileService\) Remove\(ctx context.Context, path string, options \*FileOptions\) error](<#FileService.Remove>)
+  - [func \(service \*FileService\) Rename\(ctx context.Context, source, destination string, options \*FileOptions\) \(\*EntryInfo, error\)](<#FileService.Rename>)
+  - [func \(service \*FileService\) SignedReadURL\(path string, options \*FileURLOptions\) \(string, error\)](<#FileService.SignedReadURL>)
+  - [func \(service \*FileService\) SignedWriteURL\(path string, options \*FileURLOptions\) \(string, error\)](<#FileService.SignedWriteURL>)
+  - [func \(service \*FileService\) Stat\(ctx context.Context, path string, options \*FileOptions\) \(\*EntryInfo, error\)](<#FileService.Stat>)
   - [func \(service \*FileService\) Watch\(ctx context.Context, path string, options \*WatchOptions\) \(\*WatchHandle, error\)](<#FileService.Watch>)
   - [func \(service \*FileService\) Write\(ctx context.Context, path string, reader io.Reader, options \*WriteFileOptions\) \(\*EntryInfo, error\)](<#FileService.Write>)
-  - [func \(service \*FileService\) WriteBatch\(ctx context.Context, files \[\]WriteFile, user string\) \(\[\]EntryInfo, error\)](<#FileService.WriteBatch>)
+  - [func \(service \*FileService\) WriteBatch\(ctx context.Context, files \[\]WriteFile, options \*WriteFileOptions\) \(\[\]EntryInfo, error\)](<#FileService.WriteBatch>)
   - [func \(service \*FileService\) WriteBytes\(ctx context.Context, path string, data \[\]byte, options \*WriteFileOptions\) \(\*EntryInfo, error\)](<#FileService.WriteBytes>)
   - [func \(service \*FileService\) WriteText\(ctx context.Context, path, text string, options \*WriteFileOptions\) \(\*EntryInfo, error\)](<#FileService.WriteText>)
 - [type FileType](<#FileType>)
+- [type FileURLOptions](<#FileURLOptions>)
 - [type FileUploadError](<#FileUploadError>)
   - [func \(e \*FileUploadError\) Error\(\) string](<#FileUploadError.Error>)
   - [func \(e \*FileUploadError\) Unwrap\(\) error](<#FileUploadError.Unwrap>)
@@ -115,6 +117,7 @@ Create a client, start a sandbox, and run a command:
 - [type InvalidArgumentError](<#InvalidArgumentError>)
   - [func \(e \*InvalidArgumentError\) Error\(\) string](<#InvalidArgumentError.Error>)
   - [func \(e \*InvalidArgumentError\) Unwrap\(\) error](<#InvalidArgumentError.Unwrap>)
+- [type ListFilesOptions](<#ListFilesOptions>)
 - [type ListSandboxOptions](<#ListSandboxOptions>)
 - [type ListedSandbox](<#ListedSandbox>)
 - [type MetricsOptions](<#MetricsOptions>)
@@ -266,7 +269,7 @@ Create a client, start a sandbox, and run a command:
 
 <a name="Version"></a>Version is the AgentBox SDK release version.
 
-	const Version = "0.1.8"
+	const Version = "0.2.0"
 
 <a name="IAMTokenPlaceholder"></a>
 ## func IAMTokenPlaceholder
@@ -630,6 +633,8 @@ Write writes bytes to process stdin.
 CommandOptions configures a command process.
 
 	type CommandOptions struct {
+	    // User selects the process owner. Empty uses the template default (user on envd < 0.4.0).
+	    User     string
 	    Args     []string
 	    Env      map[string]string
 	    Cwd      string
@@ -864,6 +869,15 @@ Error formats the missing\-file failure.
 
 Unwrap returns the underlying missing\-file error, if any.
 
+<a name="FileOptions"></a>
+## type FileOptions
+
+FileOptions selects the user for a filesystem operation. User affects relative path resolution and ownership of created objects, not OS permission isolation. Empty User uses the template default, or user on envd older than 0.4.0.
+
+	type FileOptions struct {
+	    User string
+	}
+
 <a name="FileService"></a>
 ## type FileService
 
@@ -876,86 +890,121 @@ FileService reads and mutates sandbox files.
 <a name="FileService.Exists"></a>
 ### func \(\*FileService\) Exists
 
-	func (service *FileService) Exists(ctx context.Context, path string) (bool, error)
+	func (service *FileService) Exists(ctx context.Context, path string, options *FileOptions) (bool, error)
 
 Exists reports whether path exists.
 
 <a name="FileService.List"></a>
 ### func \(\*FileService\) List
 
-	func (service *FileService) List(ctx context.Context, path string, depth uint32) ([]EntryInfo, error)
+	func (service *FileService) List(ctx context.Context, path string, options *ListFilesOptions) ([]EntryInfo, error)
 
-List lists path recursively up to depth.
+List lists path recursively up to the selected depth \(one level by default\).
 
 <a name="FileService.MakeDir"></a>
 ### func \(\*FileService\) MakeDir
 
-	func (service *FileService) MakeDir(ctx context.Context, path string) (*EntryInfo, error)
+	func (service *FileService) MakeDir(ctx context.Context, path string, options *FileOptions) (*EntryInfo, error)
 
 MakeDir creates a directory.
 
 <a name="FileService.Read"></a>
 ### func \(\*FileService\) Read
 
-	func (service *FileService) Read(ctx context.Context, path, user string) (io.ReadCloser, error)
+	func (service *FileService) Read(ctx context.Context, path string, options *FileOptions) (io.ReadCloser, error)
 
 Read opens a streaming file response. The caller must close it.
 
 <a name="FileService.ReadBytes"></a>
 ### func \(\*FileService\) ReadBytes
 
-	func (service *FileService) ReadBytes(ctx context.Context, path, user string) ([]byte, error)
+	func (service *FileService) ReadBytes(ctx context.Context, path string, options *FileOptions) ([]byte, error)
 
 ReadBytes reads a complete file.
 
 <a name="FileService.ReadText"></a>
 ### func \(\*FileService\) ReadText
 
-	func (service *FileService) ReadText(ctx context.Context, path, user string) (string, error)
+	func (service *FileService) ReadText(ctx context.Context, path string, options *FileOptions) (string, error)
 
 ReadText reads a UTF\-8 file as a string.
 
 <a name="FileService.ReadTo"></a>
 ### func \(\*FileService\) ReadTo
 
-	func (service *FileService) ReadTo(ctx context.Context, path, user string, writer io.Writer) (int64, error)
+	func (service *FileService) ReadTo(ctx context.Context, path string, writer io.Writer, options *FileOptions) (int64, error)
 
 ReadTo streams a file into writer.
 
 <a name="FileService.Remove"></a>
 ### func \(\*FileService\) Remove
 
-	func (service *FileService) Remove(ctx context.Context, path string) error
+	func (service *FileService) Remove(ctx context.Context, path string, options *FileOptions) error
 
 Remove recursively removes a filesystem entry.
 
 <a name="FileService.Rename"></a>
 ### func \(\*FileService\) Rename
 
-	func (service *FileService) Rename(ctx context.Context, source, destination string) (*EntryInfo, error)
+	func (service *FileService) Rename(ctx context.Context, source, destination string, options *FileOptions) (*EntryInfo, error)
 
 Rename moves a filesystem entry.
 
 <a name="FileService.SignedReadURL"></a>
 ### func \(\*FileService\) SignedReadURL
 
-	func (service *FileService) SignedReadURL(path, user string, expiration time.Time) (string, error)
+	func (service *FileService) SignedReadURL(path string, options *FileURLOptions) (string, error)
 
 SignedReadURL creates a directly usable download URL.
 
 <a name="FileService.SignedWriteURL"></a>
 ### func \(\*FileService\) SignedWriteURL
 
-	func (service *FileService) SignedWriteURL(path, user string, expiration time.Time) (string, error)
+	func (service *FileService) SignedWriteURL(path string, options *FileURLOptions) (string, error)
 
 SignedWriteURL creates a directly usable upload URL.
 
 <a name="FileService.Stat"></a>
 ### func \(\*FileService\) Stat
 
-	func (service *FileService) Stat(ctx context.Context, path string) (*EntryInfo, error)
+	func (service *FileService) Stat(ctx context.Context, path string, options *FileOptions) (*EntryInfo, error)
 
 Stat returns information about a path.
+
+###### Example
+
+
+
+
+	ctx := context.Background()
+	client, err := agentbox.NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+	sandbox, err := client.Sandboxes.Create(ctx, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer sandbox.Kill(context.Background())
+	// The same user selects process identity and resolves filesystem paths.
+	result, err := sandbox.Commands.Run(ctx, "id", &agentbox.CommandOptions{
+		User: "root",
+		Args: []string{"-un"},
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Print(string(result.Stdout))
+	info, err := sandbox.Files.Stat(ctx, "~", &agentbox.FileOptions{User: "root"})
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Print(info.Path)
+
+
+
+
+
 
 <a name="FileService.Watch"></a>
 ### func \(\*FileService\) Watch
@@ -974,9 +1023,9 @@ Write uploads a file from reader.
 <a name="FileService.WriteBatch"></a>
 ### func \(\*FileService\) WriteBatch
 
-	func (service *FileService) WriteBatch(ctx context.Context, files []WriteFile, user string) ([]EntryInfo, error)
+	func (service *FileService) WriteBatch(ctx context.Context, files []WriteFile, options *WriteFileOptions) ([]EntryInfo, error)
 
-WriteBatch writes files in order and stops at the first failure.
+WriteBatch writes files in order and stops at the first failure. Each file overrides common metadata keys. RequestTimeout applies separately to each upload.
 
 <a name="FileService.WriteBytes"></a>
 ### func \(\*FileService\) WriteBytes
@@ -1009,6 +1058,18 @@ FileType identifies a filesystem entry kind.
 	    // FileTypeSymlink identifies a symbolic link.
 	    FileTypeSymlink FileType = "symlink"
 	)
+
+<a name="FileURLOptions"></a>
+## type FileURLOptions
+
+FileURLOptions configures a signed file URL.
+
+	type FileURLOptions struct {
+	    // User follows FileOptions.User semantics and is included in the signature.
+	    User string
+	    // Expiration is the absolute expiry time. Zero creates a URL without expiry.
+	    Expiration time.Time
+	}
 
 <a name="FileUploadError"></a>
 ## type FileUploadError
@@ -1085,6 +1146,18 @@ Error formats the invalid argument failure.
 
 Unwrap returns the underlying validation error, if any.
 
+<a name="ListFilesOptions"></a>
+## type ListFilesOptions
+
+ListFilesOptions selects the user and recursion depth for directory listing.
+
+	type ListFilesOptions struct {
+	    // User follows FileOptions.User semantics.
+	    User string
+	    // Depth is the maximum directory depth. Zero defaults to one level.
+	    Depth uint32
+	}
+
 <a name="ListSandboxOptions"></a>
 ## type ListSandboxOptions
 
@@ -1150,6 +1223,8 @@ Unwrap returns the underlying storage error, if any.
 PTYOptions configures an interactive terminal.
 
 	type PTYOptions struct {
+	    // User selects the process owner. Empty uses the template default (user on envd < 0.4.0).
+	    User  string
 	    Args  []string
 	    Env   map[string]string
 	    Cwd   string
@@ -2322,7 +2397,11 @@ Close stops the watcher.
 
 WatchOptions configures recursive and enriched filesystem events.
 
-	type WatchOptions struct{ Recursive, IncludeEntry, AllowNetworkMounts bool }
+	type WatchOptions struct {
+	    // User follows FileOptions.User semantics, including expansion of ~.
+	    User                                        string
+	    Recursive, IncludeEntry, AllowNetworkMounts bool
+	}
 
 <a name="WriteFile"></a>
 ## type WriteFile
@@ -2341,6 +2420,7 @@ WriteFile describes one batch upload.
 WriteFileOptions configures file ownership, metadata, and upload timeout.
 
 	type WriteFileOptions struct {
+	    // User follows FileOptions.User semantics.
 	    User     string
 	    Metadata map[string]string
 	    // RequestTimeout limits the complete streaming upload. Zero leaves the

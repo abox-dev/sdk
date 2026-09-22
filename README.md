@@ -96,4 +96,7 @@ and publication are documented in [RELEASING.md](RELEASING.md).
 The [Go command streaming design](docs/go-command-streaming.md) documents the
 opt-in output policy for long-running processes.
 
+The [Go envd user-selection guide](docs/go-envd-user-selection.md) describes
+per-operation users and the unified filesystem options API.
+
 AgentBox SDK is derived from upstream work described in [UPSTREAM.md](UPSTREAM.md). Licensing notices are in [LICENSE](LICENSE) and [NOTICE](NOTICE).
