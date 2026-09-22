@@ -651,7 +651,7 @@ func TestCommandHelpersAndFileMappings(t *testing.T) {
 	if _, err := sandbox.PTY.Create(ctx, "", nil); err == nil {
 		t.Fatal("expected empty PTY command")
 	}
-	handle := newCommandHandle(sandbox.Commands, "")
+	handle := newCommandHandle(sandbox.Commands, "", nil)
 	canceled, cancel := context.WithCancel(ctx)
 	cancel()
 	if _, err := handle.PID(canceled); err == nil {

@@ -16,6 +16,8 @@ type PTYOptions struct {
 	Cols  uint32
 	Rows  uint32
 	OnPTY func([]byte)
+	// Streaming selects bounded delivery; nil preserves collecting-mode PTY queues.
+	Streaming *CommandStreamingOptions
 }
 
 // PTYService manages pseudo-terminal processes.
@@ -29,6 +31,11 @@ func (service *PTYService) Create(ctx context.Context, command string, options *
 	if options == nil {
 		options = &PTYOptions{}
 	}
+	callbacks := outputCallbacks{pty: options.OnPTY}
+	if err := validateCommandStreaming(options.Streaming, callbacks); err != nil {
+		return nil, err
+	}
+	ctx, cancel := context.WithCancel(ctx)
 	cols, rows := options.Cols, options.Rows
 	if cols == 0 {
 		cols = 80
@@ -45,23 +52,31 @@ func (service *PTYService) Create(ctx context.Context, command string, options *
 		request.Msg.Tag = &options.Tag
 	}
 	service.commands.addHeaders(request.Header())
-	stream, err := service.commands.client.Start(ctx, request)
+	stream, err := service.commands.outputClient(options.Streaming).Start(ctx, request)
 	if err != nil {
+		cancel()
 		return nil, connectError(err)
 	}
-	handle := newCommandHandle(service.commands, options.Tag)
+	handle := newCommandHandle(service.commands, options.Tag, options.Streaming)
+	handle.cancel = cancel
 	go handle.receive(ctx, func() (*process.ProcessEvent, bool) {
 		if !stream.Receive() {
 			return nil, false
 		}
 		return stream.Msg().GetEvent(), true
-	}, stream.Err, stream.Close, outputCallbacks{pty: options.OnPTY})
+	}, stream.Err, stream.Close, callbacks)
 	return handle, nil
 }
 
 // Connect attaches to an existing PTY process.
 func (service *PTYService) Connect(ctx context.Context, pid uint32, tag string) (*CommandHandle, error) {
 	return service.commands.Connect(ctx, pid, tag)
+}
+
+// ConnectWithOptions attaches to an existing PTY using the given output policy.
+// Use OnPTY or Streaming.PTYChannel for terminal output.
+func (service *PTYService) ConnectWithOptions(ctx context.Context, pid uint32, tag string, options *CommandConnectOptions) (*CommandHandle, error) {
+	return service.commands.ConnectWithOptions(ctx, pid, tag, options)
 }
 
 // Input sends terminal input.

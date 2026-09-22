@@ -26,9 +26,42 @@ type CommandOptions struct {
 	Stdin    bool
 	OnStdout func([]byte)
 	OnStderr func([]byte)
+	// Streaming opts out of output capture; nil preserves collecting behavior.
+	Streaming *CommandStreamingOptions
 }
 
-// CommandResult contains collected process output.
+// CommandStreamingOptions enables output delivery without retaining command output.
+// Each output uses its callback, its explicitly enabled channel, or is discarded.
+// A callback and channel for the same output are mutually exclusive.
+// Callbacks run synchronously and must return promptly. Their slices are read-only
+// and valid only until the callback returns; copy bytes that must outlive it.
+// Channel slices belong to the receiver and contain at most 32 KiB each. Channels
+// are unbuffered: all enabled channels must be consumed concurrently with Wait.
+// A stalled reader pauses transport reads and may eventually stall the process.
+// The SDK retains no output queue and at most one pending 32 KiB channel slice,
+// plus one transport event (limited to 4 MiB encoded and decompressed). Transport
+// decoding and HTTP buffers add overhead; caller-retained bytes are not bounded.
+// Oversized events fail the local attachment; bytes are never silently dropped.
+// Reattachment adds no replay, retry, restart, or exactly-once guarantee.
+type CommandStreamingOptions struct {
+	StdoutChannel bool
+	StderrChannel bool
+	PTYChannel    bool
+}
+
+// CommandConnectOptions configures output delivery when attaching to a process.
+type CommandConnectOptions struct {
+	OnStdout func([]byte)
+	OnStderr func([]byte)
+	OnPTY    func([]byte)
+	// Streaming opts out of output capture; nil preserves collecting behavior.
+	Streaming *CommandStreamingOptions
+}
+
+const commandStreamChunkBytes = 32 << 10
+const commandStreamMessageBytes = 4 << 20
+
+// CommandResult contains process metadata and, in collecting mode, output.
 type CommandResult struct {
 	PID      uint32
 	ExitCode int
@@ -67,8 +100,10 @@ type CommandService struct {
 	client  processconnect.ProcessClient
 }
 
-// CommandHandle represents a streaming process. Wait can be called without
-// draining the output channels and always returns the complete collected output.
+// CommandHandle represents a process attachment. In collecting mode, Wait returns
+// complete output without requiring channel reads. In streaming mode, Wait returns
+// only metadata and requires enabled channels to be consumed. Close detaches
+// locally without killing the process or closing its stdin.
 type CommandHandle struct {
 	service    *CommandService
 	ready      chan struct{}
@@ -82,12 +117,14 @@ type CommandHandle struct {
 	PTY    <-chan []byte
 	Done   <-chan struct{}
 
-	stdout *outputStream
-	stderr *outputStream
-	pty    *outputStream
-	done   chan struct{}
-	result CommandResult
-	err    error
+	stdout    *outputStream
+	stderr    *outputStream
+	pty       *outputStream
+	done      chan struct{}
+	result    CommandResult
+	err       error
+	streaming bool
+	cancel    context.CancelFunc
 }
 
 func newCommandService(sandbox *Sandbox) *CommandService {
@@ -95,7 +132,8 @@ func newCommandService(sandbox *Sandbox) *CommandService {
 	return &CommandService{sandbox: sandbox, client: client}
 }
 
-// Run executes a foreground command and collects its output.
+// Run executes a foreground command, draining channels and waiting for completion.
+// It collects output unless CommandOptions.Streaming is set.
 func (service *CommandService) Run(ctx context.Context, command string, options *CommandOptions) (CommandResult, error) {
 	handle, err := service.Start(ctx, command, options)
 	if err != nil {
@@ -131,6 +169,11 @@ func (service *CommandService) Start(ctx context.Context, command string, option
 	if options == nil {
 		options = &CommandOptions{}
 	}
+	callbacks := outputCallbacks{stdout: options.OnStdout, stderr: options.OnStderr}
+	if err := validateCommandStreaming(options.Streaming, callbacks); err != nil {
+		return nil, err
+	}
+	ctx, cancel := context.WithCancel(ctx)
 	config := &process.ProcessConfig{Cmd: command, Args: options.Args, Envs: options.Env}
 	if options.Cwd != "" {
 		config.Cwd = &options.Cwd
@@ -141,35 +184,54 @@ func (service *CommandService) Start(ctx context.Context, command string, option
 		request.Msg.Tag = &options.Tag
 	}
 	service.addHeaders(request.Header())
-	stream, err := service.client.Start(ctx, request)
+	stream, err := service.outputClient(options.Streaming).Start(ctx, request)
 	if err != nil {
+		cancel()
 		return nil, connectError(err)
 	}
-	handle := newCommandHandle(service, options.Tag)
+	handle := newCommandHandle(service, options.Tag, options.Streaming)
+	handle.cancel = cancel
 	go handle.receive(ctx, func() (*process.ProcessEvent, bool) {
 		if !stream.Receive() {
 			return nil, false
 		}
 		return stream.Msg().GetEvent(), true
-	}, stream.Err, stream.Close, outputCallbacks{stdout: options.OnStdout, stderr: options.OnStderr})
+	}, stream.Err, stream.Close, callbacks)
 	return handle, nil
 }
 
 // Connect attaches to an existing process by PID or tag.
 func (service *CommandService) Connect(ctx context.Context, pid uint32, tag string) (*CommandHandle, error) {
+	return service.ConnectWithOptions(ctx, pid, tag, nil)
+}
+
+// ConnectWithOptions attaches by PID or tag with an explicit output policy.
+// Canceling ctx or calling Close detaches locally without sending a signal or EOF.
+func (service *CommandService) ConnectWithOptions(ctx context.Context, pid uint32, tag string, options *CommandConnectOptions) (*CommandHandle, error) {
+	if options == nil {
+		options = &CommandConnectOptions{}
+	}
+	callbacks := outputCallbacks{stdout: options.OnStdout, stderr: options.OnStderr, pty: options.OnPTY}
+	if err := validateCommandStreaming(options.Streaming, callbacks); err != nil {
+		return nil, err
+	}
 	selector, err := processSelector(pid, tag)
 	if err != nil {
 		return nil, err
 	}
 	request := connect.NewRequest(&process.ConnectRequest{Process: selector})
 	service.addHeaders(request.Header())
-	stream, err := service.client.Connect(ctx, request)
+	ctx, cancel := context.WithCancel(ctx)
+	stream, err := service.outputClient(options.Streaming).Connect(ctx, request)
 	if err != nil {
+		cancel()
 		return nil, connectError(err)
 	}
-	handle := newCommandHandle(service, tag)
+	handle := newCommandHandle(service, tag, options.Streaming)
+	handle.cancel = cancel
 	if pid != 0 {
 		handle.pid = pid
+		handle.result.PID = pid
 		handle.closeReady()
 	}
 	go handle.receive(ctx, func() (*process.ProcessEvent, bool) {
@@ -177,7 +239,7 @@ func (service *CommandService) Connect(ctx context.Context, pid uint32, tag stri
 			return nil, false
 		}
 		return stream.Msg().GetEvent(), true
-	}, stream.Err, stream.Close, outputCallbacks{})
+	}, stream.Err, stream.Close, callbacks)
 	return handle, nil
 }
 
@@ -235,15 +297,20 @@ func (service *CommandService) addHeaders(header http.Header) {
 	header.Set("Keepalive-Ping-Interval", "50")
 }
 
-func newCommandHandle(service *CommandService, tag string) *CommandHandle {
+func newCommandHandle(service *CommandService, tag string, policy *CommandStreamingOptions) *CommandHandle {
 	ready := make(chan struct{})
-	stdout := newOutputStream()
-	stderr := newOutputStream()
-	pty := newOutputStream()
+	var stdout, stderr, pty *outputStream
+	if policy == nil {
+		stdout, stderr, pty = newOutputStream(), newOutputStream(), newOutputStream()
+	} else {
+		stdout = newDirectOutputStream(policy.StdoutChannel)
+		stderr = newDirectOutputStream(policy.StderrChannel)
+		pty = newDirectOutputStream(policy.PTYChannel)
+	}
 	done := make(chan struct{})
 	handle := &CommandHandle{
 		service: service, ready: ready, closeReady: sync.OnceFunc(func() { close(ready) }),
-		tag:    tag,
+		tag: tag, streaming: policy != nil,
 		Stdout: stdout.output, Stderr: stderr.output, PTY: pty.output, Done: done,
 		stdout: stdout, stderr: stderr, pty: pty, done: done,
 	}
@@ -267,7 +334,21 @@ func cleanupCommandOutputs(outputs commandOutputs) {
 
 func (handle *CommandHandle) receive(ctx context.Context, next func() (*process.ProcessEvent, bool), streamErr, closeStream func() error, callbacks outputCallbacks) {
 	defer close(handle.done)
-	defer func() { _ = closeStream() }()
+	closeResponse := sync.OnceFunc(func() { _ = closeStream() })
+	stopCancel := context.AfterFunc(ctx, func() {
+		cleanupCommandOutputs(commandOutputs{handle.stdout, handle.stderr, handle.pty})
+		closeResponse()
+	})
+	defer func() {
+		stopCancel()
+		if ctx.Err() != nil {
+			cleanupCommandOutputs(commandOutputs{handle.stdout, handle.stderr, handle.pty})
+		}
+		closeResponse()
+		if handle.cancel != nil {
+			handle.cancel()
+		}
+	}()
 	defer handle.stdout.close()
 	defer handle.stderr.close()
 	defer handle.pty.close()
@@ -288,27 +369,25 @@ func (handle *CommandHandle) receive(ctx context.Context, next func() (*process.
 			continue
 		}
 		if data := event.GetData(); data != nil {
-			switch output := data.GetOutput().(type) {
+			var chunk []byte
+			var output *outputStream
+			var callback func([]byte)
+			switch data := data.GetOutput().(type) {
 			case *process.ProcessEvent_DataEvent_Stdout:
-				chunk := bytes.Clone(output.Stdout)
-				handle.result.Stdout = append(handle.result.Stdout, chunk...)
-				handle.stdout.send(chunk)
-				if callbacks.stdout != nil {
-					callbacks.stdout(chunk)
+				chunk, output, callback = data.Stdout, handle.stdout, callbacks.stdout
+				if !handle.streaming {
+					handle.result.Stdout = append(handle.result.Stdout, chunk...)
 				}
 			case *process.ProcessEvent_DataEvent_Stderr:
-				chunk := bytes.Clone(output.Stderr)
-				handle.result.Stderr = append(handle.result.Stderr, chunk...)
-				handle.stderr.send(chunk)
-				if callbacks.stderr != nil {
-					callbacks.stderr(chunk)
+				chunk, output, callback = data.Stderr, handle.stderr, callbacks.stderr
+				if !handle.streaming {
+					handle.result.Stderr = append(handle.result.Stderr, chunk...)
 				}
 			case *process.ProcessEvent_DataEvent_Pty:
-				chunk := bytes.Clone(output.Pty)
-				handle.pty.send(chunk)
-				if callbacks.pty != nil {
-					callbacks.pty(chunk)
-				}
+				chunk, output, callback = data.Pty, handle.pty, callbacks.pty
+			}
+			if output != nil && !handle.deliver(ctx, output, callback, chunk) {
+				break
 			}
 		}
 		if end := event.GetEnd(); end != nil {
@@ -316,15 +395,87 @@ func (handle *CommandHandle) receive(ctx context.Context, next func() (*process.
 			handle.result.ExitCode = int(end.GetExitCode())
 			handle.result.Status = end.GetStatus()
 			if end.GetExited() && end.GetExitCode() != 0 {
-				handle.err = &CommandExitError{Result: handle.result, Message: end.GetError()}
+				message := end.GetError()
+				if handle.streaming {
+					message = ""
+				}
+				handle.err = &CommandExitError{Result: handle.result, Message: message}
 			}
 			return
 		}
 	}
 	handle.closeReady()
-	if err := streamErr(); err != nil && !errors.Is(err, context.Canceled) {
+	// Closing the response can surface as a transport read error. The attachment
+	// context is authoritative when local cancellation caused delivery to stop.
+	if ctx.Err() != nil {
+		handle.err = ctx.Err()
+		return
+	}
+	if err := streamErr(); err != nil {
+		if handle.streaming && !errors.Is(err, context.Canceled) && !errors.Is(err, context.DeadlineExceeded) {
+			// Preserve the error code without retaining server-provided output in errors.
+			err = connect.NewError(connect.CodeOf(err), errors.New("command attachment failed"))
+		}
 		handle.err = connectError(err)
 	}
+}
+
+func validateCommandStreaming(policy *CommandStreamingOptions, callbacks outputCallbacks) error {
+	if policy != nil && ((policy.StdoutChannel && callbacks.stdout != nil) ||
+		(policy.StderrChannel && callbacks.stderr != nil) || (policy.PTYChannel && callbacks.pty != nil)) {
+		return &InvalidArgumentError{Message: "streaming output must use either a callback or a channel"}
+	}
+	return nil
+}
+
+func (service *CommandService) outputClient(policy *CommandStreamingOptions) processconnect.ProcessClient {
+	if policy == nil {
+		return service.client
+	}
+	return processconnect.NewProcessClient(service.sandbox.client.envdClient, service.sandbox.envdURL(envdPort, false),
+		connect.WithCodec(tolerantJSONCodec{}), connect.WithAcceptCompression("gzip", nil, nil),
+		connect.WithReadMaxBytes(commandStreamMessageBytes))
+}
+
+func (handle *CommandHandle) deliver(ctx context.Context, output *outputStream, callback func([]byte), chunk []byte) bool {
+	if !handle.streaming {
+		chunk = bytes.Clone(chunk)
+		output.send(chunk)
+		if callback != nil {
+			callback(chunk)
+		}
+		return true
+	}
+	if ctx.Err() != nil {
+		return false
+	}
+	if callback != nil {
+		callback(chunk)
+	} else if output.enabled {
+		for len(chunk) > 0 {
+			n := min(len(chunk), commandStreamChunkBytes)
+			part := bytes.Clone(chunk[:n])
+			select {
+			case output.output <- part:
+			case <-ctx.Done():
+				return false
+			}
+			chunk = chunk[n:]
+		}
+	}
+	return ctx.Err() == nil
+}
+
+// Close cancels this local attachment and releases queued output, including an
+// unread collecting-mode tail. It does not kill the process or send stdin EOF.
+// Close does not wait for user callbacks; Done closes after the receiver exits.
+// A callback must return before Wait can complete. Close is safe to call repeatedly.
+func (handle *CommandHandle) Close() error {
+	if handle.cancel != nil {
+		handle.cancel()
+	}
+	cleanupCommandOutputs(commandOutputs{handle.stdout, handle.stderr, handle.pty})
+	return nil
 }
 
 type outputStream struct {
@@ -335,6 +486,8 @@ type outputStream struct {
 	mu        sync.Mutex
 	queue     [][]byte
 	closed    bool
+	direct    bool
+	enabled   bool
 }
 
 func newOutputStream() *outputStream {
@@ -351,6 +504,15 @@ func newOutputStream() *outputStream {
 	return stream
 }
 
+func newDirectOutputStream(enabled bool) *outputStream {
+	stream := &outputStream{output: make(chan []byte), direct: true, enabled: enabled}
+	stream.abortOnce = func() {} // Direct delivery owns no queue or background goroutine.
+	if !enabled {
+		close(stream.output)
+	}
+	return stream
+}
+
 func (stream *outputStream) send(chunk []byte) {
 	stream.mu.Lock()
 	if !stream.closed {
@@ -361,6 +523,12 @@ func (stream *outputStream) send(chunk []byte) {
 }
 
 func (stream *outputStream) close() {
+	if stream.direct {
+		if stream.enabled {
+			close(stream.output)
+		}
+		return
+	}
 	stream.mu.Lock()
 	stream.closed = true
 	stream.mu.Unlock()
@@ -420,7 +588,12 @@ func (handle *CommandHandle) PID(ctx context.Context) (uint32, error) {
 	}
 }
 
-// Wait waits for completion and returns collected output.
+// Wait waits for receiver completion. Collecting mode preserves the queued channel
+// tail and returns full output. Streaming mode returns metadata with nil output;
+// all enabled channels must be read concurrently, and are closed before Done.
+// Attachment cancellation returns a cancellation error unless a process end event
+// was already confirmed. CommandExitError preserves confirmed nonzero exits.
+// Canceling only Wait's context stops waiting; use Close to cancel the attachment.
 func (handle *CommandHandle) Wait(ctx context.Context) (CommandResult, error) {
 	select {
 	case <-ctx.Done():

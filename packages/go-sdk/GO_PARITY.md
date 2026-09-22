@@ -12,7 +12,8 @@ concurrency, and race coverage.
 | Network rules, IAM payloads, metrics, structured logs | sandbox network/IAM/metrics/log tests | `sandbox_test.go` | `integration/sdk_test.go` |
 | Forks, snapshots, signed upload/download URLs | sandbox fork/snapshot/signature tests | `sandbox_test.go` | core KVM lifecycle |
 | Foreground/background commands, attach/list, stdin/EOF, signals, output streams, exit errors | command and command-handle tests | `envd_test.go` | `integration/sdk_test.go` |
-| PTY create/attach/input/resize/kill | PTY tests | `envd_test.go` | KVM command transport |
+| Opt-in bounded command delivery, callback/discard/channel policy, detach without EOF | Go-specific explicit memory policy; default behavior remains aligned | `command_streaming_test.go` | `integration/command_streaming_test.go` |
+| PTY create/attach/input/resize/kill | PTY tests | `envd_test.go`, `command_streaming_test.go` | KVM command transport |
 | Text/binary/stream reads and writes, batch writes, list/stat/metadata/exists/mkdir/move/remove/watch | filesystem and watch-handle tests | `envd_test.go` | `integration/sdk_test.go` |
 | Base images/templates, private registries, Dockerfile parsing, copy, packages, env/user/workdir/start/ready/cache | template builder/parser tests | `template_test.go` | `integration/sdk_test.go` |
 | Build request/upload/start/poll/log/status, visibility, tags, list/info/delete | template API/build tests | `template_test.go` | `integration/sdk_test.go` |

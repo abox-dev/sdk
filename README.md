@@ -93,4 +93,7 @@ The CLI stores local configuration in `~/.agentbox/config.json`; environment var
 Contributor setup, spec synchronization, verification, KVM testing, versioning,
 and publication are documented in [RELEASING.md](RELEASING.md).
 
+The [Go command streaming design](docs/go-command-streaming.md) documents the
+opt-in output policy for long-running processes.
+
 AgentBox SDK is derived from upstream work described in [UPSTREAM.md](UPSTREAM.md). Licensing notices are in [LICENSE](LICENSE) and [NOTICE](NOTICE).
