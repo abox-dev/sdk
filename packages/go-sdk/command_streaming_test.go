@@ -86,7 +86,9 @@ func newStreamingTestSandbox(t *testing.T, fixture *streamingProcessServer) (*Sa
 }
 func waitStreamingTest(t *testing.T, handle *CommandHandle) (CommandResult, error) {
 	t.Helper()
-	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
+	// Flood fixtures decode several MiB through HTTP; allow shared CI runners
+	// headroom while keeping an explicit deadline for a stuck receiver.
+	ctx, cancel := context.WithTimeout(t.Context(), 30*time.Second)
 	defer cancel()
 	return handle.Wait(ctx)
 }
