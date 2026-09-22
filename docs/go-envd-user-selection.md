@@ -3,7 +3,8 @@
 The Go SDK supports explicit per-operation users for command launch, PTY creation,
 and filesystem operations. Behavior follows the TypeScript and Python SDKs;
 Go uses option structs, contexts, and channels for the corresponding operations.
-These changes are not yet included in the published v0.1.8 release.
+Explicit user selection and the unified filesystem options API are introduced in
+v0.2.0.
 
 ## User semantics
 
