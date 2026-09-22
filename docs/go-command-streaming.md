@@ -93,7 +93,7 @@ regressions remain required. The supported Go matrix is 1.24–1.27; run
 `make go-check` and generation/artifact gates described in
 [`RELEASING.md`](../RELEASING.md) using the pinned containers.
 
-Validation passed: `make go-check` (91.2% handwritten statement coverage), builds
+Validation passed: `make go-check` (91.1% handwritten statement coverage), builds
 and hermetic tests on Go 1.24.13, 1.25.14, 1.26.8 and 1.27.1, race checks on
 1.24.13 and 1.27.1, format/lint/type checks, workspace tests, release-artifact
 builds and clean installation checks. `make generate` and reference-contract
@@ -123,6 +123,6 @@ It creates and deletes only its own sandbox. This runtime smoke has passed.
 
 The implementation must follow the coordinated SDK release procedure in
 [`RELEASING.md`](../RELEASING.md). No ad-hoc fork or replacement module is needed.
-Publication and the consumer dependency upgrade remain release steps; no released
-module version is assigned by this source change. The consuming orchestrator must
-use the released version and explicitly enable streaming on launch and reconnect.
+The coordinated release version is 0.1.8. Consumers must upgrade to
+`github.com/abox-dev/sdk/packages/go-sdk@v0.1.8` and explicitly enable streaming
+on both launch and reconnect.
