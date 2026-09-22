@@ -58,9 +58,11 @@ Create a client, start a sandbox, and run a command:
   - [func WithProxy\(value string\) ClientOption](<#WithProxy>)
   - [func WithRequestTimeout\(timeout time.Duration\) ClientOption](<#WithRequestTimeout>)
   - [func WithSandboxURL\(value string\) ClientOption](<#WithSandboxURL>)
+- [type CommandConnectOptions](<#CommandConnectOptions>)
 - [type CommandExitError](<#CommandExitError>)
   - [func \(e \*CommandExitError\) Error\(\) string](<#CommandExitError.Error>)
 - [type CommandHandle](<#CommandHandle>)
+  - [func \(handle \*CommandHandle\) Close\(\) error](<#CommandHandle.Close>)
   - [func \(handle \*CommandHandle\) CloseStdin\(ctx context.Context\) error](<#CommandHandle.CloseStdin>)
   - [func \(handle \*CommandHandle\) Kill\(ctx context.Context\) error](<#CommandHandle.Kill>)
   - [func \(handle \*CommandHandle\) PID\(ctx context.Context\) \(uint32, error\)](<#CommandHandle.PID>)
@@ -70,11 +72,13 @@ Create a client, start a sandbox, and run a command:
 - [type CommandResult](<#CommandResult>)
 - [type CommandService](<#CommandService>)
   - [func \(service \*CommandService\) Connect\(ctx context.Context, pid uint32, tag string\) \(\*CommandHandle, error\)](<#CommandService.Connect>)
+  - [func \(service \*CommandService\) ConnectWithOptions\(ctx context.Context, pid uint32, tag string, options \*CommandConnectOptions\) \(\*CommandHandle, error\)](<#CommandService.ConnectWithOptions>)
   - [func \(service \*CommandService\) Kill\(ctx context.Context, pid uint32, tag string\) error](<#CommandService.Kill>)
   - [func \(service \*CommandService\) List\(ctx context.Context\) \(\[\]ProcessInfo, error\)](<#CommandService.List>)
   - [func \(service \*CommandService\) Run\(ctx context.Context, command string, options \*CommandOptions\) \(CommandResult, error\)](<#CommandService.Run>)
   - [func \(service \*CommandService\) Start\(ctx context.Context, command string, options \*CommandOptions\) \(\*CommandHandle, error\)](<#CommandService.Start>)
   - [func \(service \*CommandService\) Terminate\(ctx context.Context, pid uint32, tag string\) error](<#CommandService.Terminate>)
+- [type CommandStreamingOptions](<#CommandStreamingOptions>)
 - [type ConnectSandboxOptions](<#ConnectSandboxOptions>)
 - [type CopyOptions](<#CopyOptions>)
 - [type CreateSandboxOptions](<#CreateSandboxOptions>)
@@ -120,6 +124,7 @@ Create a client, start a sandbox, and run a command:
 - [type PTYOptions](<#PTYOptions>)
 - [type PTYService](<#PTYService>)
   - [func \(service \*PTYService\) Connect\(ctx context.Context, pid uint32, tag string\) \(\*CommandHandle, error\)](<#PTYService.Connect>)
+  - [func \(service \*PTYService\) ConnectWithOptions\(ctx context.Context, pid uint32, tag string, options \*CommandConnectOptions\) \(\*CommandHandle, error\)](<#PTYService.ConnectWithOptions>)
   - [func \(service \*PTYService\) Create\(ctx context.Context, command string, options \*PTYOptions\) \(\*CommandHandle, error\)](<#PTYService.Create>)
   - [func \(service \*PTYService\) Input\(ctx context.Context, handle \*CommandHandle, data \[\]byte\) error](<#PTYService.Input>)
   - [func \(service \*PTYService\) Kill\(ctx context.Context, handle \*CommandHandle\) error](<#PTYService.Kill>)
@@ -261,7 +266,7 @@ Create a client, start a sandbox, and run a command:
 
 <a name="Version"></a>Version is the AgentBox SDK release version.
 
-	const Version = "0.1.7"
+	const Version = "0.1.8"
 
 <a name="IAMTokenPlaceholder"></a>
 ## func IAMTokenPlaceholder
@@ -534,6 +539,19 @@ WithRequestTimeout sets the default unary request timeout. Zero disables it.
 
 WithSandboxURL overrides the sandbox proxy URL.
 
+<a name="CommandConnectOptions"></a>
+## type CommandConnectOptions
+
+CommandConnectOptions configures output delivery when attaching to a process.
+
+	type CommandConnectOptions struct {
+	    OnStdout func([]byte)
+	    OnStderr func([]byte)
+	    OnPTY    func([]byte)
+	    // Streaming opts out of output capture; nil preserves collecting behavior.
+	    Streaming *CommandStreamingOptions
+	}
+
 <a name="CommandExitError"></a>
 ## type CommandExitError
 
@@ -554,7 +572,7 @@ Error describes the non\-zero command exit code.
 <a name="CommandHandle"></a>
 ## type CommandHandle
 
-CommandHandle represents a streaming process. Wait can be called without draining the output channels and always returns the complete collected output.
+CommandHandle represents a process attachment. In collecting mode, Wait returns complete output without requiring channel reads. In streaming mode, Wait returns only metadata and requires enabled channels to be consumed. Close detaches locally without killing the process or closing its stdin.
 
 	type CommandHandle struct {
 	    Stdout <-chan []byte
@@ -563,6 +581,13 @@ CommandHandle represents a streaming process. Wait can be called without drainin
 	    Done   <-chan struct{}
 	    // contains filtered or unexported fields
 	}
+
+<a name="CommandHandle.Close"></a>
+### func \(\*CommandHandle\) Close
+
+	func (handle *CommandHandle) Close() error
+
+Close cancels this local attachment and releases queued output, including an unread collecting\-mode tail. It does not kill the process or send stdin EOF. Close does not wait for user callbacks; Done closes after the receiver exits. A callback must return before Wait can complete. Close is safe to call repeatedly.
 
 <a name="CommandHandle.CloseStdin"></a>
 ### func \(\*CommandHandle\) CloseStdin
@@ -590,7 +615,7 @@ PID waits for and returns the process identifier.
 
 	func (handle *CommandHandle) Wait(ctx context.Context) (CommandResult, error)
 
-Wait waits for completion and returns collected output.
+Wait waits for receiver completion. Collecting mode preserves the queued channel tail and returns full output. Streaming mode returns metadata with nil output; all enabled channels must be read concurrently, and are closed before Done. Attachment cancellation returns a cancellation error unless a process end event was already confirmed. CommandExitError preserves confirmed nonzero exits. Canceling only Wait's context stops waiting; use Close to cancel the attachment.
 
 <a name="CommandHandle.Write"></a>
 ### func \(\*CommandHandle\) Write
@@ -612,12 +637,14 @@ CommandOptions configures a command process.
 	    Stdin    bool
 	    OnStdout func([]byte)
 	    OnStderr func([]byte)
+	    // Streaming opts out of output capture; nil preserves collecting behavior.
+	    Streaming *CommandStreamingOptions
 	}
 
 <a name="CommandResult"></a>
 ## type CommandResult
 
-CommandResult contains collected process output.
+CommandResult contains process metadata and, in collecting mode, output.
 
 	type CommandResult struct {
 	    PID      uint32
@@ -643,6 +670,13 @@ CommandService executes and manages sandbox processes.
 
 Connect attaches to an existing process by PID or tag.
 
+<a name="CommandService.ConnectWithOptions"></a>
+### func \(\*CommandService\) ConnectWithOptions
+
+	func (service *CommandService) ConnectWithOptions(ctx context.Context, pid uint32, tag string, options *CommandConnectOptions) (*CommandHandle, error)
+
+ConnectWithOptions attaches by PID or tag with an explicit output policy. Canceling ctx or calling Close detaches locally without sending a signal or EOF.
+
 <a name="CommandService.Kill"></a>
 ### func \(\*CommandService\) Kill
 
@@ -662,7 +696,7 @@ List returns currently running processes.
 
 	func (service *CommandService) Run(ctx context.Context, command string, options *CommandOptions) (CommandResult, error)
 
-Run executes a foreground command and collects its output.
+Run executes a foreground command, draining channels and waiting for completion. It collects output unless CommandOptions.Streaming is set.
 
 <a name="CommandService.Start"></a>
 ### func \(\*CommandService\) Start
@@ -671,12 +705,74 @@ Run executes a foreground command and collects its output.
 
 Start starts a process and streams output through the returned handle.
 
+###### Example (Streaming)
+
+
+
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	client, err := agentbox.NewClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+	sandbox, err := client.Sandboxes.Create(ctx, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer sandbox.Kill(context.Background())
+	handle, err := sandbox.Commands.Start(ctx, "cat", &agentbox.CommandOptions{
+		Stdin:     true,
+		Streaming: &agentbox.CommandStreamingOptions{},
+		OnStdout:  func(chunk []byte) { log.Printf("output: %s", chunk) },
+		// With no callback or channel selected, stderr is discarded.
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer handle.Close()
+	pid, err := handle.PID(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, _ = handle.Write(ctx, []byte("hello\n"))
+	// Close only detaches. The process remains alive with stdin open.
+	_ = handle.Close()
+	_, _ = handle.Wait(ctx)
+	attached, err := sandbox.Commands.ConnectWithOptions(ctx, pid, "", &agentbox.CommandConnectOptions{
+		Streaming: &agentbox.CommandStreamingOptions{},
+		OnStdout:  func(chunk []byte) { log.Printf("output: %s", chunk) },
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer attached.Close()
+	_, _ = attached.Write(ctx, []byte("hello again\n"))
+	_ = attached.CloseStdin(ctx)
+	_, _ = attached.Wait(ctx)
+
+
+
+
+
+
 <a name="CommandService.Terminate"></a>
 ### func \(\*CommandService\) Terminate
 
 	func (service *CommandService) Terminate(ctx context.Context, pid uint32, tag string) error
 
 Terminate sends SIGTERM to a process.
+
+<a name="CommandStreamingOptions"></a>
+## type CommandStreamingOptions
+
+CommandStreamingOptions enables output delivery without retaining command output. Each output uses its callback, its explicitly enabled channel, or is discarded. A callback and channel for the same output are mutually exclusive. Callbacks run synchronously and must return promptly. Their slices are read\-only and valid only until the callback returns; copy bytes that must outlive it. Channel slices belong to the receiver and contain at most 32 KiB each. Channels are unbuffered: all enabled channels must be consumed concurrently with Wait. A stalled reader pauses transport reads and may eventually stall the process. The SDK retains no output queue and at most one pending 32 KiB channel slice, plus one transport event \(limited to 4 MiB encoded and decompressed\). Transport decoding and HTTP buffers add overhead; caller\-retained bytes are not bounded. Oversized events fail the local attachment; bytes are never silently dropped. Reattachment adds no replay, retry, restart, or exactly\-once guarantee.
+
+	type CommandStreamingOptions struct {
+	    StdoutChannel bool
+	    StderrChannel bool
+	    PTYChannel    bool
+	}
 
 <a name="ConnectSandboxOptions"></a>
 ## type ConnectSandboxOptions
@@ -1061,6 +1157,8 @@ PTYOptions configures an interactive terminal.
 	    Cols  uint32
 	    Rows  uint32
 	    OnPTY func([]byte)
+	    // Streaming selects bounded delivery; nil preserves collecting-mode PTY queues.
+	    Streaming *CommandStreamingOptions
 	}
 
 <a name="PTYService"></a>
@@ -1078,6 +1176,13 @@ PTYService manages pseudo\-terminal processes.
 	func (service *PTYService) Connect(ctx context.Context, pid uint32, tag string) (*CommandHandle, error)
 
 Connect attaches to an existing PTY process.
+
+<a name="PTYService.ConnectWithOptions"></a>
+### func \(\*PTYService\) ConnectWithOptions
+
+	func (service *PTYService) ConnectWithOptions(ctx context.Context, pid uint32, tag string, options *CommandConnectOptions) (*CommandHandle, error)
+
+ConnectWithOptions attaches to an existing PTY using the given output policy. Use OnPTY or Streaming.PTYChannel for terminal output.
 
 <a name="PTYService.Create"></a>
 ### func \(\*PTYService\) Create
