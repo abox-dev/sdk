@@ -58,8 +58,32 @@ type WriteFile struct {
 	Metadata map[string]string
 }
 
+// FileOptions selects the user for a filesystem operation. User affects relative
+// path resolution and ownership of created objects, not OS permission isolation.
+// Empty User uses the template default, or user on envd older than 0.4.0.
+type FileOptions struct {
+	User string
+}
+
+// ListFilesOptions selects the user and recursion depth for directory listing.
+type ListFilesOptions struct {
+	// User follows FileOptions.User semantics.
+	User string
+	// Depth is the maximum directory depth. Zero defaults to one level.
+	Depth uint32
+}
+
+// FileURLOptions configures a signed file URL.
+type FileURLOptions struct {
+	// User follows FileOptions.User semantics and is included in the signature.
+	User string
+	// Expiration is the absolute expiry time. Zero creates a URL without expiry.
+	Expiration time.Time
+}
+
 // WriteFileOptions configures file ownership, metadata, and upload timeout.
 type WriteFileOptions struct {
+	// User follows FileOptions.User semantics.
 	User     string
 	Metadata map[string]string
 	// RequestTimeout limits the complete streaming upload. Zero leaves the
@@ -68,7 +92,11 @@ type WriteFileOptions struct {
 }
 
 // WatchOptions configures recursive and enriched filesystem events.
-type WatchOptions struct{ Recursive, IncludeEntry, AllowNetworkMounts bool }
+type WatchOptions struct {
+	// User follows FileOptions.User semantics, including expansion of ~.
+	User                                        string
+	Recursive, IncludeEntry, AllowNetworkMounts bool
+}
 
 // FileEvent describes a filesystem change.
 type FileEvent struct {
@@ -106,11 +134,17 @@ func newFileService(sandbox *Sandbox) *FileService {
 }
 
 // Read opens a streaming file response. The caller must close it.
-func (service *FileService) Read(ctx context.Context, path, user string) (io.ReadCloser, error) {
+func (service *FileService) Read(ctx context.Context, path string, options *FileOptions) (io.ReadCloser, error) {
 	if path == "" {
 		return nil, &InvalidArgumentError{Message: "file path cannot be empty"}
 	}
-	user = service.sandbox.resolveUser(user)
+	if options == nil {
+		options = &FileOptions{}
+	}
+	user, err := service.sandbox.resolveUser(options.User)
+	if err != nil {
+		return nil, err
+	}
 	endpoint, _ := url.Parse(service.sandbox.envdURL(envdPort, false) + "/files")
 	query := endpoint.Query()
 	query.Set("path", path)
@@ -135,8 +169,8 @@ func (service *FileService) Read(ctx context.Context, path, user string) (io.Rea
 }
 
 // ReadBytes reads a complete file.
-func (service *FileService) ReadBytes(ctx context.Context, path, user string) ([]byte, error) {
-	reader, err := service.Read(ctx, path, user)
+func (service *FileService) ReadBytes(ctx context.Context, path string, options *FileOptions) ([]byte, error) {
+	reader, err := service.Read(ctx, path, options)
 	if err != nil {
 		return nil, err
 	}
@@ -145,14 +179,14 @@ func (service *FileService) ReadBytes(ctx context.Context, path, user string) ([
 }
 
 // ReadText reads a UTF-8 file as a string.
-func (service *FileService) ReadText(ctx context.Context, path, user string) (string, error) {
-	data, err := service.ReadBytes(ctx, path, user)
+func (service *FileService) ReadText(ctx context.Context, path string, options *FileOptions) (string, error) {
+	data, err := service.ReadBytes(ctx, path, options)
 	return string(data), err
 }
 
 // ReadTo streams a file into writer.
-func (service *FileService) ReadTo(ctx context.Context, path, user string, writer io.Writer) (int64, error) {
-	reader, err := service.Read(ctx, path, user)
+func (service *FileService) ReadTo(ctx context.Context, path string, writer io.Writer, options *FileOptions) (int64, error) {
+	reader, err := service.Read(ctx, path, options)
 	if err != nil {
 		return 0, err
 	}
@@ -174,7 +208,10 @@ func (service *FileService) Write(ctx context.Context, path string, reader io.Re
 	if len(options.Metadata) > 0 && !envdAtLeast(service.sandbox.EnvdVersion, 0, 6, 2) {
 		return nil, &TemplateError{APIError: APIError{Message: "file metadata requires envd 0.6.2 or later"}}
 	}
-	user := service.sandbox.resolveUser(options.User)
+	user, err := service.sandbox.resolveUser(options.User)
+	if err != nil {
+		return nil, err
+	}
 	endpoint, _ := url.Parse(service.sandbox.envdURL(envdPort, false) + "/files")
 	query := endpoint.Query()
 	query.Set("path", path)
@@ -233,11 +270,19 @@ func (service *FileService) WriteBytes(ctx context.Context, path string, data []
 	return service.Write(ctx, path, bytes.NewReader(data), options)
 }
 
-// WriteBatch writes files in order and stops at the first failure.
-func (service *FileService) WriteBatch(ctx context.Context, files []WriteFile, user string) ([]EntryInfo, error) {
+// WriteBatch writes files in order and stops at the first failure. Each file
+// overrides common metadata keys. RequestTimeout applies separately to each upload.
+func (service *FileService) WriteBatch(ctx context.Context, files []WriteFile, options *WriteFileOptions) ([]EntryInfo, error) {
+	if options == nil {
+		options = &WriteFileOptions{}
+	}
 	result := make([]EntryInfo, 0, len(files))
 	for _, file := range files {
-		entry, err := service.Write(ctx, file.Path, file.Data, &WriteFileOptions{User: user, Metadata: file.Metadata})
+		fileOptions := *options
+		fileOptions.Metadata = make(map[string]string, len(options.Metadata)+len(file.Metadata))
+		maps.Copy(fileOptions.Metadata, options.Metadata)
+		maps.Copy(fileOptions.Metadata, file.Metadata)
+		entry, err := service.Write(ctx, file.Path, file.Data, &fileOptions)
 		if err != nil {
 			return result, err
 		}
@@ -247,11 +292,16 @@ func (service *FileService) WriteBatch(ctx context.Context, files []WriteFile, u
 }
 
 // Stat returns information about a path.
-func (service *FileService) Stat(ctx context.Context, path string) (*EntryInfo, error) {
+func (service *FileService) Stat(ctx context.Context, path string, options *FileOptions) (*EntryInfo, error) {
+	if options == nil {
+		options = &FileOptions{}
+	}
 	requestCtx, cancel := service.sandbox.unaryContext(ctx)
 	defer cancel()
 	request := connect.NewRequest(&filesystem.StatRequest{Path: path})
-	service.addHeaders(request.Header())
+	if err := service.addHeaders(request.Header(), options.User); err != nil {
+		return nil, err
+	}
 	response, err := service.client.Stat(requestCtx, request)
 	if err != nil {
 		return nil, fileConnectError(err)
@@ -260,8 +310,8 @@ func (service *FileService) Stat(ctx context.Context, path string) (*EntryInfo, 
 }
 
 // Exists reports whether path exists.
-func (service *FileService) Exists(ctx context.Context, path string) (bool, error) {
-	_, err := service.Stat(ctx, path)
+func (service *FileService) Exists(ctx context.Context, path string, options *FileOptions) (bool, error) {
+	_, err := service.Stat(ctx, path, options)
 	var notFound *FileNotFoundError
 	if errors.As(err, &notFound) {
 		return false, nil
@@ -269,12 +319,17 @@ func (service *FileService) Exists(ctx context.Context, path string) (bool, erro
 	return err == nil, err
 }
 
-// List lists path recursively up to depth.
-func (service *FileService) List(ctx context.Context, path string, depth uint32) ([]EntryInfo, error) {
+// List lists path recursively up to the selected depth (one level by default).
+func (service *FileService) List(ctx context.Context, path string, options *ListFilesOptions) ([]EntryInfo, error) {
+	if options == nil {
+		options = &ListFilesOptions{}
+	}
 	requestCtx, cancel := service.sandbox.unaryContext(ctx)
 	defer cancel()
-	request := connect.NewRequest(&filesystem.ListDirRequest{Path: path, Depth: depth})
-	service.addHeaders(request.Header())
+	request := connect.NewRequest(&filesystem.ListDirRequest{Path: path, Depth: options.Depth})
+	if err := service.addHeaders(request.Header(), options.User); err != nil {
+		return nil, err
+	}
 	response, err := service.client.ListDir(requestCtx, request)
 	if err != nil {
 		return nil, fileConnectError(err)
@@ -287,11 +342,16 @@ func (service *FileService) List(ctx context.Context, path string, depth uint32)
 }
 
 // MakeDir creates a directory.
-func (service *FileService) MakeDir(ctx context.Context, path string) (*EntryInfo, error) {
+func (service *FileService) MakeDir(ctx context.Context, path string, options *FileOptions) (*EntryInfo, error) {
+	if options == nil {
+		options = &FileOptions{}
+	}
 	requestCtx, cancel := service.sandbox.unaryContext(ctx)
 	defer cancel()
 	request := connect.NewRequest(&filesystem.MakeDirRequest{Path: path})
-	service.addHeaders(request.Header())
+	if err := service.addHeaders(request.Header(), options.User); err != nil {
+		return nil, err
+	}
 	response, err := service.client.MakeDir(requestCtx, request)
 	if err != nil {
 		return nil, fileConnectError(err)
@@ -300,11 +360,16 @@ func (service *FileService) MakeDir(ctx context.Context, path string) (*EntryInf
 }
 
 // Rename moves a filesystem entry.
-func (service *FileService) Rename(ctx context.Context, source, destination string) (*EntryInfo, error) {
+func (service *FileService) Rename(ctx context.Context, source, destination string, options *FileOptions) (*EntryInfo, error) {
+	if options == nil {
+		options = &FileOptions{}
+	}
 	requestCtx, cancel := service.sandbox.unaryContext(ctx)
 	defer cancel()
 	request := connect.NewRequest(&filesystem.MoveRequest{Source: source, Destination: destination})
-	service.addHeaders(request.Header())
+	if err := service.addHeaders(request.Header(), options.User); err != nil {
+		return nil, err
+	}
 	response, err := service.client.Move(requestCtx, request)
 	if err != nil {
 		return nil, fileConnectError(err)
@@ -313,11 +378,16 @@ func (service *FileService) Rename(ctx context.Context, source, destination stri
 }
 
 // Remove recursively removes a filesystem entry.
-func (service *FileService) Remove(ctx context.Context, path string) error {
+func (service *FileService) Remove(ctx context.Context, path string, options *FileOptions) error {
+	if options == nil {
+		options = &FileOptions{}
+	}
 	requestCtx, cancel := service.sandbox.unaryContext(ctx)
 	defer cancel()
 	request := connect.NewRequest(&filesystem.RemoveRequest{Path: path})
-	service.addHeaders(request.Header())
+	if err := service.addHeaders(request.Header(), options.User); err != nil {
+		return err
+	}
 	_, err := service.client.Remove(requestCtx, request)
 	return fileConnectError(err)
 }
@@ -353,7 +423,10 @@ func (service *FileService) Watch(ctx context.Context, path string, options *Wat
 	}
 	watchCtx, cancel := context.WithCancel(ctx)
 	request := connect.NewRequest(&filesystem.WatchDirRequest{Path: path, Recursive: options.Recursive, IncludeEntry: options.IncludeEntry, AllowNetworkMounts: options.AllowNetworkMounts})
-	service.addHeaders(request.Header())
+	if err := service.addHeaders(request.Header(), options.User); err != nil {
+		cancel()
+		return nil, err
+	}
 	stream, err := service.client.WatchDir(watchCtx, request)
 	if err != nil {
 		cancel()
@@ -386,17 +459,23 @@ func (service *FileService) Watch(ctx context.Context, path string, options *Wat
 }
 
 // SignedReadURL creates a directly usable download URL.
-func (service *FileService) SignedReadURL(path, user string, expiration time.Time) (string, error) {
-	return service.signedURL(path, user, "read", expiration)
+func (service *FileService) SignedReadURL(path string, options *FileURLOptions) (string, error) {
+	return service.signedURL(path, "read", options)
 }
 
 // SignedWriteURL creates a directly usable upload URL.
-func (service *FileService) SignedWriteURL(path, user string, expiration time.Time) (string, error) {
-	return service.signedURL(path, user, "write", expiration)
+func (service *FileService) SignedWriteURL(path string, options *FileURLOptions) (string, error) {
+	return service.signedURL(path, "write", options)
 }
-func (service *FileService) signedURL(path, user, operation string, expiration time.Time) (string, error) {
-	user = service.sandbox.resolveUser(user)
-	signature, unix, err := fileSignature(path, operation, user, service.sandbox.envdAccessToken, expiration)
+func (service *FileService) signedURL(path, operation string, options *FileURLOptions) (string, error) {
+	if options == nil {
+		options = &FileURLOptions{}
+	}
+	user, err := service.sandbox.resolveUser(options.User)
+	if err != nil {
+		return "", err
+	}
+	signature, unix, err := fileSignature(path, operation, user, service.sandbox.envdAccessToken, options.Expiration)
 	if err != nil {
 		return "", err
 	}
@@ -414,11 +493,12 @@ func (service *FileService) signedURL(path, user, operation string, expiration t
 	return endpoint.String(), nil
 }
 
-func (service *FileService) addHeaders(header http.Header) {
+func (service *FileService) addHeaders(header http.Header, user string) error {
 	for key, values := range service.sandbox.envdHeaders(envdPort) {
 		header[key] = slices.Clone(values)
 	}
 	header.Set("Keepalive-Ping-Interval", "50")
+	return service.sandbox.addUserHeader(header, user)
 }
 func mapEntry(entry *filesystem.EntryInfo) *EntryInfo {
 	if entry == nil {

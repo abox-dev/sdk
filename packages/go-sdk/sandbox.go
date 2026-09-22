@@ -691,11 +691,30 @@ func (sandbox *Sandbox) envdHeaders(port int) http.Header {
 	return headers
 }
 
-func (sandbox *Sandbox) resolveUser(user string) string {
-	if user == "" && !envdAtLeast(sandbox.EnvdVersion, 0, 4, 0) {
-		return "user"
+// resolveUser applies the same envd compatibility default to HTTP and RPC calls.
+func (sandbox *Sandbox) resolveUser(user string) (string, error) {
+	for _, char := range user {
+		if char == ':' || char < 0x20 || char == 0x7f {
+			return "", &InvalidArgumentError{Message: "sandbox username cannot contain colons or control characters"}
+		}
 	}
-	return user
+	if user == "" && !envdAtLeast(sandbox.EnvdVersion, 0, 4, 0) {
+		return "user", nil
+	}
+	return user, nil
+}
+
+// addUserHeader selects the execution user only for an individual envd RPC.
+func (sandbox *Sandbox) addUserHeader(header http.Header, user string) error {
+	user, err := sandbox.resolveUser(user)
+	if err != nil {
+		return err
+	}
+	if user != "" {
+		request := &http.Request{Header: header}
+		request.SetBasicAuth(user, "")
+	}
+	return nil
 }
 
 func envdAtLeast(version string, major, minor, patch int) bool {

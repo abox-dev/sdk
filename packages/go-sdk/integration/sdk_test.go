@@ -35,7 +35,7 @@ func TestCoreKVM(t *testing.T) {
 	if _, err := sandbox.Files.WriteText(ctx, "/tmp/go-sdk.txt", "content", nil); err != nil {
 		t.Fatal(err)
 	}
-	if text, err := sandbox.Files.ReadText(ctx, "/tmp/go-sdk.txt", ""); err != nil || text != "content" {
+	if text, err := sandbox.Files.ReadText(ctx, "/tmp/go-sdk.txt", nil); err != nil || text != "content" {
 		t.Fatalf("file: %q %v", text, err)
 	}
 	if info, err := sandbox.Info(ctx); err != nil || info.SandboxID != sandbox.ID {

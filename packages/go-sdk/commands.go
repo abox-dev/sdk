@@ -19,6 +19,8 @@ import (
 
 // CommandOptions configures a command process.
 type CommandOptions struct {
+	// User selects the process owner. Empty uses the template default (user on envd < 0.4.0).
+	User     string
 	Args     []string
 	Env      map[string]string
 	Cwd      string
@@ -184,6 +186,10 @@ func (service *CommandService) Start(ctx context.Context, command string, option
 		request.Msg.Tag = &options.Tag
 	}
 	service.addHeaders(request.Header())
+	if err := service.sandbox.addUserHeader(request.Header(), options.User); err != nil {
+		cancel()
+		return nil, err
+	}
 	stream, err := service.outputClient(options.Streaming).Start(ctx, request)
 	if err != nil {
 		cancel()

@@ -54,6 +54,34 @@ Documentation: [core SDK](https://docs.agentbox.ru/en/sdk/),
 
 `Sandbox.Kill` returns `false, nil` when the sandbox no longer exists.
 
+## Execution user and filesystem options
+
+Set `User` in `CommandOptions`, `PTYOptions`, or filesystem options to select a
+sandbox user. Empty `User` uses the template default (or `user` on envd older
+than 0.4.0). The selection belongs to each operation and works with streaming.
+Existing-process operations retain the user selected at launch.
+
+```go
+result, err := sandbox.Commands.Run(ctx, "id", &agentbox.CommandOptions{
+    User: "root",
+    Args: []string{"-un"},
+})
+info, err := sandbox.Files.Stat(ctx, "~", &agentbox.FileOptions{User: "root"})
+entries, err := sandbox.Files.List(ctx, "~", &agentbox.ListFilesOptions{
+    User: "root",
+    Depth: 2,
+})
+```
+
+All filesystem methods accept options as their final argument; nil selects
+defaults. `FileOptions` covers reads and simple filesystem operations;
+`ListFilesOptions`, `WriteFileOptions`, `WatchOptions`, and `FileURLOptions`
+cover listing, uploads (including batches), watches, and signed URLs.
+Filesystem users affect path resolution and ownership of created objects, not
+OS permission isolation. See the [user-selection guide](../../docs/go-envd-user-selection.md)
+for semantics and the signature changes from v0.1.8. These API changes are not yet
+in a published release.
+
 ## Command output
 
 By default, command handles collect complete stdout/stderr for `Wait`, which can

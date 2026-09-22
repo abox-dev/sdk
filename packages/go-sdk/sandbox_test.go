@@ -195,7 +195,7 @@ func TestSandboxValidationAndSigning(t *testing.T) {
 		t.Fatal("expected invalid IAM config")
 	}
 	sandbox := client.sandboxFromAPI(api.Sandbox{SandboxID: "id", TemplateID: "base", EnvdVersion: "1"})
-	if _, err := sandbox.Files.SignedReadURL("/x", "", time.Time{}); err == nil {
+	if _, err := sandbox.Files.SignedReadURL("/x", nil); err == nil {
 		t.Fatal("expected missing token")
 	}
 	sandbox.envdAccessToken = "secret"
@@ -203,11 +203,11 @@ func TestSandboxValidationAndSigning(t *testing.T) {
 	if rendered := fmt.Sprintf("%+v %#v", sandbox, sandbox); strings.Contains(rendered, "secret") {
 		t.Fatalf("sandbox formatting leaked credentials: %s", rendered)
 	}
-	read, err := sandbox.Files.SignedReadURL("/x", "user", time.Unix(100, 0))
+	read, err := sandbox.Files.SignedReadURL("/x", &FileURLOptions{User: "user", Expiration: time.Unix(100, 0)})
 	if err != nil || !strings.Contains(read, "signature=v1_") || !strings.Contains(read, "signature_expiration=100") {
 		t.Fatalf("signed URL: %s %v", read, err)
 	}
-	write, err := sandbox.Files.SignedWriteURL("/x", "", time.Time{})
+	write, err := sandbox.Files.SignedWriteURL("/x", nil)
 	if err != nil || write == read {
 		t.Fatalf("signed write URL: %v", err)
 	}
