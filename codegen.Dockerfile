@@ -28,7 +28,7 @@ ENV PATH="/usr/local/go/bin:/go/bin:${PATH}"
 RUN pip install black==26.3.1 ruff==0.11.13 pyyaml==6.0.3 e2b-openapi-python-client==0.26.2 protoc-gen-connectrpc==0.11.1 protoc-gen-py==0.1.1
 
 # Install Node.js (pinned to match .tool-versions)
-ENV NODE_VERSION=22.18.0
+ENV NODE_VERSION=26.12.1
 RUN ARCH=$(uname -m) && \
     case "$ARCH" in \
         x86_64) NODE_ARCH="x64" ;; \
